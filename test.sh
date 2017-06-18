@@ -10,10 +10,8 @@ sleep 30
 js9 'cli=j.clients.atyourservice.get();cli.api.ays.listRepositories()'
 
 # validate all the schemas
-pushd /root/gig/github
 echo "Validating Schemas"
 for schema in $(find -name schema.capnp); do
   echo "Validating $schema"
   capnp compile -oc++ $schema
 end
-popd
