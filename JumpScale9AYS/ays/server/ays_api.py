@@ -255,7 +255,7 @@ async def createRun(request, repository):
 
     try:
         to_execute = repo.findScheduledActions()
-        run = repo.runCreate(to_execute)
+        run = repo.runCreate(to_execute, context={"token": extract_token(request)})
         run.save()
         if not simulate:
             await repo.run_scheduler.add(run)
@@ -412,7 +412,7 @@ async def executeBlueprint(request, blueprint, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     blueprints = repo.blueprints
     for item in blueprints:
@@ -420,10 +420,10 @@ async def executeBlueprint(request, blueprint, repository):
             bp = item
             break
     else:
-        return json({'error':"No blueprint found with this name '{}'".format(blueprint)}, 404)
+        return json({'error': "No blueprint found with this name '{}'".format(blueprint)}, 404)
 
     try:
-        await repo.blueprintExecute(path=bp.path)
+        await repo.blueprintExecute(path=bp.path, context={'token': extract_token(request)})
 
     except j.exceptions.Input as inputEx:
         error_msg = "Input Exception : \n %s" % str(inputEx)
@@ -435,7 +435,7 @@ async def executeBlueprint(request, blueprint, repository):
         j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(e)}, 500)
 
-    return json({'msg':'Blueprint {} executed'.format(blueprint)})
+    return json({'msg': 'Blueprint {} executed'.format(blueprint)})
 
 async def updateBlueprint(request, blueprint, repository):
     '''
@@ -690,7 +690,7 @@ async def updateActor(request, name, repository):
         return json({'error': 'actor {} not found'.format(name)}, 404)
 
     reschedule = j.data.types.bool.fromString(request.args.get('reschedule', False))
-    actor.update(reschedule=reschedule)
+    actor.update(reschedule=reschedule, context={'token': extract_token(request)})
 
     return json(actor_view(actor), 200)
 
@@ -708,3 +708,12 @@ def get_repo(name):
             return repo
 
     raise j.exceptions.NotFound("Repository {} doesn't exists".format(name))
+
+
+def extract_token(request):
+    auth_header = request.headers.get('Authorization', None)
+    if auth_header:
+        ss = auth_header.split(' ', 1)
+        if len(ss) == 2:
+            return ss[1]
+    return ""
