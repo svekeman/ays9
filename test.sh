@@ -14,4 +14,4 @@ echo "Validating Schemas"
 for schema in $(find -name schema.capnp); do
   echo "Validating $schema"
   capnp compile -oc++ $schema
-end
+done
