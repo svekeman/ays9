@@ -430,6 +430,9 @@ async def executeBlueprint(request, blueprint, repository):
         j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(inputEx)}, 400)
 
+    except j.exceptions.NotFound as e:
+        return json({'error': str(e.message)}, 404)
+
     except Exception as e:
         error_msg = "Error during execution of the blueprint:\n %s" % str(e)
         j.atyourservice.server.logger.exception(error_msg)
