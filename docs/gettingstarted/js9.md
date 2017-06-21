@@ -62,7 +62,12 @@ source ~/.jsenv.sh
 js9_build -l -p
 ```
 
-In order to SSH into your `js9_base` container:
+Now the start the container:
+```shell
+js9_start
+```
+
+In order to SSH into your `js9` container:
 ```shell
 ssh -A root@localhost -p 2222
 ```
