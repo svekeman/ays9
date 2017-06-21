@@ -61,9 +61,9 @@ And now only execute the new blueprint, by explicitly specifying the name of the
 ays blueprint change.yaml
 ```
 
-Alternatively you could first deleted the existing, and `ays blueprint` command with options:
+Alternatively you could first deleted or achive the existing blueprint, and execute the `ays blueprint` command without specifying any specific blueprint. In order to archive a blueprint simply rename the blueprint with a "\_" prefix:
 ```bash
-rm blueprints/vdc.yaml
+mv blueprints/vdc.yaml blueprints/_vdc.yaml
 ays blueprint
 ```
 
