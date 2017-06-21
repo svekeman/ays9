@@ -5,7 +5,7 @@ You can create a blueprint in multiple ways:
 - [Using the AYS command line tool](#using-the-ays-command-line-tool)
 - [Using the AYS RESTful API](#using-the-ays-restful-api)
 - [Using the AYS Python client](#using-the-ays-python-client)
-- [Using the JumpScale client](#using-the-jumpScale-client)
+- [Using the JumpScale client](#using-the-jumpscale-client)
 - [Using the AYS Portal](#using-the-ays-portal)
 
 All are discussed here below.
@@ -54,12 +54,10 @@ cl.ays...
 
 ## Using the JumpScale client
 
-@todo
-
 ```python
 cl = j.clients.atyourservice.get()
 cl.api.ays.listRepositories().json()
-cl.api.ays...
+...
 ```
 
 
