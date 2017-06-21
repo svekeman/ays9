@@ -1,6 +1,6 @@
 # How to Create a VDC
 
-For creating a virtual datacenter (VDC) use the **vdc** template, available here: https://github.com/Jumpscale/ays_jumpscale8/tree/master/templates/ovc/vdc
+For creating a virtual datacenter (VDC) use the **vdc** template, available here: https://github.com/Jumpscale/ays9/tree/master/templates/ovc/vdc
 
 - [Minimal Blueprint](#minimal-blueprint)
 - [Full Blueprint](#full-blueprint)
