@@ -49,7 +49,7 @@ rm -rf $GIGDIR
 
 Now prepare your environment for building a new Docker image and container:
 ```shell
-export GIGBRANCH="9.0.0"
+export GIGBRANCH="master"
 export GIGSAFE=1
 rm -rf /tmp/jsinit.sh
 curl https://raw.githubusercontent.com/Jumpscale/developer/${GIGBRANCH}/jsinit.sh?$RANDOM > /tmp/jsinit.sh
@@ -57,7 +57,7 @@ bash /tmp/jsinit.sh
 ```
 
 And finally, start the actual building of your image with the `js9_build ` script, which will also start your container with the name `js9_base`:
-```
+```shell
 source ~/.jsenv.sh
 js9_build -l -p
 ```
