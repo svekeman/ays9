@@ -1,19 +1,9 @@
 #!/bin/bash
-
-# start ays
-sudo docker exec js9_base js9 'j.atyourservice.server.start()'
-
-# sleep for 30 seconds
-sleep 30
-
-# check if the server started
-sudo docker exec js9_base js9 'cli=j.clients.atyourservice.get();cli.api.ays.listRepositories()'
-
-# validate all the schemas
-pushd /root/gig/github
-echo "Validating Schemas"
-for schema in $(find -name schema.capnp); do
-  echo "Validating $schema"
-  capnp compile -oc++ $schema
-end
-popd
+echo "* Including js environment variables"
+export SSHKEYNAME=main
+source ~/.jsenv.sh
+echo "* Start container"
+js9_start
+# install capnp tools
+ssh -A -i ~/.ssh/main root@localhost -p 2222 "cd /tmp/;curl -O https://capnproto.org/capnproto-c++-0.6.1.tar.gz;tar zxf capnproto-c++-0.6.1.tar.gz;cd capnproto-c++-0.6.1;./configure;make install"
+ssh -A -i ~/.ssh/main root@localhost -p 2222 'cd /root/gig/code/github/jumpscale/ays9; /bin/bash test.sh'
