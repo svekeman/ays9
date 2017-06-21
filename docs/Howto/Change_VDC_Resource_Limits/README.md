@@ -67,4 +67,4 @@ rm blueprints/vdc.yaml
 ays blueprint
 ```
 
-> Note: In case you don't to specify the new blueprint as an option to the `aus blueprint` command, or did not delete the old one first, AYS would execute both blueprints in alphabetic order, and since the `change.yaml` will be processed first, processing `vdc.yaml` would override the change, resulting in no change at all.
+> Note: In case you don't to specify the new blueprint as an option to the `ays blueprint` command, or did not delete the old one first, AYS would execute both blueprints in alphabetic order, and since the `change.yaml` will be processed first, processing `vdc.yaml` would override the change, resulting in no change at all.
