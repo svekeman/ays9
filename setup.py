@@ -50,7 +50,6 @@ setup(
     install_requires=[
         'JumpScale9>=9.0.3',
         'JumpScale9Lib>=9.0.3',
-        'g8core>=1.0.0',  # is not ok, because strictly spoken this is not part of ays9
         'jsonschema>=2.6.0',
         'python-jose>=1.3.2',
         'sanic>=0.5.4'
