@@ -39,7 +39,7 @@ export GIGDIR="/Users/$USER/gig9"
 
 Or on Linux:
 ```shell
-export GIGDIR="/home/user/$USER/gig9"
+export GIGDIR="/home/$USER/gig9"
 ```
 
 Then remove the old directory:
