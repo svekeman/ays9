@@ -17,7 +17,7 @@ prefab.solutions.cockpit.install(ip="<Zero-Tier-IP-address>")
 This will install and start the AYS Portal on port 8200: http://<Zero-Tier-IP-address>:8200/.
 
 When attaching to the main TMUX session, you'll see that two additional TMUX windows have been added, one for MongoDB and another one for the Portal:
-```
+```shell
 tmux at
 ```
 
