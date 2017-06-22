@@ -4,6 +4,7 @@ doc:
   - threshold: Size in mega before the autoscale should add new disk
   - mount: ''
   - incrementSize: Incremental disk size
+  - autoScaleLimit: AutoScaling limit. 
 links:
   parent:
     auto: false

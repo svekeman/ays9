@@ -72,8 +72,18 @@ def autoscale(job):
     code, out, err = prefab.core.run('btrfs filesystem  usage -b {}'.format(service.model.data.mount), die=False)
     if code != 0:
         raise RuntimeError('failed to get device usage: %s', err)
-    # get free space.
+
     import re
+    # TODO: make sure to test autoScaleLimit.
+    match = re.search('Device size:\s+(\d+)', out)
+    if match is None:
+        raise RuntimeError('failed to get device size')
+    else:
+        device_size = int(match.group(1)) / (1024 * 1024)  # MB.
+        if device_size > service.model.data.autoScaleLimit:
+            raise RuntimeError("Cannot exceed autoScaleLimit: {}".format(service.model.data.autoScaleLimit))
+
+    # get free space.
     match = re.search('Free[^:]*:\s+(\d+)', out)
     if match is None:
         raise RuntimeError('failed to get free space')

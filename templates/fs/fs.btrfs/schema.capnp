@@ -5,5 +5,6 @@ struct Schema {
 	mount @1 :Text;
 	threshold @2 :Int64 = 100;
 	incrementSize @3 :Int64 = 1000;
+	autoScaleLimit @4: Int64 = 50000;
 
 }
