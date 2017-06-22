@@ -40,7 +40,7 @@ class develop(_develop):
 
 setup(
     name='JumpScale9AYS',
-    version='9.0.0',
+    version='9.0.3',
     description='Automation framework for cloud workloads ays lib',
     url='https://github.com/Jumpscale/ays9',
     author='GreenItGlobe',
@@ -48,9 +48,8 @@ setup(
     license='Apache',
     packages=['JumpScale9AYS'],
     install_requires=[
-        'JumpScale9>=9.0.0',
-        'JumpScale9Lib>=9.0.0',
-        'g8core>=1.0.0',  # is not ok, because strictly spoken this is not part of ays9
+        'JumpScale9>=9.0.3',
+        'JumpScale9Lib>=9.0.3',
         'jsonschema>=2.6.0',
         'python-jose>=1.3.2',
         'sanic>=0.5.4'

@@ -256,7 +256,7 @@ async def createRun(request, repository):
 
     try:
         to_execute = repo.findScheduledActions()
-        run = repo.runCreate(to_execute)
+        run = repo.runCreate(to_execute, context={"token": extract_token(request)})
         run.save()
         if not simulate:
             await repo.run_scheduler.add(run)
@@ -446,12 +446,17 @@ async def executeBlueprint(request, blueprint, repository):
         return json({'error': "No blueprint found with this name '{}'".format(blueprint)}, 404)
 
     try:
-        jobkeys = await repo.blueprintExecute(path=bp.path)
+        jobkeys = await repo.blueprintExecute(path=bp.path, context={'token': extract_token(request)})
 
     except j.exceptions.Input as inputEx:
         error_msg = "Input Exception : \n %s" % str(inputEx)
         j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(inputEx)}, 400)
+
+    except j.exceptions.NotFound as e:
+        error_msg = "Input Exception : \n %s" % str(e)        
+        j.atyourservice.server.logger.exception(error_msg)        
+        return json({'error': str(e.message)}, 400)
 
     except Exception as e:
         error_msg = "Error during execution of the blueprint:\n %s" % str(e)
@@ -714,7 +719,7 @@ async def updateActor(request, name, repository):
         return json({'error': 'actor {} not found'.format(name)}, 404)
 
     reschedule = j.data.types.bool.fromString(request.args.get('reschedule', False))
-    actor.update(reschedule=reschedule)
+    actor.update(reschedule=reschedule, context={'token': extract_token(request)})
 
     return json(actor_view(actor), 200)
 
@@ -732,3 +737,12 @@ def get_repo(name):
             return repo
 
     raise j.exceptions.NotFound("Repository {} doesn't exists".format(name))
+
+
+def extract_token(request):
+    auth_header = request.headers.get('Authorization', None)
+    if auth_header:
+        ss = auth_header.split(' ', 1)
+        if len(ss) == 2:
+            return ss[1]
+    return ""

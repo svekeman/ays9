@@ -251,15 +251,15 @@ class AtYourServiceRepo():
         self.no_exec = False
 
 # ACTORS
-    def actorCreate(self, name):
+    def actorCreate(self, name, context=None):
         """
         will look for name inside & create actor from it
         """
         actorTemplate = self.templateGet(name)
-        actor = Actor(aysrepo=self, template=actorTemplate)
+        actor = Actor(aysrepo=self, template=actorTemplate, context=context)
         return actor
 
-    def actorGet(self, name, die=False):
+    def actorGet(self, name, die=False, context=None):
         actor_models = self.db.actors.find(name=name)
         if len(actor_models) == 1:
             obj = actor_models[0].objectGet(self)
@@ -271,12 +271,12 @@ class AtYourServiceRepo():
             actors_dir = j.sal.fs.joinPaths(self.path, 'actors')
             results = j.sal.fswalker.walkExtended(actors_dir, files=False, dirPattern=name)
             if len(results) == 1:
-                return Actor(aysrepo=self, name=name)
+                return Actor(aysrepo=self, name=name, context=context)
             elif die:
                 raise j.exceptions.NotFound(message="Could not find actor with name:%s" %
                                             name, level=1, source="", tags="", msgpub="")
 
-            obj = self.actorCreate(name)
+            obj = self.actorCreate(name, context=context)
             obj.saveAll()
         return obj
 
@@ -502,7 +502,7 @@ class AtYourServiceRepo():
         bps = sorted(bps, key=lambda bp: bp.name)
         return bps
 
-    async def blueprintExecute(self, path="", content="", role="", instance=""):
+    async def blueprintExecute(self, path="", content="", role="", instance="", context=None):
         curr_time = j.data.time.epoch
         if path == "" and content == "":
             for bp in self.blueprints:
@@ -510,7 +510,7 @@ class AtYourServiceRepo():
                     self.logger.warning(
                         "blueprint %s not executed because it doesn't have a valid format" % bp.path)
                     raise j.exceptions.Input(bp.valid_msg)
-                await bp.load(role=role, instance=instance)
+                await bp.load(role=role, instance=instance, context=context)
         else:
             bp = Blueprint(self, path=path, content=content)
             # self._blueprints[bp.path] = bp
@@ -518,11 +518,13 @@ class AtYourServiceRepo():
                 self.logger.warning(
                     "blueprint %s not executed because it doesn't have a valid format" % bp.path)
                 raise j.exceptions.Input(bp.valid_msg)
-            await bp.load(role=role, instance=instance)
-        await self.init(role=role, instance=instance)
+            await bp.load(role=role, instance=instance, context=context)
+
+        await self.init(role=role, instance=instance, context=context)
         # Gets all process change job keys created after executing the blueprint, to make it possible to retrieve process change jobs information.
         # Gets time before executing the blueprint and lists all jobs with processChange action and last modified date after that time.
         jobkeys = j.core.jobcontroller.db.jobs.list(action='processChange', fromEpoch=curr_time)
+
         print("blueprint done")
         return jobkeys
 
@@ -640,7 +642,7 @@ class AtYourServiceRepo():
 
         return result
 
-    def runCreate(self, to_execute, debug=False, profile=False):
+    def runCreate(self, to_execute, debug=False, profile=False, context=None):
         """
         Create a run from all the scheduled actions in the repository.
         """
@@ -666,6 +668,9 @@ class AtYourServiceRepo():
 
                 job.model.dbobj.profile = profile
                 job.model.dbobj.debug = profile if profile is True else debug
+                if context is not None:
+                    for k, v in context.items():
+                        job.context[k] = v
 
                 job.save()
 
@@ -684,10 +689,10 @@ class AtYourServiceRepo():
         return run
 
 # ACTIONS
-    async def init(self, role="", instance="", hasAction="", includeDisabled=False, data=""):
+    async def init(self, role="", instance="", hasAction="", includeDisabled=False, data="", context=None):
         for service in self.servicesFind(name=instance, actor=r'%s(\..*)?' % role, hasAction=hasAction, includeDisabled=includeDisabled):
             self.logger.info('init service: %s' % service)
-            await service.init()
+            await service.init(context=context)
 
         print("init done")
 
