@@ -70,6 +70,10 @@ class oauth2_itsyouonline:
                     if 'scope' in payload and 'user:memberof:%s' % self.cfg[
                             'oauth'].get('organization') in payload['scope']:
                         return 200, ''
+                        
+                    # in case jwt created from organization
+                    if 'azp' in payload and payload['azp'] == self.cfg['oauth'].get('organization'):
+                        return 200, ''
 
                     msg = 'Unauthorized'
                 except exceptions.ExpiredSignatureError as e:
