@@ -49,7 +49,7 @@ rm -rf $GIGDIR
 
 Now prepare your environment for building a new Docker image and container:
 ```shell
-export GIGBRANCH="master"
+export GIGBRANCH="9.0.1"
 export GIGSAFE=1
 rm -rf /tmp/jsinit.sh
 curl https://raw.githubusercontent.com/Jumpscale/developer/${GIGBRANCH}/jsinit.sh?$RANDOM > /tmp/jsinit.sh
