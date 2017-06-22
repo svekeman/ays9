@@ -48,8 +48,8 @@ setup(
     license='Apache',
     packages=['JumpScale9AYS'],
     install_requires=[
-        'JumpScale9>=9.0.1',
-        'JumpScale9Lib>=9.0.1',
+        'JumpScale9>=9.0.2',
+        'JumpScale9Lib>=9.0.2',
         'g8core>=1.0.0',  # is not ok, because strictly spoken this is not part of ays9
         'jsonschema>=2.6.0',
         'python-jose>=1.3.2',
