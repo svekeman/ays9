@@ -39,7 +39,7 @@ export GIGDIR="/Users/$USER/gig9"
 
 Or on Linux:
 ```shell
-export GIGDIR="/home/user/$USER/gig9"
+export GIGDIR="/home/$USER/gig9"
 ```
 
 Then remove the old directory:
@@ -49,7 +49,7 @@ rm -rf $GIGDIR
 
 Now prepare your environment for building a new Docker image and container:
 ```shell
-export GIGBRANCH="master"
+export GIGBRANCH="9.0.3"
 export GIGSAFE=1
 rm -rf /tmp/jsinit.sh
 curl https://raw.githubusercontent.com/Jumpscale/developer/${GIGBRANCH}/jsinit.sh?$RANDOM > /tmp/jsinit.sh
