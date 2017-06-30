@@ -49,8 +49,7 @@ rm -rf $GIGDIR
 
 Now prepare your environment for building a new Docker image and container:
 ```shell
-export GIGBRANCH="9.0.3"
-export GIGSAFE=1
+export GIGBRANCH="master"
 rm -rf /tmp/jsinit.sh
 curl https://raw.githubusercontent.com/Jumpscale/developer/${GIGBRANCH}/jsinit.sh?$RANDOM > /tmp/jsinit.sh
 bash /tmp/jsinit.sh
@@ -62,16 +61,18 @@ source ~/.jsenv.sh
 js9_build -l -p
 ```
 
-Now the start the container:
+Now to start the container:
 ```shell
 js9_start
 ```
+
+> Remember to always execute `source ~/.jsenv.sh` prior to executing for the first time (e.g. in a new terminal session) any of the `js9_` commands.
 
 In order to SSH into your `js9` container:
 ```shell
 ssh -A root@localhost -p 2222
 ```
 
-For more details on the JumpScale9 Docker container see https://github.com/Jumpscale/developer#jumpscale-9.
+For more details on the JumpScale9 Docker container see https://github.com/Jumpscale/developer.
 
 Next you will probably want start the AYS service, as documented in [Start AYS](startays.md).
