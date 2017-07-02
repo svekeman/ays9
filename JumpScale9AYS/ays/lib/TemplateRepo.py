@@ -76,51 +76,6 @@ class TemplateRepoCollection:
         self.logger.info("actor template repo {} has been changed, updating".format(repo_path))
         self._template_repos[repo_path]._load()
 
-    def handle_fs_events(self, dirname, filename, event):
-        if filename.endswith('.log'):
-            return
-        full_path = j.sal.fs.joinPaths(dirname, filename)
-        if j.sal.fs.getBaseName(full_path)[0] in '._':
-            return
-        is_file = j.sal.fs.isFile(full_path)
-        # optimization to only react to these files
-        if is_file and filename not in ['schema.capnp', 'config.yaml', 'actions.py']:
-            return
-        containing_repos = [i for i in self._template_repos if full_path.startswith(i)]
-        inside_added_repo = bool(containing_repos)
-        containing_repo = containing_repos[0] if inside_added_repo else None
-        if inside_added_repo:
-            if not is_it_a_template_repo(containing_repo):
-                self.delete(containing_repo)
-            else:
-                template_root = get_root_template_repo_if_relevant(dirname)
-                if template_root is None:
-                    # not relevant
-                    pass
-                elif template_root != containing_repo:
-                    # This is evil
-                    self.delete(containing_repo)
-                    self.create(template_root)
-                else:
-                    if is_file:
-                        self.update(template_root)
-                    elif event[0].mask & inotify.constants.IN_MOVED_TO:
-                        cmd = """find %s \( -name schema.capnp -o -name config.yaml -o -name actions.py \) -print -quit""" % (containing_repo)
-                        rc, _, _ = j.sal.process.execute(cmd, die=False, showout=False)
-                        if rc != 0:
-                            self.update(template_root)
-        else:
-            template_root = get_root_template_repo_if_relevant(dirname)
-            if template_root and template_root[0] in '._':
-                template_root = None
-            if template_root:
-                self.create(template_root)
-            else:
-                for i in self._template_repos:
-                    if i.startswith(full_path):
-                        self.delete(i)
-                self.__load(full_path)
-
     def list(self):
         # todo protect with lock
         return list(self._template_repos.values())
