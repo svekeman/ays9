@@ -40,7 +40,15 @@ async def addTemplateRepo(request):
     except jsonschema.ValidationError as e:
         return text('Bad Request Body', 400)
 
-    j.do.pullGitRepo(url=inputs['url'], branch=inputs['branch'])
+    path = j.do.pullGitRepo(url=inputs['url'], branch=inputs['branch'])
+
+    # Register/update the cloned/pulled template repo
+    template_repo_collection = j.atyourservice.server.templateRepos
+    if path not in template_repo_collection._template_repos:
+        template_repo_collection.create(path=path)
+    else:
+        template_repo_collection._template_repos[path]._load()
+
     return json({'message': 'repo added'}, 201)
 
 async def listRepositories(request):

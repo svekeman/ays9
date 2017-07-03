@@ -42,32 +42,6 @@ class AtYourServiceRepoCollection:
                     if j.atyourservice.server.debug:
                         raise
 
-    def handle_fs_events(self, dirname, filename, event):
-        if filename.endswith('.log'):
-            return
-
-        full_path = j.sal.fs.joinPaths(dirname, filename)
-        current_path = full_path
-        while current_path:
-            if j.sal.fs.exists(j.sal.fs.joinPaths(current_path, '.ays')):
-                if event[0].mask & (inotify.constants.IN_MOVED_TO | inotify.constants.IN_CREATE):
-                    if current_path not in self._repos:
-                        self.logger.debug("AYS repo added {}".format(current_path))
-                        try:
-                            repo = AtYourServiceRepo(current_path, loop=self._loop)
-                            self._repos[repo.path] = repo
-                        except Exception as e:
-                            self.logger.exception("can't load repo at {}: {}".format(current_path, str(e)))
-                            if j.atyourservice.server.debug:
-                                raise
-                return
-            current_path = j.sal.fs.getParent(current_path)
-        if event[0].mask & (inotify.constants.IN_MOVED_FROM | inotify.constants.IN_DELETE):
-            if filename in ['.ays', '.git'] or full_path in self._repos:
-                repo_path = dirname if filename in ['.ays', '.git'] else full_path
-                self.logger.debug("AYS repo removed {}".format(full_path))
-                self._repos.pop(repo_path, None)
-
     def loadRepo(self, path):
         ayspath = j.sal.fs.joinPaths(path, ".ays")
         if j.sal.fs.exists(path) and not j.sal.fs.exists(ayspath):

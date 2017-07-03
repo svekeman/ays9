@@ -14,8 +14,6 @@ def _post_install(libname, libpath):
 
     print("****:%s:%s" % (libname, libpath))
 
-    j.do.execute("pip3 install git+https://github.com/gigforks/PyInotify")
-
     j.tools.jsloader.generateJumpscalePlugins()
     j.tools.jsloader.copyPyLibs()
 
