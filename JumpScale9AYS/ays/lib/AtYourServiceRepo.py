@@ -12,7 +12,6 @@ from JumpScale9AYS.ays.lib.RunScheduler import RunScheduler
 
 import asyncio
 from collections import namedtuple
-import inotify
 
 import colored_traceback
 colored_traceback.add_hook(always=True)
