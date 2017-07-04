@@ -1,7 +1,6 @@
 from js9 import j
 from JumpScale9AYS.ays.lib.ActorTemplate import ActorTemplate
 import asyncio
-import inotify
 
 
 def get_root_template_repo_if_relevant(path):

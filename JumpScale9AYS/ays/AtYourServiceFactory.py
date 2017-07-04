@@ -8,9 +8,6 @@ from JumpScale9AYS.ays.lib.AtYourServiceTester import AtYourServiceTester
 import colored_traceback
 import os
 import sys
-from inotify.adapters import BaseTree, _DEFAULT_EPOLL_BLOCK_DURATION_S
-from inotify.calls import InotifyError
-import inotify.constants
 import threading
 if "." not in sys.path:
     sys.path.append(".")
