@@ -63,7 +63,7 @@ def execute_blueprint(cli, blueprint, repo_info):
     errors = []
     j.logger.logging.info('Executing blueprint [%s]' % blueprint)
     curdir = j.sal.fs.getcwd()
-    j.sals.fs.changeDir(repo_info[path])
+    j.sal.fs.changeDir(repo_info[path])
     cmd = 'ays blueprint -f %s' % blueprint
     try:
         j.tools.prefab.get().core.run(cmd)
@@ -75,7 +75,7 @@ def execute_blueprint(cli, blueprint, repo_info):
     except Exception as e:
         errors.append('Failed to execute blueprint [%s]. Error: %s' % (blueprint, e))
     finally:
-        j.sals.fs.changeDir(curdir)
+        j.sal.fs.changeDir(curdir)
     return errors
 
 def create_run(cli, repo_info):
@@ -85,7 +85,7 @@ def create_run(cli, repo_info):
     errors = []
     j.logger.logging.info('Creating a new run')
     curdir = j.sal.fs.getcwd()
-    j.sals.fs.changeDir(repo_info[path])
+    j.sal.fs.changeDir(repo_info[path])
     cmd = 'ays run create -y --force -f'
     try:
         j.tools.prefab.get().core.run(cmd)
