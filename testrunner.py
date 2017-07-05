@@ -50,12 +50,11 @@ def ensure_test_repo(cli, repo_name):
 
 def main():
     cli = j.clients.atyourservice.get().api.ays
-
     repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME)
 
     if repo_info:
         try:
-
+            copy_blueprints()
         finally:
             # clean the created repo
             j.logger.logging.log('Cleaning up ceated repository')
