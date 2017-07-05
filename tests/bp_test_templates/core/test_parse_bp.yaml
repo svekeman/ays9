@@ -10,4 +10,3 @@ actions:
    - action: 'install'
    - action: 'test'
      actor: "test_parse_bp"
-

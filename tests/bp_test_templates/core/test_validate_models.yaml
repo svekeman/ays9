@@ -5,4 +5,4 @@ test_validate_models__instance:
 actions:
    - action: 'install'
    - action: 'test'
-     actor: "test_validate_models"   
+     actor: "test_validate_models"

@@ -5,6 +5,7 @@ import random
 
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
+AYS_CORE_BP_TESTS_PATH = 'tests/bp_test_templates/core'
 
 def check_status_code(res, expected_status_code=200):
     """
@@ -12,7 +13,7 @@ def check_status_code(res, expected_status_code=200):
 
     returns (response object, True/False)
     """
-    print('Validating response status code %s with expected status code %s' % (res.status_code, expected_status_code))
+    j.logger.logging.debug('Validating response status code %s with expected status code %s' % (res.status_code, expected_status_code))
     if res.status_code == expected_status_code:
         return res, True
     return res, False
@@ -43,9 +44,17 @@ def ensure_test_repo(cli, repo_name):
             if ok is True:
                 result = res.json()
     else:
-        j.logger.logging.log('Failed to list Repositories. Error: %s' % res.text)
+        j.logger.logging.info('Failed to list Repositories. Error: %s' % res.text)
 
     return result
+
+def copy_blueprints(test_bp_path, repo_info):
+    """
+    Copies the ays core test bluepprints to the test runner ays repo
+    """
+    dest = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
+    j.sal.fs.copyDirTree(test_bp_path, dest)
+
 
 
 def main():
@@ -54,12 +63,12 @@ def main():
 
     if repo_info:
         try:
-            copy_blueprints()
+            copy_blueprints(AYS_CORE_BP_TESTS_PATH, repo_info)
         finally:
             # clean the created repo
-            j.logger.logging.log('Cleaning up ceated repository')
-            cli.destroyRepository(repository=repo_info['name'])
-            cli.deleteRepository(repository=repo_info['name'])
+            j.logger.logging.info('Cleaning up ceated repository')
+            # cli.destroyRepository(data={}, repository=repo_info['name'])
+            # cli.deleteRepository(repository=repo_info['name'])
 
 if __name__ == '__main__':
     main()
