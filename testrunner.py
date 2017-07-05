@@ -104,13 +104,14 @@ def execute_blueprints(cli, repo_info):
         - wait for the run to finish
         - destory the repo
     """
+    errors = []
     bps_path = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
     blueprints = map(j.sal.fs.getBaseName, j.sal.fs.listFilesInDir(path=bps_path))
     for blueprint in blueprints:
         errors.extend(execute_blueprint(cli, blueprint, repo_info))
         errors.extend(create_run(cli, repo_info))
         cli.destroyRepository(data={}, repository=repo_info['name'])
-
+    return errors
 
 def main():
     cli = j.clients.atyourservice.get().api.ays
@@ -120,7 +121,7 @@ def main():
     if repo_info:
         try:
             copy_blueprints(AYS_CORE_BP_TESTS_PATH, repo_info)
-            execute_blueprints(cli, repo_info)
+            errors.extend(execute_blueprints(cli, repo_info))
         finally:
             # clean the created repo
             j.logger.logging.info('Cleaning up ceated repository')
