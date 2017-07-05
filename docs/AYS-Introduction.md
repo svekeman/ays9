@@ -42,12 +42,12 @@ We use only one command `ays` to control everything:
 
 Next you will want to learn about:
 
-- [AYS Definitions](Definitions/Definitions.md)
+- [AYS Definitions](Definitions/README.md)
 - [Life Cycle of an AYS Service](Service-Lifecycle.md)
-- [AYS Commands](Commands/commands.md)
-- [AYS File Locations & Details](FileDetails/FilesDetails.md)
+- [AYS Commands](Commands/README.md)
+- [AYS File Locations & Details](FileDetails/README.md)
 - [AYS File System](G8OS-FS.md)
-- [AYS Examples](Examples/Home.md)
+- [AYS Examples](howTo/README.md)
 
 ```toml
 !!!
