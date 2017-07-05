@@ -499,6 +499,11 @@ class AtYourServiceRepo():
         jobkeys = j.core.jobcontroller.db.jobs.list(action='processChange', fromEpoch=curr_time)
 
         print("blueprint done")
+        try:
+            self.commit()
+            self.logger.info("AYS Repo {} auto push done".format(self.name))
+        except Exception as e:
+            self.logger.error("AYS Repo push failed: {}".format(e))
         return jobkeys
 
     def blueprintGet(self, bname):
@@ -680,7 +685,7 @@ class AtYourServiceRepo():
         self.git.commit(message, True)
 
         if push:
-            print("PUSH")
+            self.git.repo.git.push('--all', 'origin', 'master')
 
     def __str__(self):
         return("aysrepo:%s" % (self.path))
