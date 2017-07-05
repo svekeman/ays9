@@ -49,6 +49,13 @@ def main(host, port, log, dev):
         j.atyourservice.server.dev_mode = dev
         if j.atyourservice.server.dev_mode:
             j.atyourservice.server.logger.info("development mode enabled")
+
+        # Generate/Load ays_repos ssh key which will be used to auto push repos changes
+        key_path = j.tools.prefab.local.ssh.keygen(name='ays_repos_key')
+        if not j.sal.process.checkProcessRunning('ssh-agent'):
+            j.sal.process.execute('eval `ssh-agent`')
+        j.tools.prefab.local.ssh.sshagent_add(path=key_path.split(".pub")[0])
+
         j.atyourservice.server._start(loop=loop)
 
     @sanic_app.listener('after_start')

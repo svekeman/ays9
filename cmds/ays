@@ -81,6 +81,10 @@ def create(name, git):
     try:
         resp = ayscl.api.ays.createRepository(data=data)
         print("AYS repository created at {}".format(resp.json()['path']))
+        if "git@" in git:
+            print("If you want to auto push AYS Repo changes, please authorize the following ssh key to your git repository: ")
+            key = j.tools.prefab.local.core.file_read("/root/.ssh/ays_repos_key.pub")
+            print(key)
     except Exception as e:
         print("Error during creation of the repository: {}".format(_extract_error(e)))
 
