@@ -475,7 +475,8 @@ class AtYourServiceRepo():
         bps = sorted(bps, key=lambda bp: bp.name)
         return bps
 
-    async def blueprintExecute(self, path="", content="", role="", instance="", context=None):
+    async def blueprintExecute(self, path="", content="", role="", instance="", context=None,
+                               message=""):
         curr_time = j.data.time.epoch
         if path == "" and content == "":
             for bp in self.blueprints:
@@ -500,7 +501,9 @@ class AtYourServiceRepo():
 
         print("blueprint done")
         try:
-            self.commit()
+            if not message:
+                message = "Auto Commit By AYS"
+            self.commit(message=message)
             self.logger.info("AYS Repo {} auto push done".format(self.name))
         except Exception as e:
             self.logger.error("AYS Repo push failed: {}".format(e))
@@ -685,7 +688,7 @@ class AtYourServiceRepo():
         self.git.commit(message, True)
 
         if push:
-            self.git.repo.git.push('--all', 'origin', 'master')
+            self.git.repo.git.push('--all')
 
     def __str__(self):
         return("aysrepo:%s" % (self.path))

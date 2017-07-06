@@ -81,10 +81,6 @@ def create(name, git):
     try:
         resp = ayscl.api.ays.createRepository(data=data)
         print("AYS repository created at {}".format(resp.json()['path']))
-        if "git@" in git:
-            print("If you want to auto push AYS Repo changes, please authorize the following ssh key to your git repository: ")
-            key = j.tools.prefab.local.core.file_read("/root/.ssh/ays_repos_key.pub")
-            print(key)
     except Exception as e:
         print("Error during creation of the repository: {}".format(_extract_error(e)))
 
@@ -653,8 +649,9 @@ def start(bind, port, log):
 
 @cli.command()
 @click.option('--follow', '-f', default=False, is_flag=True, help='return ids of process change jobs')
+@click.option('--message', '-m', default='', help='commit message')
 @click.argument('name', default='')
-def blueprint(name, follow):
+def blueprint(name, follow, message):
     """
     will process the blueprint(s) pointed by name
     if name is empty    then all blueprints found in $aysdir/blueprints will be processed
@@ -674,7 +671,7 @@ def blueprint(name, follow):
     for name in sorted(names):
         # Will print json response containing list of jobkeys and execution message if follow flag is used, otherwise only the message.
         try:
-            resp = ayscl.api.ays.executeBlueprint(data=None, blueprint=name, repository=_current_repo_name())
+            resp = ayscl.api.ays.executeBlueprint(data={"message": message}, blueprint=name, repository=_current_repo_name())
             if follow:
                 print(resp.json())
             else:
@@ -727,7 +724,8 @@ status: {state}
 @click.option('--actor', '-a', help='filter actor by name')
 @click.option('--service', '-s', help='filter service by name')
 @click.option('--force', '-f', default=False, is_flag=True, help='force action')
-def action(action, assume_yes, actor, service, force):
+@click.option('--message', '-m', default='', help='commit message')
+def action(action, assume_yes, actor, service, force, message):
     """
     Shortcut to execute actions blocks
 
@@ -763,7 +761,7 @@ def action(action, assume_yes, actor, service, force):
 
     try:
         ayscl.api.ays.createBlueprint(bp, _current_repo_name())
-        resp = ayscl.api.ays.executeBlueprint(data=None, blueprint=name, repository=_current_repo_name())
+        resp = ayscl.api.ays.executeBlueprint(data={"message": message}, blueprint=name, repository=_current_repo_name())
         ayscl.api.ays.deleteBlueprint(blueprint=name, repository=_current_repo_name())
         print("blueprint {} executed".format(name))
     except Exception as e:
