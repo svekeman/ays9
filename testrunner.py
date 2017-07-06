@@ -110,6 +110,7 @@ def execute_blueprints(cli, repo_info):
     for blueprint in blueprints:
         errors.extend(execute_blueprint(cli, blueprint, repo_info))
         errors.extend(create_run(cli, repo_info))
+        # import ipdb; ipdb.set_trace()
         cli.destroyRepository(data={}, repository=repo_info['name'])
     return errors
 
