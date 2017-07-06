@@ -1,5 +1,5 @@
 #!bin/bash
-set -e
+
 echo "Starting AYS server"
 js9 'j.atyourservice.server.start()'
 
