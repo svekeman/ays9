@@ -448,6 +448,12 @@ types:
           post:
             displayName: executeBlueprint
             description: Execute the blueprint
+            body:
+              application/json:
+                properties:
+                  message:
+                    type: string
+                    required: false
             responses:
               200:
                 description: blueprint executed and if applicable list of processChange jobs IDs
