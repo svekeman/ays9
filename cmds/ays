@@ -619,15 +619,21 @@ def show(key, logs, follow):
 @click.option('--clientid', help='client_id')
 @click.option('--clientsecret', help='client_secret')
 @click.option('--organization', help='Organization')
-def generatetoken(clientid, clientsecret, organization):
+@click.option('--validity', help='validity time')
+def generatetoken(clientid, clientsecret, organization=None, validity=None):
     import requests
     params = {
         'grant_type': 'client_credentials',
         'client_id': clientid,
         'client_secret': clientsecret,
         'response_type': 'id_token',
-        'scope': 'user:memberof:{},offline_access'.format(organization)
+        'scope': 'offline_access'
     }
+    if validity:
+        params['validity'] = validity
+    if organization:
+        params['scope'] = 'user:memberof:{},offline_access'.format(organization)
+
     url = 'https://itsyou.online/v1/oauth/access_token'
     resp = requests.post(url, params=params)
     resp.raise_for_status()

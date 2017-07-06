@@ -37,11 +37,11 @@ So an AYS actor template becomes an AYS service recipe when copied into the loca
 
 ## Step 4: AYS service recipe gets "converted" into one or more AYS service instances
 
-This happens when executing the `AYS init` command on the AYS repository.
+This happens when executing the `ays blueprint` command on the AYS repository.
 
-What actually happens at that moment is that the `instance.hrd` for each of the service instances gets created in `ays-repo/services/.../$servicerole!$serviceinstance/`.
+What actually happens at that moment is that the data for each of the service instances gets created in `ays-repo/services/.../$servicerole!$serviceinstance/`.
 
-The `ìnstance.hrd` has all the configuration settings for that AYS service instance. All `instance.hrd` files get born out of the `schema.hrd` orginating from the actor template which got "converted" to the service recipe. The schema defines the properties required for the `instance.hrd`.
+The `data.json` has all the configuration settings for that AYS service instance. All the content of  `data.json` files get born out of the `schema.capnp` originating from the actor template which got "converted" to the service recipe.
 
 ## Step 5: Deploy & manage the AYS service instance
 
@@ -50,12 +50,9 @@ This starts when you actually install the AYS service instance.
 The installation
 
 ```
-- Applies changes to reality
 - This can for instance be the provisioning of database content
 - All types of actions now are possible on the AYS service instance
 ```
-
-If anything changes to what was described in the previous steps, this will automatically impact the instalation.
 
 ## Step 6: Update the version of a service
 
@@ -64,12 +61,13 @@ Imagine you have some service instances already deployed and a new version of th
 1. The new version only bring some change in the `actions.py` file, then you have to:
 
   - Download the new version of the template. Usually a simple `git pull` on the AYS templates repository is enough.
-  - Execute the command `ays init`. Init action will walk over of the service recipe and update the `actions.py` file to the same version as the template of this service.
+  - Execute the command `ays actor update`. Init action will walk over of the service recipe and update the `actions.py` file to the same version as the template of this service.
 
 2. The new version bring new fields in the schema, then you have to:
 
+  - Execute `ays actor update` 
   - Add these new field and their value to the blueprint.
-  - execute `ays blueprint`. This command will walk over the blueprints and update the `instance.hrd` accordingly. If there is some new fields they will be added to the `instance.hrd` of your instances.
+  - execute `ays blueprint`. This command will walk over the blueprints and update the data accordingly. If there is some new fields they will be added to the `data.json`.
 
 ```
 !!!
