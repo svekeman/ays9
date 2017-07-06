@@ -31,9 +31,9 @@ Commands:
 
 the following commands show you the typical order in which you need to execute at your service
 - [repo create](repo/create.md) creates a new AYS repository
-- [blueprint](blueprint/blueprint.md) executes one or more blueprints, converting them into service instances
-- [service show](service/show.md) inspect the service that you created during the excuting of the blueprint.
-- [run create](run/create.md) creates jobs (runs) for the scheduled actions, and proposes to start the jobs, which then executes the actions
+- [blueprint](blueprint/blueprint.md) executes one or more blueprints, converting them into service instances. You need to be at the root of the repo before executing this command
+- [service show](service/show.md) inspect the service that you created during the execution of the blueprint. You need to be at the root of the repo before executing this command
+- [run create](run/create.md) creates jobs (runs) for the scheduled actions, and proposes to start the jobs, which then executes the actions. You need to be at the root of the repo before executing this command
 - [generate token](generatetoken.md) Generate an Itsyou.online JWT token based on client_id and client_secret
 
 ## Extensive list of all commands

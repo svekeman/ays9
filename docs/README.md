@@ -2,7 +2,7 @@
 
 * [Introduction](AYS-Introduction.md)
 * [Getting Started](gettingstarted/README.md)
-* [Commands introduction](Commands/commands.md)
-* [Definitions of AYS concepts](Definitions/Definitions.md)
-* [Description of AYS files](FileDetails/FilesDetails.md)
+* [Commands introduction](Commands/README.md)
+* [Definitions of AYS concepts](Definitions/README.md)
+* [Description of AYS files](FileDetails/README.md)
 * [How To](Howto/README.md)
