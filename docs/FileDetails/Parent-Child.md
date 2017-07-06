@@ -63,7 +63,7 @@ rack__storage4:
 ```
 
 In this example the `rack` service use the datacenter service as parent.<br>
-After execution of the command `ays repo blueprint`, the service tree will look like that:
+After execution of the command `ays blueprint`, the service tree will look like that:
 
 ```shell
 $ tree services/

@@ -31,16 +31,18 @@ Commands:
 
 the following commands show you the typical order in which you need to execute at your service
 - [repo create](repo/create.md) creates a new AYS repository
-- [blueprint](blueprint/blueprint.md) executes one or more blueprints, converting them into service instances
-- [service show](service/show.md) inspect the service that you created during the excuting of the blueprint.
-- [run create](run/create.md) creates jobs (runs) for the scheduled actions, and proposes to start the jobs, which then executes the actions
+- [blueprint](blueprint/blueprint.md) executes one or more blueprints, converting them into service instances. You need to be at the root of the repo before executing this command
+- [service show](service/show.md) inspect the service that you created during the execution of the blueprint. You need to be at the root of the repo before executing this command
+- [run create](run/create.md) creates jobs (runs) for the scheduled actions, and proposes to start the jobs, which then executes the actions. You need to be at the root of the repo before executing this command
 - [generate token](generatetoken.md) Generate an Itsyou.online JWT token based on client_id and client_secret
 
 ## Extensive list of all commands
-- [actor](actor)  : Grouf of command about to actors.
+- [actor](actor) : Group of command about to actors.
     - [list](actor/list.md) : list all actor that exist in the current AYS repository.
     - [update](actor/update.md) : Update an actor to a new version.
 - [blueprint](blueprint/blueprint.md) : executes one or more blueprints, converting them into service instances.
+- [generatetoken](generatetoken.md): Generate an Itsyou.online JWT token based on client_id and client_secret.
+- [reload](reload.md): reload AYS objects in memory to include newly added objects.
 - [repo](repo) : Group of commands about AYS repositories.
     - [create](repo/create.md) : create a new AYS repository.
     - [destroy](repo/destroy.md) : reset all services & recipe's in current repo (DANGEROUS) all instances will be lost !!!
@@ -50,6 +52,8 @@ the following commands show you the typical order in which you need to execute a
     - [create](run/create.md) : creates jobs (runs) for the scheduled actions, and proposes to start the jobs, which then executes the actions.
     - [list](run/list.md) : List all the keys and creation date of the previous runs.
     - [show](run/show.md) : Print the detail of a run.
+- [scheduler](scheduler) : Group of commands about the run scheduler.
+    - [status](scheduler/status.md) : Show information about the state of the run scheduler.
 - [service](service) : Group of commands aobut services.
     - [delete](service/delete.md) : Delete a service and all its children.
     - [list](service/list.md) : List services.
@@ -58,7 +62,6 @@ the following commands show you the typical order in which you need to execute a
 - [start](start/start.md) : start AYS server.
 - [template](template) : Groupf of commands about actor templates
     - [list](template/list): List available template to be used in a blueprint.
-
 ```toml
 !!!
 title = "AYS Commands Intro"
