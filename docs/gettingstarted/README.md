@@ -9,5 +9,5 @@ First you will want to prepare your environment:
 - You can also interact with AYS through the AYS Portal, once you have the Portal installed and started as documented in [Start the AYS Portal](portal.md).
 
 Once all that is done, we recommend to go through the How To's:
-- [How to Create a New Repository](../Howto/Create_repository/Create_repository.md)
-- [How to Create a VDC](../Howto/Create_VDC/Create_VDC.md)
+- [How to Create a New Repository](../Howto/Create_repository/README.md)
+- [How to Create a VDC](../Howto/Create_VDC/README.md)

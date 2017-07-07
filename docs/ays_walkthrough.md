@@ -133,13 +133,13 @@ node.packet.net__kvm:
 In the above sample a new instance kvm is created. The client parameter references the instance of the service which is specified in <i>schema.capnp</i>. The actions field specifies the actions or functions to be executed by this instance.
 
 ## Running the services
-To create the services and schedule the actions run the command `ays repo blueprint`. All files in the <b>blueprints</b> directory will be used for the creation of the instances.<br>
+To create the services and schedule the actions run the command `ays blueprint`. All files in the <b>blueprints</b> directory will be used for the creation of the instances.<br>
 
 The command `ays run create` execute the functions specified in the blueprints files. It searches for all scheduled, error or changed actions and start a run to execute these actions.<br>
 
 `ays repo destroy` deletes all services instances as well as all scheduled actions in the repo.
 
-To reload the blueprint files, first use `ays repo destroy` followed by `ays repo blueprint`
+To reload the blueprint files, first use `ays repo destroy` followed by `ays blueprint`
 
 ```
 !!!
