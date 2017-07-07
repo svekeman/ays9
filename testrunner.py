@@ -6,6 +6,13 @@ import random
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
 AYS_CORE_BP_TESTS_PATH = 'tests/bp_test_templates/core'
+REPORT_TEMPLATE = """
+AYS test runner results
+-----------------------
+Total number of tests: %{nr_of_tests}s
+Number of passed tests: %{nr_ok}s
+Number of failed/error tests: %{nr_errs}s
+"""
 
 def check_status_code(res, expected_status_code=200):
     """
@@ -55,7 +62,6 @@ def copy_blueprints(test_bp_path, repo_info):
     dest = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
     j.sal.fs.copyDirTree(test_bp_path, dest)
 
-
 def execute_blueprint(cli, blueprint, repo_info):
     """
     Execute a blueprint
@@ -94,6 +100,56 @@ def create_run(cli, repo_info):
 
     return errors
 
+def report_run(cli, repo_info):
+    """
+    Check the created run and services for errors and report them if found
+    check run status and report errors and logs if status is not ok
+    if run status is ok then check the services result attribute and report errors if found
+    """
+    errors = []
+    # check the run itself if there were errors while executing it
+    res, ok = check_status_code(cli.listRuns(repository=repo_info['name']))
+    if ok:
+        runs_info = res.json()
+        for run_info in runs_info:
+            runid = run_info['key']
+            if run_info['state'] == 'error':
+                # get run
+                res, ok = check_status_code(cli.getRun(runid, repo_info['name']))
+                if ok:
+                    run_details = res.json()
+                    # run has steps and each step consists of jobs
+                    for step in run_details['steps']:
+                        if step['state'] == 'error':
+                            for job in step['jobs']:
+                                errors.append('\nActor: %s Action: %s\n' % (job['actor_name'], job['action_name']))
+                                for log in job['logs']:
+                                    if log['log']:
+                                        errors.append(log['log'])
+
+                else:
+                    errors.append('Failed to retieve run [%s]' % runid)
+
+        # after checking the runs, we need to check the services
+        res, ok = check_status_code(cli.listServices(repo_info['name']))
+        if ok:
+            services = res.json()
+            for service_info in services:
+                res, ok = check_status_code(cli.getServiceByName(service_info['name'], service_info['role'], repo_info['name']))
+                if ok:
+                    service_details = res.json()
+                    if service_details['data'].get('result') and not service_details['data']['result'].startswith('OK'):
+                        errors.append('\nService role: %s Service instance: %s\n' % (service_info['role'], service_info['name']))
+                        errors.append(service_details['data']['result'])
+                else:
+                    errors.append('Failed to get service [%s!%s]' % (service_info['role'], service_info['name']))
+        else:
+            errors.append('Failed to list services')
+    else:
+        errors.append('Failed to list runs')
+
+    return errors
+
 def execute_blueprints(cli, repo_info):
     """
     Executes all the blueprints in the repo
@@ -104,13 +160,16 @@ def execute_blueprints(cli, repo_info):
         - wait for the run to finish
         - destory the repo
     """
-    errors = []
+    errors = {}
     bps_path = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
     blueprints = map(j.sal.fs.getBaseName, j.sal.fs.listFilesInDir(path=bps_path))
+    # import ipdb; ipdb.set_trace()
     for blueprint in blueprints:
-        errors.extend(execute_blueprint(cli, blueprint, repo_info))
-        errors.extend(create_run(cli, repo_info))
-        # import ipdb; ipdb.set_trace()
+        errors[blueprint] = {'errors': []}
+        bp_errors = errors[blueprint]['errors']
+        bp_errors.extend(execute_blueprint(cli, blueprint, repo_info))
+        bp_errors.extend(create_run(cli, repo_info))
+        bp_errors.extend(report_run(cli, repo_info))
         cli.destroyRepository(data={}, repository=repo_info['name'])
     return errors
 
@@ -118,11 +177,21 @@ def main():
     cli = j.clients.atyourservice.get().api.ays
     repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME)
     errors = []
-
     if repo_info:
         try:
             copy_blueprints(AYS_CORE_BP_TESTS_PATH, repo_info)
-            errors.extend(execute_blueprints(cli, repo_info))
+            result = execute_blueprints(cli, repo_info)
+            # report final results
+            nr_ok = 0
+            nr_errs = 0
+            for bp_errors in result.values():
+                if bp_errors:
+                    errors.extend(bp_errors)
+                    nr_errs += 1
+                else:
+                    nr_ok += 1
+            nr_of_tests = nr_ok + nr_errs
+            print(REPORT_TEMPLATE % {'nr_of_tests': nr_of_tests, 'nr_ok': nr_ok, 'nr_errs' : nr_errs})
         finally:
             # clean the created repo
             j.logger.logging.info('Cleaning up ceated repository')
