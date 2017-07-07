@@ -6,13 +6,6 @@ import random
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
 AYS_CORE_BP_TESTS_PATH = 'tests/bp_test_templates/core'
-REPORT_TEMPLATE = """
-AYS test runner results
------------------------
-Total number of tests: %{nr_of_tests}s
-Number of passed tests: %{nr_ok}s
-Number of failed/error tests: %{nr_errs}s
-"""
 
 def check_status_code(res, expected_status_code=200):
     """
@@ -73,11 +66,6 @@ def execute_blueprint(cli, blueprint, repo_info):
     cmd = 'ays blueprint -f %s' % blueprint
     try:
         j.tools.prefab.get().core.run(cmd)
-        # res, ok = check_status_code(cli.executeBlueprint(data={}, blueprint=blueprint, repository=repo_info['name']))
-        # if not ok:
-        #     j.logger.logging.error('Failed to execute blueprint [%s]. Error: %s' % (blueprint, e))
-        # else:
-        #     j.logger.logging.debug('Executed blueprint [%s]' % blueprint)
     except Exception as e:
         errors.append('Failed to execute blueprint [%s]. Error: %s' % (blueprint, e))
     finally:
@@ -122,7 +110,9 @@ def report_run(cli, repo_info):
                     for step in run_details['steps']:
                         if step['state'] == 'error':
                             for job in step['jobs']:
-                                errors.append('\nActor: %s Action: %s\n' % (job['actor_name'], job['action_name']))
+                                msg = 'Actor: %s Action: %s' % (job['actor_name'], job['action_name'])
+                                errors.append('\n%s' % msg)
+                                errors.append('%s\n' % ('-' * len(msg)))
                                 for log in job['logs']:
                                     if log['log']:
                                         errors.append(log['log'])
@@ -139,7 +129,9 @@ def report_run(cli, repo_info):
                 if ok:
                     service_details = res.json()
                     if service_details['data'].get('result') and not service_details['data']['result'].startswith('OK'):
-                        errors.append('\nService role: %s Service instance: %s\n' % (service_info['role'], service_info['name']))
+                        msg = 'Service role: %s Service instance: %s' % (service_info['role'], service_info['name'])
+                        errors.append('\n%s' % msg)
+                        errors.append('%s\n' % ('-' * len(msg)))
                         errors.append(service_details['data']['result'])
                 else:
                     errors.append('Failed to get service [%s!%s]' % (service_info['role'], service_info['name']))
@@ -163,7 +155,6 @@ def execute_blueprints(cli, repo_info):
     errors = {}
     bps_path = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
     blueprints = map(j.sal.fs.getBaseName, j.sal.fs.listFilesInDir(path=bps_path))
-    # import ipdb; ipdb.set_trace()
     for blueprint in blueprints:
         errors[blueprint] = {'errors': []}
         bp_errors = errors[blueprint]['errors']
@@ -185,13 +176,20 @@ def main():
             nr_ok = 0
             nr_errs = 0
             for bp_errors in result.values():
-                if bp_errors:
-                    errors.extend(bp_errors)
+                if bp_errors['errors']:
+                    errors.extend(bp_errors['errors'])
                     nr_errs += 1
                 else:
                     nr_ok += 1
             nr_of_tests = nr_ok + nr_errs
-            print(REPORT_TEMPLATE % {'nr_of_tests': nr_of_tests, 'nr_ok': nr_ok, 'nr_errs' : nr_errs})
+            print("AYS testrunner results\n---------------------------\n")
+            print("Total number of tests: %s" % nr_of_tests)
+            print("Number of passed tests: %s" % nr_ok)
+            print("Number of failed/error tests: %s" % nr_errs)
+            if errors:
+                print("\nErrors\n-------\n")
+                print('\n'.join(errors))
+                raise RuntimeError('Failures while running ays tests')
         finally:
             # clean the created repo
             j.logger.logging.info('Cleaning up ceated repository')
