@@ -17,28 +17,28 @@ def test(job):
         log.addHandler(j.logger._LoggerFactory__fileRotateHandler('tests'))
         service = job.service
         branch = service.model.data.branch
-        prefab = service.executor.prefab
+        cuisine = service.executor.cuisine
         log.info('Installing jumpscale on the VM')
-        prefab.core.run('apt-get update')
-        prefab.core.run('echo Y | apt-get install curl')
-        prefab.core.run('curl -k https://raw.githubusercontent.com/Jumpscale/'
+        cuisine.core.run('apt-get update')
+        cuisine.core.run('echo Y | apt-get install curl')
+        cuisine.core.run('curl -k https://raw.githubusercontent.com/Jumpscale/'
                          'jumpscale_core8/{}/install/install.sh > install.sh'.format(branch))
         if branch != "master":
-            prefab.core.run('bash install.sh', env={'JSBRANCH': branch})
+            cuisine.core.run('bash install.sh', env={'JSBRANCH': branch})
         else:
-            prefab.core.run('bash install.sh')
+            cuisine.core.run('bash install.sh')
         time.sleep(50)
 
         log.info('Check if js is working, should succeed')
-        output = prefab.core.run('js "print(j.sal.fs.getcwd())"')
+        output = cuisine.core.run('js "print(j.sal.fs.getcwd())"')
         if output[1] != '/root':
             service.model.data.result = 'FAILED : {} {}'.format('test_js8_install', str(sys.exc_info()[:2]))
             service.save()
             return
 
         log.info('Making sure Redis started correctly')
-        tmpdir = prefab.core.replace('$TMPDIR')
-        output = prefab.core.run('''js "print(j.core.db.config_get('unixsocket')['unixsocket'])"''')
+        tmpdir = cuisine.core.replace('$TMPDIR')
+        output = cuisine.core.run('''js "print(j.core.db.config_get('unixsocket')['unixsocket'])"''')
         sock = '%s/redis.sock' % tmpdir
         if output[1] != sock:
             service.model.data.result = 'FAILED : {} wrong unix socket'.format('test_js8_install')
@@ -46,30 +46,30 @@ def test(job):
             return
 
         log.info('Checking if AYS is usable')
-        prefab.core.execute_bash('ays start')
-        output = prefab.core.run('netstat -nltp')
+        cuisine.core.execute_bash('ays start')
+        output = cuisine.core.run('netstat -nltp')
         if '127.0.0.1:5000' not in output[1]:
             service.model.data.result = 'FAILED : {} AYS not started'.format('test_js8_install')
             service.save()
             return
 
         log.info('Check if directories under /optvar/ is as expected')
-        output = prefab.core.run('ls /optvar')
+        output = cuisine.core.run('ls /optvar')
         if 'cfg\ndata' not in output[1]:
             service.model.data.result = 'FAILED : {} {}'.format('test_js8_install', str(sys.exc_info()[:2]))
             service.save()
             return
 
         log.info('Check if directories under /opt/jumpscale8/ is as expected')
-        output = prefab.core.run('ls /opt/jumpscale8/')
+        output = cuisine.core.run('ls /opt/jumpscale8/')
         if 'bin\nenv.sh\nlib' not in output[1]:
             service.model.data.result = 'FAILED : {} {}'.format('test_js8_install', str(sys.exc_info()[:2]))
             service.save()
             return
 
-        log.info('Compare js.dir to j.tools.prefab.local.core.dir_paths, should be the same')
-        output = prefab.core.run('js "print(j.dirs)"')
-        output2 = prefab.core.run('js "print(j.tools.prefab.local.core.dir_paths)"')
+        log.info('Compare js.dir to j.tools.cuisine.local.core.dir_paths, should be the same')
+        output = cuisine.core.run('js "print(j.dirs)"')
+        output2 = cuisine.core.run('js "print(j.tools.cuisine.local.core.dir_paths)"')
 
         str_list = output[1].split('\n')
         # remove empty strings found in a list
@@ -79,9 +79,9 @@ def test(job):
         dict1 = dict(str_list)
         dict2 = literal_eval(output2[1])
 
-        log.info('Compare js.dir to j.tools.prefab.local.core.dir_paths, should be the same')
-        output = prefab.core.run('js "print(j.dirs)"')
-        output2 = prefab.core.run('js "print(j.tools.prefab.local.core.dir_paths)"')
+        log.info('Compare js.dir to j.tools.cuisine.local.core.dir_paths, should be the same')
+        output = cuisine.core.run('js "print(j.dirs)"')
+        output2 = cuisine.core.run('js "print(j.tools.cuisine.local.core.dir_paths)"')
         str_list = output[1].split('\n')
         # remove empty strings found in a list
         for i in str_list:
@@ -105,9 +105,9 @@ def test(job):
         tc.assertEqual(dict1['TEMPLATEDIR'].replace('/', ''), dict2['TEMPLATEDIR'].replace('/', ''))
 
         log.info('Checking portal installation')
-        prefab.core.run('js "j.tools.prefab.local.apps.portal.install()"')
-        prefab.core.run('js "j.tools.prefab.local.apps.portal.start()"')
-        output = prefab.core.run('netstat -nltp')
+        cuisine.core.run('js "j.tools.cuisine.local.apps.portal.install()"')
+        cuisine.core.run('js "j.tools.cuisine.local.apps.portal.start()"')
+        output = cuisine.core.run('netstat -nltp')
         if ':8200' not in output[1]:
             service.model.data.result = 'FAILED : {} Portal not started'.format('test_js8_install')
             service.save()
