@@ -6,6 +6,7 @@ import random
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
 AYS_CORE_BP_TESTS_PATH = 'tests/bp_test_templates/core'
+STOP_AT_ERRORS = False
 
 def check_status_code(res, expected_status_code=200):
     """
@@ -162,6 +163,8 @@ def execute_blueprints(cli, repo_info):
         bp_errors.extend(create_run(cli, repo_info))
         bp_errors.extend(report_run(cli, repo_info))
         cli.destroyRepository(data={}, repository=repo_info['name'])
+        if STOP_AT_ERRORS:
+            raise RuntimeError('Failures while executing blueprint %s. Errors: %s' %(blueprint, bp_errors))
     return errors
 
 def main():
