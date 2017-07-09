@@ -163,7 +163,7 @@ def execute_blueprints(cli, repo_info):
         bp_errors.extend(create_run(cli, repo_info))
         bp_errors.extend(report_run(cli, repo_info))
         cli.destroyRepository(data={}, repository=repo_info['name'])
-        if STOP_AT_ERRORS:
+        if bp_errors and STOP_AT_ERRORS:
             raise RuntimeError('Failures while executing blueprint %s. Errors: %s' %(blueprint, bp_errors))
     return errors
 
