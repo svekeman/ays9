@@ -44,6 +44,11 @@ def test(job):
         'service.json']},
       'files': ['data.json', 'schema.capnp', 'service.json']},
      'sshkey!main': {'files': ['data.json', 'schema.capnp', 'service.json']}}
+    cwd = os.getcwd()
+    repos = []
+    repo_name = 'sample_repo1'
+    repo_path = j.sal.fs.joinPaths(j.dirs.CODEDIR, 'github/jumpscale/ays9/tests/%s' % repo_name)
+    repos.append(repo_name)
 
     def check_service_dir(base_path, service):
             for service_name, service_info in service.items():
@@ -55,9 +60,11 @@ def test(job):
                         if not j.sal.fs.exists(j.sal.fs.joinPaths(base_path, service_file)):
                             failures.append(service_file_missing_msg % j.sal.fs.joinPaths(base_path, service_file))
     try:
-        j.atyourservice.reposDiscover()
-        repo = j.atyourservice.repoGet(j.sal.fs.joinPaths(j.dirs.codeDir, 'github/jumpscale/jumpscale_core8/tests/sample_repo1'))
-        repo.blueprintExecute(role="", instance="", path="")
+        ays_client = j.clients.atyourservice.get()
+        bp_cmd = 'ays blueprint'
+        j.sal.fs.changeDir(repo_path)
+        j.tools.prefab.get().core.run(bp_cmd)
+
         # validate directory structure
         for actor in expected_actors:
             if not j.sal.fs.exists(j.sal.fs.joinPaths(repo.path, 'actors', actor)):
@@ -77,6 +84,5 @@ def test(job):
         model.data.result = RESULT_ERROR % str(sys.exc_info()[:2])
     finally:
         job.service.save()
-        if repo:
-            repo.destroy()
-    
+        for repo in repos:
+            ays_client.api.ays.destroyRepository(data={}, repository=repo)
