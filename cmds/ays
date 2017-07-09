@@ -637,7 +637,6 @@ def generatetoken(clientid, clientsecret, organization=None, validity=None):
     url = 'https://itsyou.online/v1/oauth/access_token'
     resp = requests.post(url, params=params)
     resp.raise_for_status()
-    print("# Generated Token, please run to use in client:")
     print("export JWT='{}'".format(resp.content.decode('utf8')))
 
 
