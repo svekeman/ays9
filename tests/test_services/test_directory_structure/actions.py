@@ -21,6 +21,7 @@ def test(job):
     Test the created directory structure is corrected after ays blueprint on a test repo
     """
     import sys
+    import os
     RESULT_OK = 'OK : %s'
     RESULT_FAILED = 'FAILED : %s'
     RESULT_ERROR = 'ERROR : %s %%s' % job.service.name
@@ -67,15 +68,15 @@ def test(job):
 
         # validate directory structure
         for actor in expected_actors:
-            if not j.sal.fs.exists(j.sal.fs.joinPaths(repo.path, 'actors', actor)):
+            if not j.sal.fs.exists(j.sal.fs.joinPaths(repo_path, 'actors', actor)):
                 failures.append(actor_missing_msg % actor)
             else:
                 for actor_file in expected_files_per_actor:
-                    if not j.sal.fs.exists(j.sal.fs.joinPaths(repo.path, 'actors', actor, actor_file)):
+                    if not j.sal.fs.exists(j.sal.fs.joinPaths(repo_path, 'actors', actor, actor_file)):
                         failures.append(actor_file_missing_msg % (actor_file, actor))
 
         for service_name, service_info in expected_services.items():
-            path = j.sal.fs.joinPaths(repo.path, 'services', service_name)
+            path = j.sal.fs.joinPaths(repo_path, 'services', service_name)
             check_service_dir(path, service_info)
         if failures:
             model.data.result = RESULT_FAILED % '\n'.join(failures)
@@ -84,5 +85,6 @@ def test(job):
         model.data.result = RESULT_ERROR % str(sys.exc_info()[:2])
     finally:
         job.service.save()
+        j.sal.fs.changeDir(cwd)
         for repo in repos:
             ays_client.api.ays.destroyRepository(data={}, repository=repo)
