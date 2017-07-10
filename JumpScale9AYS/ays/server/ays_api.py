@@ -3,7 +3,7 @@ from sanic.response import json, text
 import jsonschema
 from jsonschema import Draft4Validator
 import capnp
-
+from JumpScale9AYS.ays.lib.Blueprint import Blueprint
 from JumpScale9AYS.ays.server.views import service_view
 from JumpScale9AYS.ays.server.views import run_view
 from JumpScale9AYS.ays.server.views import actor_view
@@ -189,7 +189,7 @@ async def getTemplate(request, template, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     template_names = list(repo.templates.keys())
     if template not in template_names:
@@ -370,6 +370,7 @@ async def listBlueprints(request, repository):
             blueprints.append({'name': blueprint.name})
     return json(blueprints, 200)
 
+
 async def createBlueprint(request, repository):
     '''
     Create a new blueprint
@@ -385,14 +386,13 @@ async def createBlueprint(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     new_name = inputs['name']
     content = inputs['content']
     names = [bp.name for bp in repo.blueprints]
     if new_name in names:
-        return json({'error':"Blueprint with the name %s' already exists" % new_name}, 409)
-
+        return json({'error': "Blueprint with the name %s' already exists" % new_name}, 409)
 
     bp_path = j.sal.fs.joinPaths(repo.path, 'blueprints', new_name)
     try:
@@ -402,7 +402,7 @@ async def createBlueprint(request, repository):
         print(str(e))
         if j.sal.fs.exists(bp_path):
             j.sal.fs.remove(bp_path)
-        return json({'error':"Can't save new blueprint"}, 500)
+        return json({'error': "Can't save new blueprint"}, 500)
 
     # check validity of input as blueprint syntax
     try:
@@ -410,9 +410,10 @@ async def createBlueprint(request, repository):
     except:
         if j.sal.fs.exists(bp_path):
             j.sal.fs.remove(bp_path)
-        return json({'error':"Invalid blueprint syntax"}, 500)
+        return json({'error': "Invalid blueprint syntax"}, 500)
 
     return json(blueprint_view(blueprint), 201)
+
 
 async def getBlueprint(request, blueprint, repository):
     '''
@@ -434,6 +435,7 @@ async def getBlueprint(request, blueprint, repository):
         return json({'error':"No blueprint found with this name '%s'" % blueprint}, 404)
 
     return json(blueprint_view(bp), 200)
+
 
 async def executeBlueprint(request, blueprint, repository):
     '''
@@ -465,8 +467,8 @@ async def executeBlueprint(request, blueprint, repository):
         return json({'error': str(inputEx)}, 400)
 
     except j.exceptions.NotFound as e:
-        error_msg = "Input Exception : \n %s" % str(e)        
-        j.atyourservice.server.logger.exception(error_msg)        
+        error_msg = "Input Exception : \n %s" % str(e)
+        j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(e.message)}, 400)
 
     except Exception as e:
@@ -504,14 +506,20 @@ async def updateBlueprint(request, blueprint, repository):
     blueprint_path = j.sal.fs.joinPaths(repo.path, 'blueprints', name)
     blueprint = repo.blueprintGet(blueprint_path)
     content = inputs['content']
-    blueprint.content =  j.data.serializer.yaml.dumps(inputs['content'])
-    blueprint.name = new_name
-    j.sal.fs.writeFile(blueprint_path, content)
-    # Rename the file
-    new_path = j.sal.fs.joinPaths(repo.path, 'blueprints', new_name)
-    j.sal.fs.renameFile(blueprint_path, new_path)
-    blueprint = repo.blueprintGet(new_path)
-    return json(blueprint_view(blueprint), 200)
+
+    newpb = Blueprint(aysrepo=repo, content=content, path="")
+    if not newpb.is_valid:
+        j.atyourservice.server.logger.exception("Invalid blueprint syntax.")
+        return json({'error': str("Invalid blueprint syntax.")}, 400)
+    else:
+        blueprint.content = j.data.serializer.yaml.dumps(inputs['content'])
+        blueprint.name = new_name
+        j.sal.fs.writeFile(blueprint_path, content)
+        # Rename the file
+        new_path = j.sal.fs.joinPaths(repo.path, 'blueprints', new_name)
+        j.sal.fs.renameFile(blueprint_path, new_path)
+        blueprint = repo.blueprintGet(new_path)
+        return json(blueprint_view(blueprint), 200)
 
 async def deleteBlueprint(request, blueprint, repository):
     '''
