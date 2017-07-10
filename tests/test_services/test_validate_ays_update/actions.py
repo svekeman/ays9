@@ -32,7 +32,7 @@ def test(job):
     cwd = os.getcwd()
     repo_name = 'sample_repo2'
     bp_name = 'bp_validate_update_propagation.yaml'
-    repo_path = j.sal.fs.joinPaths(j.dirs.CODEDIR, 'github/jumpscale/jumpscale_core8/tests/%s' % repo_name)
+    repo_path = j.sal.fs.joinPaths(j.dirs.CODEDIR, 'github/jumpscale/ays9/tests/%s' % repo_name)
     bp_path = j.sal.fs.joinPaths(repo_path, 'blueprints', bp_name)
     replacement_str = 'REPLACED'
     original_str = 'REPLACEME'
