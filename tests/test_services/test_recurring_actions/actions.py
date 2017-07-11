@@ -63,4 +63,7 @@ def test(job):
         job.service.save()
         if repos:
             for repo in repos:
-                ays_client.api.ays.destroyRepository(data={}, repository=repo)
+                try:
+                    ays_client.api.ays.destroyRepository(data={}, repository=repo)
+                except Exception as e:
+                    j.logger.logging.error('Error while destroying repo %s. Error %s' % (repo, e) )
