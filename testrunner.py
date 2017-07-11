@@ -155,7 +155,8 @@ def execute_blueprints(cli, repo_info):
     """
     errors = {}
     bps_path = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
-    blueprints = map(j.sal.fs.getBaseName, j.sal.fs.listFilesInDir(path=bps_path))
+    # skip tests that start with _
+    blueprints = filter(lambda item: not item.startswith('_'), map(j.sal.fs.getBaseName, j.sal.fs.listFilesInDir(path=bps_path)))
     for blueprint in blueprints:
         errors[blueprint] = {'errors': []}
         bp_errors = errors[blueprint]['errors']
