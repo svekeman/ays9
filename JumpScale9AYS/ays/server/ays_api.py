@@ -457,7 +457,7 @@ async def executeBlueprint(request, blueprint, repository):
 
     try:
         inputs = request.json
-        message = inputs.get('message')
+        message = inputs.get('message') if inputs else None
         jobkeys = await repo.blueprintExecute(path=bp.path, context={'token': extract_token(request)},
                                               message=message)
 
