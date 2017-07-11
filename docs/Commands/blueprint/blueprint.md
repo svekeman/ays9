@@ -11,6 +11,7 @@ Usage: ays blueprint [OPTIONS] [NAME]
 
 Options:
   -f, --follow  return ids of process change jobs
+  -m, --message git commit message
   --help        Show this message and exit.
 
 ```
