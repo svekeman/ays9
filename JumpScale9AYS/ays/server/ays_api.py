@@ -456,7 +456,10 @@ async def executeBlueprint(request, blueprint, repository):
         return json({'error': "No blueprint found with this name '{}'".format(blueprint)}, 404)
 
     try:
-        jobkeys = await repo.blueprintExecute(path=bp.path, context={'token': extract_token(request)})
+        inputs = request.json
+        message = inputs.get('message') if inputs else None
+        jobkeys = await repo.blueprintExecute(path=bp.path, context={'token': extract_token(request)},
+                                              message=message)
 
     except j.exceptions.Input as inputEx:
         error_msg = "Input Exception : \n %s" % str(inputEx)
