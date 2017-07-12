@@ -2,7 +2,7 @@ datacenter__ovh_germany2:
   location: 'germany'
   description: 'ovh_germany2'
 
-cockpit__cockpitv1:
+cockpittesting__cockpitv1:
     description: 'cockpit v1'
     datacenter: 'ovh_germany1'
 
