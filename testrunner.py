@@ -2,8 +2,6 @@
 
 from js9 import j
 import random
-import threading
-import time
 
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
@@ -75,13 +73,11 @@ def execute_blueprint(cli, blueprint, repo_info):
         j.sal.fs.changeDir(curdir)
     return errors
 
-def create_run(cli, repo_info, errors=None):
+def create_run(cli, repo_info):
     """
     Create a run and executing it
     """
-    if errors is None:
-        errors = []
-
+    errors = []
     j.logger.logging.info('Creating a new run')
     curdir = j.sal.fs.getcwd()
     j.sal.fs.changeDir(repo_info['path'])
@@ -165,10 +161,7 @@ def execute_blueprints(cli, repo_info):
         errors[blueprint] = {'errors': []}
         bp_errors = errors[blueprint]['errors']
         bp_errors.extend(execute_blueprint(cli, blueprint, repo_info))
-        run_thread = threading.Thread(target=create_run, args=(cli, repo_info, bp_errors))
-        while run_thread.is_alive():
-            print('Executing run...')
-            time.sleep(60)
+        bp_errors.extend(create_run(cli, repo_info))
         bp_errors.extend(report_run(cli, repo_info))
         cli.destroyRepository(data={}, repository=repo_info['name'])
         if bp_errors and STOP_AT_ERRORS:
