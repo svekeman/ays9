@@ -33,20 +33,20 @@ def test(job):
     try:
         expected_nr_of_jobs = 1
         curdir = os.getcwd()
-        j.atyourservice.server.reposDiscover()
-        repo = j.atyourservice.server.repoGet(j.sal.fs.joinPaths(j.dirs.codeDir, 'github/jumpscale/jumpscale_core8/tests/sample_repo_recurring'))
-        repos.append(repo)
-        bp_path = j.sal.fs.joinPaths(repo.path, 'blueprints', 'test_recurring_actions_1.yaml')
-        repo.blueprintExecute(path=bp_path)
-        start_time = time.time()
-        os.chdir(repo.path)
-        job.service.executor.execute('ays run --ask')
-        end_time = time.time()
-        nr_of_jobs = len(j.core.jobcontroller.db.jobs.find(actor='test_recurring_actions_1', service='instance', 
-                action='execution_gt_period', fromEpoch=start_time,
-                toEpoch=end_time))
-        if nr_of_jobs != expected_nr_of_jobs:
-            failures.append('Wrong number of jobs found. Expected [%s] found [%s]' % (expected_nr_of_jobs, nr_of_jobs))
+        ays_client = j.clients.atyourservice.get()
+        repo_name = 'sample_repo_recurring'
+        bp_name = 'test_recurring_actions_1.yaml'
+        repos.append(repo_name)
+        execute_bp_res = ays_client.api.ays.executeBlueprint(data={}, blueprint=bp_name, repository=repo_name)
+        if execute_bp_res.status_code == 200:
+            start_time = time.time()
+            time.sleep(60 * 2)
+            nr_of_jobs = len(j.core.jobcontroller.db.jobs.find(actor='test_recurring_actions_1', service='instance',
+                    action='execution_gt_period', fromEpoch=start_time))
+            if nr_of_jobs > expected_nr_of_jobs:
+                failures.append('Wrong number of jobs found. Expected [%s] found [%s]' % (expected_nr_of_jobs, nr_of_jobs))
+        else:
+            failures.append('Failed to execute blueprint [%s]' % bp_name)
 
         if failures:
             model.data.result = RESULT_FAILED % '\n'.join(failures)
@@ -57,5 +57,7 @@ def test(job):
         job.service.save()
         if repos:
             for repo in repos:
-                repo.destroy()
-    
+                try:
+                    ays_client.api.ays.destroyRepository(data={}, repository=repo)
+                except Exception as e:
+                    j.logger.logging.error('Error while destroying repo %s. Error %s' % (repo, e) )

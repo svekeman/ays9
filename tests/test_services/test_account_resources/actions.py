@@ -132,7 +132,7 @@ def test(job):
 
         log.info('Running python script to convert binary file to xls file')
         bin_to_xls_script = """
-        from js9 import j
+        from JumpScale import j
         import argparse
         import os
         import xlwt
