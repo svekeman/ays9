@@ -500,13 +500,9 @@ class AtYourServiceRepo():
         jobkeys = j.core.jobcontroller.db.jobs.list(action='processChange', fromEpoch=curr_time)
 
         print("blueprint done")
-        try:
-            if not message:
-                message = "Auto Commit By AYS"
-            self.commit(message=message)
-            self.logger.info("AYS Repo {} auto push done".format(self.name))
-        except Exception as e:
-            self.logger.error("AYS Repo push failed: {}".format(e))
+        if not message:
+            message = "Auto Commit By AYS"
+        self.commit(message=message)
         return jobkeys
 
     def blueprintGet(self, bname):
@@ -685,10 +681,27 @@ class AtYourServiceRepo():
         if branch != "master":
             self.git.switchBranch(branch)
 
-        self.git.commit(message, True)
+        try:
+            self.git.commit(message, True)
+            self.logger.info("AYS Repo {} auto commit done".format(self.name))
+        except Exception as e:
+            self.logger.warning("AYS Repo auto commit failed: {}".format(e))
 
-        if push:
-            self.git.repo.git.push('--all')
+        if push and not j.atyourservice.server.dev_mode:
+            if self.git.repo.remotes and "git@" in self.git.repo.remotes[0].url:
+                try:
+                    local_prefab = j.tools.prefab.local
+                    key_path = local_prefab.ssh.keygen(name='ays_repos_key').split(".pub")[0]
+                    if not j.do.SSHAgentCheckKeyIsLoaded(key_path):
+                        j.do.SSHKeysLoad(key_path)
+                    self.git.repo.git.push('--all')
+                    self.logger.info("Auto Push done successfully")
+                except Exception as e:
+                    self.logger.warning("Auto Push failed: {}".format(e))
+            else:
+                self.logger.warning(
+                    "Auto Push skipped, please make sure that you are using ssh url as a remote to be able to auto push"
+                )
 
     def __str__(self):
         return("aysrepo:%s" % (self.path))
