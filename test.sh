@@ -1,7 +1,7 @@
 #!bin/bash
 
 echo "Starting AYS server"
-js9 'j.atyourservice.server.start()'
+js9 'j.atyourservice.server.start(dev=True)'
 
 # sleep for 30 seconds
 sleep 30

@@ -33,13 +33,16 @@ def test(job):
     actor_missing_msg = 'Actor folder [%s] does not exist'
     actor_file_missing_msg = 'File [%s] for actor [%s] is missing'
     service_file_missing_msg = 'Service file [%s] is missing'
-    expected_services = {'datacenter!ovh_germany1': {'cockpittesting!cockpitv1': {'files': ['data.json',
-        'schema.capnp',
-        'service.json']},
+    expected_services = {'datacenter!ovh_germany1':{
+        # Un-comment the following when enabling the _bp_related1.yaml blueprint
+        # 'cockpittesting!cockpitv1': {'files': ['data.json',
+        # 'schema.capnp',
+        # 'service.json']},
       'files': ['data.json', 'schema.capnp', 'service.json']},
-     'datacenter!ovh_germany2': {'files': ['data.json',
-       'schema.capnp',
-       'service.json']},
+      # Un-comment the following when enabling the _bp_related1.yaml blueprint
+    #  'datacenter!ovh_germany2': {'files': ['data.json',
+    #    'schema.capnp',
+    #    'service.json']},
      'datacenter!ovh_germany3': {'cockpittesting!cockpitv2': {'files': ['data.json',
         'schema.capnp',
         'service.json']},
@@ -62,13 +65,10 @@ def test(job):
                             failures.append(service_file_missing_msg % j.sal.fs.joinPaths(base_path, service_file))
     try:
         ays_client = j.clients.atyourservice.get().api.ays
-        blueprints = map(lambda item: item['name'], ays_client.listBlueprints(repo_name).json())
+        blueprints = map(lambda item: item['name'], ays_client.listBlueprints(repo_name, query_params={'archived': False}).json())
         for blueprint in blueprints:
             ays_client.executeBlueprint(data={}, blueprint=blueprint, repository=repo_name)
 
-        # bp_cmd = 'ays blueprint'
-        # j.sal.fs.changeDir(repo_path)
-        # j.tools.prefab.get().core.run(bp_cmd)
 
         # validate directory structure
         for actor in expected_actors:
