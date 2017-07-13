@@ -28,19 +28,19 @@ def test(job):
     model = job.service.model
     model.data.result = RESULT_OK % job.service.name
     failures = []
-    expected_actors = ['cockpit', 'datacenter', 'sshkey']
+    expected_actors = ['cockpittesting', 'datacenter', 'sshkey']
     expected_files_per_actor = ['actions.py', 'actor.json', 'schema.capnp']
     actor_missing_msg = 'Actor folder [%s] does not exist'
     actor_file_missing_msg = 'File [%s] for actor [%s] is missing'
     service_file_missing_msg = 'Service file [%s] is missing'
-    expected_services = {'datacenter!ovh_germany1': {'cockpit!cockpitv1': {'files': ['data.json',
+    expected_services = {'datacenter!ovh_germany1': {'cockpittesting!cockpitv1': {'files': ['data.json',
         'schema.capnp',
         'service.json']},
       'files': ['data.json', 'schema.capnp', 'service.json']},
      'datacenter!ovh_germany2': {'files': ['data.json',
        'schema.capnp',
        'service.json']},
-     'datacenter!ovh_germany3': {'cockpit!cockpitv2': {'files': ['data.json',
+     'datacenter!ovh_germany3': {'cockpittesting!cockpitv2': {'files': ['data.json',
         'schema.capnp',
         'service.json']},
       'files': ['data.json', 'schema.capnp', 'service.json']},
@@ -61,10 +61,14 @@ def test(job):
                         if not j.sal.fs.exists(j.sal.fs.joinPaths(base_path, service_file)):
                             failures.append(service_file_missing_msg % j.sal.fs.joinPaths(base_path, service_file))
     try:
-        ays_client = j.clients.atyourservice.get()
-        bp_cmd = 'ays blueprint'
-        j.sal.fs.changeDir(repo_path)
-        j.tools.prefab.get().core.run(bp_cmd)
+        ays_client = j.clients.atyourservice.get().api.ays
+        blueprints = map(lambda item: item['name'], ays_client.listBlueprints(repo_name).json())
+        for blueprint in blueprints:
+            ays_client.executeBlueprint(data={}, blueprint=blueprint, repository=repo_name)
+
+        # bp_cmd = 'ays blueprint'
+        # j.sal.fs.changeDir(repo_path)
+        # j.tools.prefab.get().core.run(bp_cmd)
 
         # validate directory structure
         for actor in expected_actors:
@@ -87,4 +91,4 @@ def test(job):
         job.service.save()
         j.sal.fs.changeDir(cwd)
         for repo in repos:
-            ays_client.api.ays.destroyRepository(data={}, repository=repo)
+            ays_client.destroyRepository(data={}, repository=repo)
