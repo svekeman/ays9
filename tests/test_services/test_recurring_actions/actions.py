@@ -23,7 +23,6 @@ def test(job):
     import sys
     import os
     import time
-    import json
     RESULT_OK = 'OK : %s'
     RESULT_FAILED = 'FAILED : %s'
     RESULT_ERROR = 'ERROR : %s %%s' % job.service.name
@@ -40,12 +39,7 @@ def test(job):
         repos.append(repo_name)
         execute_bp_res = ays_client.api.ays.executeBlueprint(data={}, blueprint=bp_name, repository=repo_name)
         if execute_bp_res.status_code == 200:
-            # create run
-            data = json.loads(ays_client.api.ays.createRun(data={}, repository=repo_name).text)
-            runid = data['key']
-            # execute run
             start_time = time.time()
-            data = json.loads(ays_client.api.ays.executeRun(data={}, runid=runid, repository=repo_name).text)
             time.sleep(60 * 2)
             nr_of_jobs = len(j.core.jobcontroller.db.jobs.find(actor='test_recurring_actions_1', service='instance',
                     action='execution_gt_period', fromEpoch=start_time))
