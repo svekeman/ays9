@@ -41,7 +41,7 @@ class ActorServiceBaseModel(ModelBaseWithData):
         o = self.collection.capnp_schema.Timeout.new_message(actionName=actionname, timeout=timeout)
         self.addSubItem('timeouts', o)
 
-    def actionAdd(self, name, key="", period=0, log=True, isJob=True, timeout=0):
+    def actionAdd(self, name, key="", period=0, log=True, isJob=True, timeout=0, longjob=False):
         """
         creates and add an action code model to the actor/service
         """
@@ -69,7 +69,8 @@ class ActorServiceBaseModel(ModelBaseWithData):
                 period=period,
                 log=log,
                 isJob=isJob,
-                timeout=timeout)
+                timeout=timeout,
+                longjob=longjob)
 
             self.changed = True
             self.addSubItem('actions', action_obj)
@@ -156,6 +157,19 @@ class ActorServiceBaseModel(ModelBaseWithData):
             if obj.period != 0:
                 recurrings[obj.name] = obj
         return recurrings
+
+    @property
+    def actionsLongRunning(self):
+        """
+        return dict
+            key = action name
+            val = longrunningjobs model
+        """
+        longjobs = {}
+        for obj in self.dbobj.actions:
+            if obj.longjob is True:
+                longjobs[obj.name] = obj
+        return longjobs
 
     @property
     def actionsEvents(self):

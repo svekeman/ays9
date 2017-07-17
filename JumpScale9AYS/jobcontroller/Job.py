@@ -191,7 +191,6 @@ class Job:
         self._logHandler = None
         self.logger = None
 
-
     @property
     def action(self):
         if self._action is None:
@@ -327,8 +326,20 @@ class Job:
         if self.model.dbobj.debug is False:
             self.model.dbobj.debug = self.sourceLoader.source.find('ipdb') != -1 or \
                                      self.sourceLoader.source.find('IPython') != -1
+        if j.atyourservice.server.dev_mode or self.service.model.actions[self.action.dbobj.name].longjob is False:
+            self._future = self._loop.run_in_executor(None, self.method, self)
+        else:
+            # THIS FEATURE IS VERY DANGEROUS: USE with CARE or you END UP with a blocked AYS.
+            # CODE IN `inner` coroutine defined must be fully async or ays main thread will block.
+            # typical definition:
+            # def longjob(job):
+            #     async def inner(job):
+            #         ## code here
+            #     return inner(job)
+            # self.method here is longjob and u need to call it with job to get the coroutine object returned `inner`
 
-        self._future = self._loop.run_in_executor(None, self.method, self)
+            self._future = self._loop.create_task(self.method(self))
+
         # register callback to deal with logs and state of the job after execution
         self._future.add_done_callback(functools.partial(_execute_cb, self))
 
@@ -347,7 +358,6 @@ class Job:
             self._future.remove_done_callback(_execute_cb)
             self._future.cancel()
             self.logger.info("job {} cancelled".format(self))
-
 
     def str_error(self, error):
         out = 'Error of %s:' % str(self)
