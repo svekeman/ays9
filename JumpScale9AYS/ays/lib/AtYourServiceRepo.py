@@ -500,9 +500,10 @@ class AtYourServiceRepo():
         jobkeys = j.core.jobcontroller.db.jobs.list(action='processChange', fromEpoch=curr_time)
 
         print("blueprint done")
-        if not message:
-            message = "Auto Commit By AYS"
-        self.commit(message=message)
+        if not j.atyourservice.server.dev_mode:
+            if not message:
+                message = "Auto Commit By AYS"
+            self.commit(message=message)
         return jobkeys
 
     def blueprintGet(self, bname):
@@ -687,8 +688,7 @@ class AtYourServiceRepo():
         except Exception as e:
             self.logger.warning("AYS Repo auto commit failed: {}".format(e))
 
-        if push and not j.atyourservice.server.dev_mode:
-            if self.git.repo.remotes and "git@" in self.git.repo.remotes[0].url:
+        if push and self.git.repo.remotes and "git@" in self.git.repo.remotes[0].url:
                 try:
                     local_prefab = j.tools.prefab.local
                     key_path = local_prefab.ssh.keygen(name='ays_repos_key').split(".pub")[0]
@@ -698,10 +698,10 @@ class AtYourServiceRepo():
                     self.logger.info("Auto Push done successfully")
                 except Exception as e:
                     self.logger.warning("Auto Push failed: {}".format(e))
-            else:
-                self.logger.warning(
-                    "Auto Push skipped, please make sure that you are using ssh url as a remote to be able to auto push"
-                )
+        else:
+            self.logger.warning(
+                "Auto Push skipped, please make sure that you are using ssh url as a remote to be able to auto push"
+            )
 
     def __str__(self):
         return("aysrepo:%s" % (self.path))
