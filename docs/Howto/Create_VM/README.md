@@ -76,12 +76,31 @@ actions:
 
 ## Example
 
+The below blueprint will create virtual machine (`myvm1`) with one data disk (`mydisk1`) of 500 GB that is limited to 2000 IOPS:
+
 ```yaml
-node.ovc__myvm:
+g8client__cl:
+  url: 'be-gen-1.demo.greenitglobe.com'
+  login: '****'
+  password: '****'
+  account: '****'
+
+vdc__vdctest1:
+  g8client: 'cl'
+  location: 'be-gen-1'
+
+disk.ovc__mydisk1:
+  type: "D"
+  size: 500
+  maxIOPS: 2000
+
+node.ovc__myvm1:
   vdc: "myvdc"
   bootdisk.size: 20
   memory: 1
   os.image: 'Ubuntu 16.04 x64'
+  disk:
+    - mydisk1
 
 actions:
   - action: install
@@ -116,10 +135,23 @@ actions:
 
 You first will need to create a virtual datacenter, as documented in [How to create a VDC](../Create_VDC/README.md).
 
-The execute the above blueprint and create a new run:
+In case AYS is protected with ItsYou.online, you will first need to create a JWT, as documented in [How to Get a JWT](../Get_JWT/README.md).
+
+Once you got your JWT, export the value:
+```bash
+export JWT='...'
+```
+
+Then execute the above blueprint and create a new run:
 ```bash
 ays blueprint
 ays run create
+```
+
+Optionally you can check the status of the run:
+```bash
+ays run list
+ays run show -k <run-id>
 ```
 
 Once the virtual machine got deployed, check the result using the `ays service` command:
