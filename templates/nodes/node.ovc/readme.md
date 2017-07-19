@@ -29,6 +29,7 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - ovf.password: password for owncloud server
 - ovf.path: path to put the exported machine in e.g /exported_vms/machine.ovf
 - ovf.callbackUrl: callbackurl for calling you back when the machine is exported
+- disk: list of disk instances to be attached to the VM
 
 
 
