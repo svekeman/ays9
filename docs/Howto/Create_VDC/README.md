@@ -7,7 +7,7 @@ For creating a virtual datacenter (VDC) use the **vdc** template, available here
 - [Values](#values)
 - [Example](#example)
 - [Using the AYS command line tool](#cli)
-- [Using the AYS RESTfull API](#rest)
+- [Using the AYS RESTful API](#rest)
 - [Using the AYS Python client](#using-the-python-client)
 - [Using the JumpScale client](#using-the-jumpscale-client)
 - [Using the AYS Portal](#using-the-ays-portal)

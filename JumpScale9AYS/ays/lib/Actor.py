@@ -172,6 +172,7 @@ class Actor():
         self._processActionsFile(j.sal.fs.joinPaths(template.path, "actions.py"), context=context)
         self._initRecurringActions(template)
         self._initTimeouts(template)
+        self._initLongjobs(template)
         self._initEvents(template)
 
         self.model.dbobj.serviceDataSchema = template.schemaCapnpText
@@ -208,6 +209,17 @@ class Actor():
                 ac = j.core.jobcontroller.db.actions.get(key=action_model.actionKey)
                 ac.timeout = timeoutasint
                 ac.save()
+
+    def _initLongjobs(self, template):
+        for jobinfo in template.longjobsConfig:
+            actionname = jobinfo['action']
+            action_model = self.model.actions[actionname]
+            action_model.timeout = 0
+            action_model.longjob = True
+            ac = j.core.jobcontroller.db.actions.get(key=action_model.actionKey)
+            ac.timeout = 0
+            ac.longjob = True
+            ac.save()
 
     def _initRecurringActions(self, template):
         for reccuring_info in template.recurringConfig:

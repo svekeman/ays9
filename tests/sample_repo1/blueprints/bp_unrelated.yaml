@@ -1,0 +1,14 @@
+datacenter__ovh_germany3:
+  location: 'germany'
+  description: 'ovh_germany3'
+
+
+sshkey__main:
+
+cockpittesting__cockpitv2:
+  description: 'cockpit v2'
+  datacenter: 'ovh_germany3'
+
+
+actions:
+    - action: 'install'

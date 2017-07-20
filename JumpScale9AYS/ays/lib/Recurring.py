@@ -1,7 +1,6 @@
 from js9 import j
 import asyncio
 
-
 class RecurringTask:
     """Execute a job periodicly"""
     def __init__(self, service, action, period, loop=None):
@@ -53,6 +52,24 @@ class RecurringTask:
         if self._future:
             self._loop.call_soon_threadsafe(self._future.cancel)
 
+
+class LongRunningTask(RecurringTask):
+    def __init__(self, service, action, loop=None):
+        super().__init__(service=service, action=action, period=None, loop=loop)
+        self.logger.info("Created long task {} of service {}".format(action, service))
+
+    async def _run(self):
+        try:
+            # create job
+            self._job = self.service.getJob(actionName=self.action)
+            # execute
+            await self._job.execute()
+            # update last exection time
+        except asyncio.CancelledError:
+            self.logger.info("LongRunningTask for {}:{} is cancelled".format(self.service, self.action))
+            if self._job:
+                self._job.cancel()
+            raise
 
 
 if __name__ == '__main__':
