@@ -1,0 +1,17 @@
+g8client__env:
+    url: 'du-conv-2.demo.greenitglobe.com'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    description: 'vdc for demo'
+    g8client: 'env'
+    account: '<account>'
+    location: '<location>'
+
+node.ovc__testnode:
+actions:
+  - action: uninstall
+    actor: node.ovc
+    service: testnode

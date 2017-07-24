@@ -1,0 +1,4 @@
+test_node_ovc__node:
+
+actions:
+  - action: test_delete
