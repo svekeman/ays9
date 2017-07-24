@@ -228,11 +228,11 @@ class Service:
 
             available_services = self.aysrepo.servicesFind(role=producer_role)
             available_services = list(set(available_services) - set(usersetservices))
-
-            extraservices = len(usersetservices) - producer_model.maxServices
-            if extraservices > 0:
-                raise j.exceptions.Input(message="Specified services [%s] are more than maximum services: [%s]" % (str(usersetservices), str(producer_model.maxServices)),
-                                         level=1, source="", tags="", msgpub="")
+            if producer_model.maxServices:
+                extraservices = len(usersetservices) - producer_model.maxServices
+                if extraservices > 0:
+                    raise j.exceptions.Input(message="Specified services [%s] are more than maximum services: [%s]" % (str(usersetservices), str(producer_model.maxServices)),
+                                             level=1, source="", tags="", msgpub="")
 
             tocreate = producer_model.minServices - len(available_services) - len(usersetservices)
             if tocreate > 0:
