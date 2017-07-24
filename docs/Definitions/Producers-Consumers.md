@@ -23,6 +23,7 @@ links:
 
 This describes that the service consumes a minimum of `1` and a maximum of `100` sshkey instances, and that it should auto-create these instances if they don't already exist. Minimum and maximum tags are optional. As well as `auto`.
 
+Note that if you need the max services (consumed by a service) to be unlimited, either do not set the `max` attribute or set max to `0`
 
 
 ```toml
