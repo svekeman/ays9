@@ -78,13 +78,126 @@ g8client__env:
     account: '<account>'
 
 vdc__vdcname:
-    description: 'vdc for demo'
-    g8client: 'env'
-    account: '<account>'
     location: '<location>'
 
 node.ovc__demo:
 
 actions:
   - action: uninstall
+    actor: node.ovc
+    service: demo
+```
+
+## Example for stopping machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: stop
+    actor: node.ovc
+    service: demo
+```
+
+## Example for starting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: start
+    actor: node.ovc
+    service: demo
+```
+
+## Example for pausing machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: pause
+    actor: node.ovc
+    service: demo
+```
+
+## Example for resuming machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: resume
+    actor: node.ovc
+    service: demo
+```
+
+## Example for restarting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: restart
+    actor: node.ovc
+    service: demo
+```
+
+## Example for resetting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: reset
+    actor: node.ovc
+    service: demo
 ```
