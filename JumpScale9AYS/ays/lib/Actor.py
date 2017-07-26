@@ -147,8 +147,7 @@ class Actor():
                     act.isJob = action.isJob
                     act.timeout = action.timeout
 
-                # FIXME: s.model.actions[action.name].longjob isn't the same as action.longjob.
-                if s.model.actions[action.name].longjob is True:
+                if action.longjob is True:
                     if s._longrunning_tasks[action.name].actioncode != self.model.actionsCode[action.name]:
                         print("Restarting longjob: ", action.name)
                         s._longrunning_tasks[action.name].stop()
@@ -228,8 +227,8 @@ class Actor():
         for jobinfo in template.longjobsConfig:
             actionname = jobinfo['action']
             action_model = self.model.actions[actionname]
-            action_model.timeout = 0
-            action_model.longjob = True
+            self.model.actions[actionname].longjob = True
+            self.model.save()
             ac = j.core.jobcontroller.db.actions.get(key=action_model.actionKey)
             ac.timeout = 0
             ac.longjob = True
