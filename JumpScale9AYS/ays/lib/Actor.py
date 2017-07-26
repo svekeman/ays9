@@ -209,7 +209,7 @@ class Actor():
             self.model.producerAdd(
                 role=consume_info['role'],
                 min=int(consume_info['min']),
-                max=int(consume_info['max']),
+                max=int(consume_info.get('max', 0)),
                 auto=bool(consume_info['auto']),
                 argname=consume_info.get('argname', consume_info['role'])
             )
