@@ -131,6 +131,20 @@ class ServiceModel(ActorServiceBaseModel):
         service.model.dbobj.parent.key = new_parent.model.key
         service.model.dbobj.parent.serviceName = new_parent.name
 
+        # change path to new parent in the filesystem
+        j.sal.fs.removeDirTree(service.path)
+        skey = "%s!%s" % (service.model.role, service.model.dbobj.name)
+        fullpath = j.sal.fs.joinPaths(new_parent.path, skey)
+        newpath = j.sal.fs.pathRemoveDirPart(fullpath, service.aysrepo.path)
+        service.model.dbobj.gitRepo.path = newpath
+        service._path = ""
+
+        # change service dataJSON to reflect the change in the parent
+        actor = service.aysrepo.actorGet(service.model.dbobj.actorName)
+        template = service.aysrepo.templateGet(actor.model.dbobj.name)
+        argname = template.configDict['links']['parent']['argname']
+        setattr(service.model.data, argname, new_parent.name)
+
         service.model.reSerialize()
         service.parent.model.reSerialize()
         new_parent.model.reSerialize()
