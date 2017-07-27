@@ -599,15 +599,21 @@ async def listServices(request, repository):
 
     return json(services, 200)
 
+
 def _sanitize(value):
     if isinstance(value, (list, capnp.lib.capnp._DynamicListBuilder)):
         result = list()
         for item in value:
             result.append(_sanitize(item))
         return result
-    elif isinstance(value, (dict, capnp.lib.capnp._DynamicStructBuilder)):
+    elif isinstance(value, capnp.lib.capnp._DynamicStructBuilder):
         result = dict()
         for key, val in value.to_dict().items():
+            result[key] = _sanitize(val)
+        return result
+    elif isinstance(value, dict):
+        result = dict()
+        for key, val in value.items():
             result[key] = _sanitize(val)
         return result
     elif isinstance(value, capnp.lib.capnp._DynamicEnum):
