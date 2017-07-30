@@ -38,7 +38,6 @@ def _execute_cb(job, future):
     except asyncio.CancelledError as err:
         exception = err
         job.logger.info("{} has been cancelled".format(job))
-
     if exception is not None:
         job.state = 'error'
         job.model.dbobj.state = 'error'
@@ -65,7 +64,8 @@ def _execute_cb(job, future):
             job.service.model.dbobj.state = 'ok'
 
         job.logger.info("job {} done sucessfuly".format(str(job)))
-    if service_action_obj.period > 0:  # recurring action.
+
+    if service_action_obj.period > 0:   # recurring action.
         job.model.delete()
         del job
     else:
@@ -290,6 +290,8 @@ class Job:
         raise RuntimeError(errormsg)
 
     def save(self):
+        if not j.sal.fs.exists(self.service.path):
+            return # repo destroyed.
         # fill the context list in capnp obj before save
         self.model.dbobj.init('context', len(self.context))
         i = 0
