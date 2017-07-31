@@ -16,7 +16,6 @@ def init(job):
     users = service.model.data.uservdc
     for user in users:
         uservdc = service.aysrepo.serviceGet('uservdc', user.name)
-        #service.model.producerAdd('uservdc', user.name, uservdc.model.key)
         service.consume(uservdc)
 
     accountservice = None
