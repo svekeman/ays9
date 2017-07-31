@@ -196,7 +196,7 @@ def main():
                 raise RuntimeError('Failures while running ays tests')
         finally:
             # clean the created repo
-            j.logger.logging.info('Cleaning up ceated repository')
+            j.logger.logging.info('Cleaning up created repository')
             cli.destroyRepository(data={}, repository=repo_info['name'])
             cli.deleteRepository(repository=repo_info['name'])
 
