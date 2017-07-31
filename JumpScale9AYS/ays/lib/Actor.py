@@ -1,6 +1,5 @@
 from js9 import j
 from .Service import Service
-from .utils import validate_service_name
 import capnp
 from JumpScale9AYS.ays.lib import model_capnp as ModelCapnp
 
@@ -492,9 +491,6 @@ class Actor():
 # SERVICE
 
     async def asyncServiceCreate(self, instance="main", args={}, context=None):
-        valid, message = validate_service_name(name=instance)
-        if not valid:
-            raise j.exceptions.Input(message)
         instance = instance
         service = self.aysrepo.serviceGet(role=self.model.role, instance=instance, die=False)
         if service is not None:
