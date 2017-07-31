@@ -1,6 +1,6 @@
 def init_actions_(service, args):
     """
-    this needs to returns an array of actions representing the depencies between actions.
+    This needs to return an array of actions representing the depencies between actions.
     Looks at ACTION_DEPS in this module for an example of what is expected
     """
 
