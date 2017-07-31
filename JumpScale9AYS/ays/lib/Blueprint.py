@@ -1,6 +1,7 @@
 from js9 import j
 import yaml
 import re
+from .utils import validate_service_name
 
 class Blueprint:
     """
@@ -206,6 +207,7 @@ class Blueprint:
             self.path = newpath
             self.active = True
 
+
     def _validate_yaml(self, content):
         try:
             j.data.serializer.yaml.loads(content)
@@ -245,9 +247,7 @@ class Blueprint:
                         self.logger.error(message)
                         return False, message
 
-                    if not re.sub("[-_.]", "", instance).isalnum():
-                        message = "Service instance name should be digits or alphanumeric. you passed [%s]" % instance
-                        return False, message
+                    return validate_service_name(name=instance)
 
         return True, 'Blueprint format is valid'
 
