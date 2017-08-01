@@ -6,7 +6,7 @@ struct Schema {
 	g8client @2 :Text;
 	account @3 :Text;
 	location @4 :Text;
-	uservdc @5 :List(Text);
+	uservdc @5 :List(UserVdcEntry);
 	allowedVMSizes @6 :List(Int64);
 	cloudspaceID @7 :Int64 = 0;
 	maxMemoryCapacity @8 :Int64 = -1;
@@ -14,5 +14,9 @@ struct Schema {
 	maxDiskCapacity @10 :Int64 = -1;
 	maxNumPublicIP @11 :Int64 = -1;
 	externalNetworkID @12 :Int64 = -1;
+	struct UserVdcEntry {
+		name @0 :Text;
+		accesstype @1 :Text;
+	}
 
 }
