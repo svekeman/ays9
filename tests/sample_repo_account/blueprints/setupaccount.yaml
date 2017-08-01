@@ -1,0 +1,24 @@
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: <account>
+
+uservdc__usertest:
+    password: '<password>'
+    email: '<email>'
+    groups:
+      - user
+    g8client: 'env'
+
+account_acc:
+    description: '<random>'
+    g8client: 'env'
+    accountusers: []
+    maxMemoryCapacity: <randint=1,100>
+    maxCPUCapacity:  <randint=1,100>
+    maxDiskCapacity: <randint=10,100>
+    maxNumPublicIP: <randint=1,100>
+
+actions:
+   - action: install

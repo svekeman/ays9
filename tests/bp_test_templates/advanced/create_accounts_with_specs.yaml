@@ -15,7 +15,6 @@ account__<random_account_1>:
     maxDiskCapacity: <randint=10,100>
     maxNumPublicIP: <randint=1,100>
 
-
 account__<random_account_2>:
     description: '<random>'
     g8client: 'env'
@@ -47,4 +46,4 @@ test_create_accounts_with_specs__<random>:
 actions:
    - action: 'install'
    - action: 'test'
-actor: test_create_accounts_with_specs
+     actor: test_create_accounts_with_specs
