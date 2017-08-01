@@ -137,6 +137,7 @@ class Actor():
 
         for s in services:
             dirtyservice = False
+            ensure_longjobs = False
             for action in self.model.dbobj.actions:
                 if action.period > 0:
                     dirtyservice = True
@@ -145,6 +146,18 @@ class Actor():
                     act.log = action.log
                     act.isJob = action.isJob
                     act.timeout = action.timeout
+
+                if action.longjob is True:
+                    if s._longrunning_tasks[action.name].actioncode != self.model.actionsCode[action.name]:
+                        print("Restarting longjob: ", action.name)
+                        s._longrunning_tasks[action.name].stop()
+                        del s._longrunning_tasks[action.name]
+                        ensure_longjobs = True
+
+
+            if ensure_longjobs:
+                s._ensure_longjobs()
+
             if dirtyservice:
                 s.model.reSerialize()
                 s.saveAll()
@@ -214,8 +227,8 @@ class Actor():
         for jobinfo in template.longjobsConfig:
             actionname = jobinfo['action']
             action_model = self.model.actions[actionname]
-            action_model.timeout = 0
-            action_model.longjob = True
+            self.model.actions[actionname].longjob = True
+            self.model.save()
             ac = j.core.jobcontroller.db.actions.get(key=action_model.actionKey)
             ac.timeout = 0
             ac.longjob = True
