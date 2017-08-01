@@ -2,7 +2,7 @@ from js9 import j
 from JumpScale9AYS.ays.lib.models.ActorServiceBaseModel import ActorServiceBaseModel
 from JumpScale9AYS.ays.lib.Service import Service
 from JumpScale9AYS.ays.lib import model_capnp as ModelCapnp
-
+import re
 VALID_STATES = ['new', 'installing', 'ok', 'error', 'disabled', 'changed']
 
 
@@ -110,7 +110,9 @@ class ServiceModel(ActorServiceBaseModel):
 
         if service.parent == new_parent:
             return
-        old_parent_name = service.parent.name
+        old_parent = '%s!%s' % (service.parent.model.dbobj.actorName, service.parent.name)
+        old_parent_index = '{name}:{actor}:.*:{parent}:.*'.format(name=service.name, actor=self.dbobj.actorName,
+                                                                  parent=old_parent)
         # remove old parent from the producers list.
         service.model.producerRemove(service.parent)
         # remove ourself from the consumers list of the old parent
@@ -148,17 +150,14 @@ class ServiceModel(ActorServiceBaseModel):
         service.model.reSerialize()
         service.parent.model.reSerialize()
         new_parent.model.reSerialize()
-        toRemove = None
+
+        toRemoveItems = []
         for k, v in self.collection._db.dbindex.items():
-            if old_parent_name in k and service.name in k:
-                toRemove = k
-                break
+            if re.match(old_parent_index, k) is not None:
+                toRemoveItems.append(k)
 
-        if toRemove is not None:
+        for toRemove in toRemoveItems:
             self.collection._db.dbindex.pop(toRemove)
-
-        #import ipdb; ipdb.set_trace()
-        #self.collection._db.delete(self.key)
 
         self.save()
 
