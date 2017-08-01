@@ -461,6 +461,7 @@ def uninstall(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.delete()
@@ -479,6 +480,7 @@ def start(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.start()
@@ -497,6 +499,7 @@ def stop(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.stop()
@@ -515,6 +518,7 @@ def restart(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.restart()
@@ -533,6 +537,7 @@ def pause(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.pause()
@@ -551,6 +556,7 @@ def resume(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.resume()
@@ -569,6 +575,7 @@ def reset(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.reset()
