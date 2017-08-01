@@ -1,4 +1,4 @@
 account_acc:
   accountusers:
       - name: 'usertest'
-        accesstype: 'R'
+        accesstype: 'ACDRUX'

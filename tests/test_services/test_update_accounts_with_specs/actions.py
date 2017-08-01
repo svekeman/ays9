@@ -18,8 +18,15 @@ def test(job):
     RESULT_OK = 'OK : %s '
     RESULT_FAILED = 'FAILED : %s'
     RESULT_ERROR = 'ERROR : %s'
+    failures = []
     try:
         cl = j.clients.atyourservice.get().api.ays
+
+        client = j.clients.atyourservice.get().api
+        token=service.model.data.token
+        client.set_auth_header('Bearer {}'.format(token))
+        cli = client.ays
+
         repo = 'sample_repo_account'
 
         # execute blueprint to setup account
@@ -63,9 +70,10 @@ def test(job):
 
         response = session.post(url=API_URL, data=API_BODY)
 
-        # TODO: check if user added to account
+        # check if user added to account
         if response.status_code == 200:
             content = response.json()
+            job.logger.info("CONTENT AFTER USER ADD:" + str(content))
             if len(content['accountusers']) == 1:
                     service.model.data.result = RESULT_OK % 'successfully added user to account'
             else:
@@ -75,8 +83,28 @@ def test(job):
                              'content': response.content}
             failures.append(RESULT_ERROR % str(response_data) + str(accountId))
 
+        account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
+
+        execute blueprint to change access
+        res = cl.executeBlueprint(data=None, blueprint='changeaccess.yaml', repository=repo).json()
+        job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+        while job['state'] != 'ok':
+            time.sleep(2)
+            job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
+
+        accesstype = 'ACDRUX'
+        if account['data']['accountusers'][0]['accesstype'] != accesstype:
+            failures.append(RESULT_FAILED % 'accesstype of user not updated in data')
+
+        accountId = account.model.data.accountID
+        API_BODY = {'accountId': accountId}
+
+        response = session.post(url=API_URL, data=API_BODY)
+
+        # TODO: check if access is changed
+
 
         # execute blueprint to delete user
         res = cl.executeBlueprint(data=None, blueprint='deleteuser.yaml', repository=repo).json()
@@ -90,7 +118,7 @@ def test(job):
 
         response = session.post(url=API_URL, data=API_BODY)
 
-        # TODO: check if user removed
+        # check if user removed
         if response.status_code == 200:
             content = response.json()
             if len(content['accountusers']) == 0:
@@ -111,7 +139,7 @@ def test(job):
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
 
-        # TODO: check if limits are updated
+        # check if limits are updated
         if response.status_code == 200:
             content = response.json()
             if content['maxMemoryCapacity'] == 50 and content['maxCPUCapacity'] == 10 and \
@@ -126,7 +154,7 @@ def test(job):
 
         if failures:
             service.model.data.result = '\n'.join(failures)
-        cl.destroyRepository(data=None, repository=repo)
     except:
         service.model.data.result = 'ERROR :  %s %s' % ('test_update_accounts_with_specs', str(sys.exc_info()[:2]))
     service.save()
+    cl.destroyRepository(data=None, repository=repo)
