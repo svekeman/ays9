@@ -2,7 +2,7 @@ from js9 import j
 from JumpScale9AYS.ays.lib.models.ActorServiceBaseModel import ActorServiceBaseModel
 from JumpScale9AYS.ays.lib.Service import Service
 from JumpScale9AYS.ays.lib import model_capnp as ModelCapnp
-import re
+
 VALID_STATES = ['new', 'installing', 'ok', 'error', 'disabled', 'changed']
 
 
@@ -151,12 +151,8 @@ class ServiceModel(ActorServiceBaseModel):
         service.parent.model.reSerialize()
         new_parent.model.reSerialize()
 
-        toRemoveItems = []
-        for k, v in self.collection._db.dbindex.items():
-            if re.match(old_parent_index, k) is not None:
-                toRemoveItems.append(k)
-
-        for toRemove in toRemoveItems:
+        toRemoveItems = self.collection._db.list(old_parent_index, True)
+        for (toRemove, key) in toRemoveItems:
             self.collection._db.dbindex.pop(toRemove)
 
         self.save()
