@@ -11,7 +11,7 @@ uservdc__usertest:
       - user
     g8client: 'env'
 
-account_acc:
+account__acc:
     description: '<random>'
     g8client: 'env'
     accountusers: []

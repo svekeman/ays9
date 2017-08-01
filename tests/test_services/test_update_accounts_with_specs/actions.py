@@ -22,11 +22,6 @@ def test(job):
     try:
         cl = j.clients.atyourservice.get().api.ays
 
-        client = j.clients.atyourservice.get().api
-        token=service.model.data.token
-        client.set_auth_header('Bearer {}'.format(token))
-        cli = client.ays
-
         repo = 'sample_repo_account'
 
         # execute blueprint to setup account
@@ -73,7 +68,6 @@ def test(job):
         # check if user added to account
         if response.status_code == 200:
             content = response.json()
-            job.logger.info("CONTENT AFTER USER ADD:" + str(content))
             if len(content['accountusers']) == 1:
                     service.model.data.result = RESULT_OK % 'successfully added user to account'
             else:
@@ -85,7 +79,7 @@ def test(job):
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
 
-        execute blueprint to change access
+        #execute blueprint to change access
         res = cl.executeBlueprint(data=None, blueprint='changeaccess.yaml', repository=repo).json()
         job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
         while job['state'] != 'ok':
