@@ -1,9 +1,6 @@
 
-@0xec90f63238ca16a9;
+@0xb91d5c84f0365c10;
 struct Schema {
-	vdc @0 :Text;
-	g8client @1 :Text;
-	uservdc @2 :Text;
-	result @3 :Text;
+	result @0 :Text;
 
 }
