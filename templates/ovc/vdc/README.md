@@ -24,7 +24,7 @@ This actor template creates a cloudspace (Virtual Data Center) on the specified 
 
 Using process change it is possible to add, remove and update user access to the cloudspace. To add user after executing the run and creating the vdc, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. changing the accesstype will update the user access when executing the blueprint.
 
-## Example
+## Example for creating VDC
 
 ```yaml
 g8client__example:
@@ -55,4 +55,22 @@ vdc__cs2:
     allowedVMSizes:
         - 1
         - 2
+actions:
+  - action: install
+```
+
+## Example for Deleting VDC
+
+```yaml
+g8client__example:
+    url: '<url of the environment>'
+    login: '<username>'
+    password: '<password>'
+    account: '<account name>'
+
+vdc__cs2:
+    location: '<name of the environment>'
+
+actions:
+  - action: uninstall
 ```
