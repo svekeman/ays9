@@ -39,3 +39,165 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
  - Adding new port forward in blueprint will add a new portforwardomg.
  - Editing port foward in blueprint = removing the old portforward and creating new one.
  > port 22 is special case we keep it even if edited or deleted.
+
+Replace \<with actual value \>
+
+## Example for creating machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    description: 'vdc for demo'
+    g8client: 'env'
+    account: '<account>'
+    location: '<location>'
+
+# create the vm.
+# expose ports 22. Map it to 2210.
+node.ovc__demo:
+    bootdisk.size: 50
+    memory: 2
+    os.image: 'Ubuntu 16.04 x64'
+    ports:
+        - '2210:22'
+
+actions:
+  - action: install
+```
+
+## Example for deleting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: uninstall
+    actor: node.ovc
+    service: demo
+```
+
+## Example for stopping machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: stop
+    actor: node.ovc
+    service: demo
+```
+
+## Example for starting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: start
+    actor: node.ovc
+    service: demo
+```
+
+## Example for pausing machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: pause
+    actor: node.ovc
+    service: demo
+```
+
+## Example for resuming machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: resume
+    actor: node.ovc
+    service: demo
+```
+
+## Example for restarting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: restart
+    actor: node.ovc
+    service: demo
+```
+
+## Example for resetting machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: reset
+    actor: node.ovc
+    service: demo
+```
