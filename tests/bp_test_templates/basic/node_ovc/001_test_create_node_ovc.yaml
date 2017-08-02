@@ -1,0 +1,20 @@
+g8client__env:
+    url: '<url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+
+node.ovc__testn:
+    os.image: 'Ubuntu 16.04 x64'
+
+test_node_ovc__node:
+
+actions:
+  - action: install
+  - action: test_create
+    actor: test_node_ovc
+    service: node
