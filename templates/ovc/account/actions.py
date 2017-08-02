@@ -1,6 +1,13 @@
 from js9 import j
 
 
+def init_actions_(service, args):
+    dependencies = {
+        'list_disks': ['init']
+    }
+    return dependencies
+
+
 def init(job):
     service = job.service
     if 'g8client' not in service.producers:
@@ -111,3 +118,12 @@ def uninstall(job):
     cl = j.clients.openvcloud.getFromService(g8client)
     acc = cl.account_get(service.model.dbobj.name)
     acc.delete()
+
+
+def list_disks(job):
+    service = job.service
+    g8client = service.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    account = cl.account_get(name=service.model.dbobj.name)
+    service.model.disks = account.disks
+    service.save()

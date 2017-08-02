@@ -290,7 +290,7 @@ class Job:
         raise RuntimeError(errormsg)
 
     def save(self):
-        if not j.sal.fs.exists(self.service.path):
+        if not j.sal.fs.exists(j.sal.fs.joinPaths(self.service.aysrepo.path, "services")):
             return # repo destroyed.
         # fill the context list in capnp obj before save
         self.model.dbobj.init('context', len(self.context))
