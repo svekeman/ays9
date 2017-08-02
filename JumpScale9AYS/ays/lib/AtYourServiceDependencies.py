@@ -68,15 +68,16 @@ def addEdges(node, action, all_nodes, nodes):
 def addConsumerEdges(node, action, all_nodes, nodes):
     """
     recursivlely add edged to a node
+    only if its a parent.
     """
-    for consumers in node.service.consumers.values():
-        for prod in consumers:
-            name = "%s-%s" % (prod.model.key, action)
-            edge = all_nodes.get(name)
-            if edge:
-                addConsumerEdges(edge, action, all_nodes, nodes)
-                node.addEdge(edge)
-                nodes.add(edge)
+    for prod in node.service.children:
+
+        name = "%s-%s" % (prod.model.key, action)
+        edge = all_nodes.get(name)
+        if edge:
+            addConsumerEdges(edge, action, all_nodes, nodes)
+            node.addEdge(edge)
+            nodes.add(edge)
 
 def get_task_batches(nodes):
 
