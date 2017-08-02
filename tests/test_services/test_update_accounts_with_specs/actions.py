@@ -32,7 +32,7 @@ def test(job):
         while run['state'] != 'ok':
             time.sleep(2)
             run = cl.getRun(repository=repo, runid=run['key']).json()
-        g8client = cl.getServiceByName(role="g8client", name="example", repository=repo).json()
+        g8client = cl.getServiceByName(role="g8client", name="env", repository=repo).json()
 
         url = 'https://' + g8client['data']['url']
         username = g8client['data']['login']

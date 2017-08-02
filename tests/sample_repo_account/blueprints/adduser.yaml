@@ -1,4 +1,3 @@
 account__acc:
   accountusers:
-      - name: 'usertest'
-        accesstype: 'R'
+      - 'usertest'
