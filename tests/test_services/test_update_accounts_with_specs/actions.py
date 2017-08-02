@@ -146,8 +146,18 @@ def test(job):
                              'content': response.content}
             failures.append(RESULT_ERROR % str(response_data) + str(accountId))
 
+        # execute blueprint for cleanup
+        cl.executeBlueprint(data=None, blueprint='cleanup.yaml', repository=repo)
+        run = cl.createRun(data=None, repository=repo)
+        run = cl.executeRun(repository=repo, data=None, runid=run.json()['key']).json()
+        run = cl.getRun(repository=repo, runid=run['key']).json()
+        while run['state'] != 'ok':
+            time.sleep(2)
+            run = cl.getRun(repository=repo, runid=run['key']).json()
+
         if failures:
             service.model.data.result = '\n'.join(failures)
+
     except:
         service.model.data.result = 'ERROR :  %s %s' % ('test_update_accounts_with_specs', str(sys.exc_info()[:2]))
     service.save()

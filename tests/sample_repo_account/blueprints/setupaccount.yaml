@@ -1,12 +1,11 @@
 g8client__env:
-    url: '<env_url>'
-    login: '<login>'
-    password: '<password>'
-    account: <account>
+    url: 'du-conv-2.demo.greenitglobe.com'
+    login: 'jonas'
+    password: 'gigorgpass'
 
 uservdc__usertest:
-    password: '<password>'
-    email: '<email>'
+    password: 'test'
+    email: 'test@example.com'
     groups:
       - user
     g8client: 'env'
@@ -14,11 +13,12 @@ uservdc__usertest:
 account__acc:
     description: '<random>'
     g8client: 'env'
-    accountusers: []
-    maxMemoryCapacity: <randint=1,100>
-    maxCPUCapacity:  <randint=1,100>
-    maxDiskCapacity: <randint=10,100>
-    maxNumPublicIP: <randint=1,100>
+    accountusers:
+      - 'jonas'
+    maxMemoryCapacity: 20
+    maxCPUCapacity:  5
+    maxDiskCapacity: 20
+    maxNumPublicIP: 5
 
 actions:
    - action: install
