@@ -110,7 +110,9 @@ class ServiceModel(ActorServiceBaseModel):
 
         if service.parent == new_parent:
             return
-
+        old_parent = '%s!%s' % (service.parent.model.dbobj.actorName, service.parent.name)
+        old_parent_index = '{name}:{actor}:.*:{parent}:.*'.format(name=service.name, actor=self.dbobj.actorName,
+                                                                  parent=old_parent)
         # remove old parent from the producers list.
         service.model.producerRemove(service.parent)
         # remove ourself from the consumers list of the old parent
@@ -148,6 +150,10 @@ class ServiceModel(ActorServiceBaseModel):
         service.model.reSerialize()
         service.parent.model.reSerialize()
         new_parent.model.reSerialize()
+
+        toRemoveItems = self.collection._db.list(old_parent_index, True)
+        for (toRemove, key) in toRemoveItems:
+            self.collection._db.dbindex.pop(toRemove)
 
         self.save()
 
