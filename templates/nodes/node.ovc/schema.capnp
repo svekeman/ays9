@@ -22,5 +22,6 @@ struct Schema {
 	ovfPassword @18 :Text;
 	ovfPath @19 :Text;
 	ovfCallbackUrl @20 :Text;
-	stackID @21 :Int64 = -1; 
+	stackID @21 :Int64 = -1;
+	vmHistory @22 :Text;
 }
