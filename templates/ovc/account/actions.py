@@ -11,7 +11,7 @@ def init_actions_(service, args):
 def init(job):
     service = job.service
     if 'g8client' not in service.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue init of %s" % service)
 
     service.saveAll()
 
@@ -19,7 +19,7 @@ def init(job):
 def install(job):
     service = job.service
     if 'g8client' not in service.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue install of %s" % service)
     g8client = service.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
 
@@ -78,7 +78,7 @@ def processChange(job):
             setattr(service.model.data, key, value)
 
         if 'g8client' not in service.producers:
-            raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+            raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue processChange of %s" % service)
 
         g8client = service.producers["g8client"][0]
         cl = j.clients.openvcloud.getFromService(g8client)
@@ -112,7 +112,7 @@ def processChange(job):
 def uninstall(job):
     service = job.service
     if 'g8client' not in service.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue uninstall of %s" % service)
 
     g8client = service.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)

@@ -75,7 +75,7 @@ def execute_blueprint(cli, blueprint, repo_info):
 
 def create_run(cli, repo_info):
     """
-    Create a run and executing it
+    Create a run and execute it
     """
     errors = []
     j.logger.logging.info('Creating a new run')
@@ -151,7 +151,7 @@ def execute_blueprints(cli, repo_info):
         - create a run
         - execute the run
         - wait for the run to finish
-        - destory the repo
+        - destroy the repo
     """
     errors = {}
     bps_path = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
@@ -196,7 +196,7 @@ def main():
                 raise RuntimeError('Failures while running ays tests')
         finally:
             # clean the created repo
-            j.logger.logging.info('Cleaning up ceated repository')
+            j.logger.logging.info('Cleaning up created repository')
             cli.destroyRepository(data={}, repository=repo_info['name'])
             cli.deleteRepository(repository=repo_info['name'])
 
