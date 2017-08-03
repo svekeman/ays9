@@ -49,29 +49,35 @@ def test(job):
 
         # execute blueprint to add user to account
         res = cl.executeBlueprint(data=None, blueprint='adduser.yaml', repository=repo).json()
-        job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-        while job['state'] != 'ok':
+        bjob = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+        while bjob['state'] != 'ok':
             time.sleep(2)
-            job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+            bjob = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
 
         if not account['data']['accountusers']:
             failures.append(RESULT_FAILED % 'user not added to model data')
 
-        accountId = account.model.data.accountID
+        accountId = account['data']['accountID']
         API_URL = url + '/restmachine/cloudapi/accounts/get'
         API_BODY = {'accountId': accountId}
 
         response = session.post(url=API_URL, data=API_BODY)
 
+        user_name = 'usertest'
+
         # check if user added to account
         if response.status_code == 200:
             content = response.json()
-            if len(content['accountusers']) == 1:
-                    service.model.data.result = RESULT_OK % 'successfully added user to account'
+            job.logger.info("!!!!!!! CONTENT: " + str(content))
+            for user in content['acl']:
+                if user_name in user['userGroupId']:
+                    service.model.data.result = RESULT_OK % 'user added to account'
+                    break
             else:
-                failures.append(RESULT_FAILED % 'failed to add user to account')
+                failure = '%s not in %i account' % (username, accountId)
+                failures.append(RESULT_FAILED % failure)
         else:
             response_data = {'status_code': response.status_code,
                              'content': response.content}
@@ -79,33 +85,13 @@ def test(job):
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
 
-        #execute blueprint to change access
-        res = cl.executeBlueprint(data=None, blueprint='changeaccess.yaml', repository=repo).json()
-        job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-        while job['state'] != 'ok':
-            time.sleep(2)
-            job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-
-        account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
-
-        accesstype = 'ACDRUX'
-        if account['data']['accountusers'][0]['accesstype'] != accesstype:
-            failures.append(RESULT_FAILED % 'accesstype of user not updated in data')
-
-        accountId = account.model.data.accountID
-        API_BODY = {'accountId': accountId}
-
-        response = session.post(url=API_URL, data=API_BODY)
-
-        # TODO: check if access is changed
-
 
         # execute blueprint to delete user
         res = cl.executeBlueprint(data=None, blueprint='deleteuser.yaml', repository=repo).json()
-        job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-        while job['state'] != 'ok':
+        bjob = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+        while bjob['state'] != 'ok':
             time.sleep(2)
-            job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+            bjob = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
         API_BODY = {'accountId': accountId}
@@ -115,10 +101,15 @@ def test(job):
         # check if user removed
         if response.status_code == 200:
             content = response.json()
-            if len(content['accountusers']) == 0:
-                    service.model.data.result = RESULT_OK % 'successfully deleted user from account'
+            found = False
+            for user in content['acl']:
+                if user_name in user['userGroupId']:
+                    found = True
+            if found:
+                failure = '%s still in %i account' % (username, accountId)
+                failures.append(RESULT_FAILED % failure)
             else:
-                failures.append(RESULT_FAILED % 'failed to delete user from account')
+                service.model.data.result = RESULT_OK % 'user deleted from account'
         else:
             response_data = {'status_code': response.status_code,
                              'content': response.content}
@@ -126,19 +117,22 @@ def test(job):
 
         # execute blueprint to update limits
         res = cl.executeBlueprint(data=None, blueprint='updatelimits.yaml', repository=repo).json()
-        job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-        while job['state'] != 'ok':
+        bjob = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+        while bjob['state'] != 'ok':
             time.sleep(2)
-            job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+            bjob = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
 
         # check if limits are updated
         if response.status_code == 200:
             content = response.json()
-            if content['maxMemoryCapacity'] == 50 and content['maxCPUCapacity'] == 10 and \
-                content['maxDiskCapacity'] == 50 and content['maxNumPublicIP'] == 10:
-                    service.model.data.result = RESULT_OK % 'successfully updated limimits for account'
+            limits = content['resourceLimits']
+            actual_limits = [limits['CU_M'], limits['CU_C'], limits['CU_D'], limits['CU_I']]
+            expected_limits = [50, 10, 50, 10]
+
+            if actual_limits == expected_limits:
+                service.model.data.result = RESULT_OK % 'successfully updated limimits for account'
             else:
                 failures.append(RESULT_FAILED % 'failed to update limits of account')
         else:

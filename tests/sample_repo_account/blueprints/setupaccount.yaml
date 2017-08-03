@@ -4,14 +4,14 @@ g8client__env:
     password: 'gigorgpass'
 
 uservdc__usertest:
-    password: 'test'
-    email: 'test@example.com'
+    password: 'test1234'
+    email: 'test@fake.com'
     groups:
       - user
     g8client: 'env'
 
 account__acc:
-    description: '<random>'
+    description: 'random'
     g8client: 'env'
     accountusers:
       - 'jonas'
