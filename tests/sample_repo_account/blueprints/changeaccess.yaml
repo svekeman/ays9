@@ -1,4 +1,5 @@
 account__acc:
   accountusers:
       - '<login>'
-      - 'usertest'
+      - name: 'usertest'
+        accesstype: 'ACDRUX'
