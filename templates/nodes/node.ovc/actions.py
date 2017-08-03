@@ -83,6 +83,8 @@ def _authorization_user(machine, service, action=""):
                         except ApiError as err:
                             service.logger.logging.error('Failed to delete access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
                             raise
+                    elif action == 'add' and existing_acl == uuvdc.accesstype:
+                        service.logger.info('User {} already have the required access type on machine {}'.format(user, machine.name))
                     else:
                         # user already registered but the action was not update, then we need to fail to prevernt users from updating users by mistake
                         msg = 'User {} already have the required access type on machine {}. If you want to update the access rights, please your update_user action'.format(user, machine.name)
@@ -394,6 +396,9 @@ def init_actions_(service, args):
         'stop': [],
         'getHistory': ['install'],
         'uninstall': ['stop'],
+        'add_user': ['install'],
+        'update_user': ['install'],
+        'delete_user': ['install'],
     }
 
 
