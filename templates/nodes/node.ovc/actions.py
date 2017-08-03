@@ -18,41 +18,77 @@ def init(job):
         uservdc = service.aysrepo.serviceGet('uservdc', user.name)
         service.consume(uservdc)
 
-def _authorization_user(machine, service):
+def _authorization_user(machine, service, action=""):
     from JumpScale9Lib.clients.portal.PortalClient import ApiError
 
     userslist = service.producers.get('uservdc', [])
+    if not userslist:
+        return
+
     users = []
-    for uvdc in service.model.data.uservdc:
+    for u in userslist:
         if u.model.data.provider != '':
             users.append(u.model.dbobj.name + "@" + u.model.data.provider)
         else:
             users.append(u.model.dbobj.name)
     try:
         machine_info = machine.client.api.cloudapi.machines.get(machineId=machine.id)
-    except ApiError, err:
-        j.logger.logging.error('Failed to retrieve machine information for machine {}'.format(machine.id))
+    except ApiError as err:
+        j.logger.logging.error('Failed to retrieve machine information for machine {}. Error: {}'.format(machine.id, err))
         raise
     # get acl info
     acl_info = {}
     for item in machine_info['acl']:
-        acl_info[item['userGroupId'] = item
+        acl_info[item['userGroupId']] = item
 
 
     # Authorize users
     for user in users:
+        # user is not registred...then add it
         if user not in acl_info:
+            if not action or action == 'add':
+                for uvdc in service.model.data.uservdc:
+                    if uvdc.name == user.split('@')[0]:
+                        try:
+                            result = machine.client.api.cloudapi.machines.addUser(machineId=machine.id, userId=user, accesstype=uvdc.accesstype)
+                        except ApiError as err:
+                            service.logger.logging.error('Failed to register access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
+                            raise
+                        if result is not True:
+                            service.logger.logging.error('Failed to register access rights for user {} on machine {}'.format(user, machine.name))
+            elif action == 'delete':
+                service.logger.logging.warning('User {} does not have access rights on machine {}'.format(user, machine.name))
+            else:
+                # user is not registred while action is not add, then we need to fail to prevent users from registering users by mistake
+                msg = 'User {} is not registred to have access rights on machine {}. If you want to register user, please use add_user action'.format(user, machine.name)
+                service.logger.logging.error(msg)
+                raise RuntimeError(msg)
+
+        else:
+            # user already registered, check if the acl changed
+            existing_acl = acl_info[user]['right']
             for uvdc in service.model.data.uservdc:
                 if uvdc.name == user.split('@')[0]:
-                    if uvdc.accesstype:
-                        space.authorize_user(username=user, right=uvdc.accesstype)
+                    if not action or action == "update":
+                        try:
+                            result = machine.client.api.cloudapi.machines.updateUser(machineId=machine.id, userId=user, accesstype=uvdc.accesstype)
+                        except ApiError as err:
+                            service.logger.logging.error('Failed to update access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
+                            raise
+                        if result is not True:
+                            service.logger.logging.error('Failed to update access rights for user {} on machine {}'.format(user, machine.name))
+                    elif action == 'delete':
+                        try:
+                            machine.client.api.cloudapi.machines.deleteUser(machineId=machine.id, userId=user)
+                        except ApiError as err:
+                            service.logger.logging.error('Failed to delete access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
+                            raise
                     else:
-                        space.authorize_user(username=user)
+                        # user already registered but the action was not update, then we need to fail to prevernt users from updating users by mistake
+                        msg = 'User {} already have the required access type on machine {}. If you want to update the access rights, please your update_user action'.format(user, machine.name)
+                        service.logger.error(msg)
+                        raise RuntimeError(msg)
 
-    # Unauthorize users not in the schema
-    for user in authorized_users:
-        if user not in users:
-            space.unauthorize_user(username=user)
 
 
 def install(job):
@@ -83,6 +119,9 @@ def install(job):
 
     service.model.data.machineId = machine.id
     service.model.data.ipPublic = machine.space.model['publicipaddress'] or space.get_space_ip()
+
+    # register users acls
+    _authorization_user(machine, service)
 
     ip, vm_info = machine.get_machine_ip()
     if not ip:
@@ -626,10 +665,9 @@ def mail(job):
     print('hello world')
 
 
-
-def add_user(job):
+def _update_user_acl(job, action):
     """
-    Give a registered user access rights to the machine
+    Updates user access rights on the machine
     """
     service = job.service
     vdc = service.parent
@@ -643,6 +681,29 @@ def add_user(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
-        service.logger.warning("Machine doesn't exist in the cloud space")
-        return
+        msg = "Machine {} doesn't exist in the cloud space {}".format(service.name, space.name)
+        service.logger.warning(msg)
+        raise RuntimeError(msg)
     machine = space.machines[service.name]
+    _authorization_user(machine, service, action=action)
+
+
+def add_user(job):
+    """
+    Give a registered user access rights to the machine
+    """
+    _update_user_acl(job=job, action='add')
+
+
+def update_user(job):
+    """
+    Update a registered user access rights to the machine
+    """
+    _update_user_acl(job=job, action='update')
+
+
+def delete_user(job):
+    """
+    Remove a registered user access rights to the machine
+    """
+    _update_user_acl(job=job, action='delete')

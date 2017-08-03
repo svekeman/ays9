@@ -197,10 +197,6 @@ vdc__vdcname:
     location: '<location>'
 
 uservdc__demo_user:
-    password: '<password>'
-    email: '<email>'
-    provider: 'itsyouonline'
-    groups: '<list of groups>'
     g8client: env
 
 node.ovc__demo:
@@ -212,6 +208,54 @@ actions:
   - action: add_user
     actor: node.ovc
     service: demo
+```
+
+## Example for updating user access right on a machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+uservdc__demo_user:
+    g8client: env
+
+node.ovc__demo:
+  uservdc:
+    - name: demo_user
+      accesstype: R
+
+actions:
+  - action: update_user
+    actor: node.ovc
+    service: demo
+```
 
 
+## Example for delete user access right from a machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+uservdc__demo_user:
+    g8client: env
+
+node.ovc__demo:
+  uservdc:
+    - name: demo_user
+
+actions:
+  - action: delete_user
+    actor: node.ovc
+    service: demo
 ```

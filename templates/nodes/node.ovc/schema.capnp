@@ -26,6 +26,6 @@ struct Schema {
 	uservdc @22 :List(UserVdcEntry);
 	struct UserVdcEntry {
 		name @0 :Text;
-		accesstype @1 :Text;
+		accesstype @1 :Text = "R";
 	}
 }
