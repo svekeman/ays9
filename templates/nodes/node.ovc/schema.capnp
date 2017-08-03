@@ -1,5 +1,5 @@
 
-@0xf3d30fa3ae2e10d8;
+@0xd97b94107bdbb647;
 struct Schema {
 	description @0 :Text;
 	bootdiskSize @1 :Int64 = 10;
@@ -22,5 +22,10 @@ struct Schema {
 	ovfPassword @18 :Text;
 	ovfPath @19 :Text;
 	ovfCallbackUrl @20 :Text;
-	stackID @21 :Int64 = -1; 
+	stackID @21 :Int64 = -1;
+	uservdc @22 :List(UserVdcEntry);
+	struct UserVdcEntry {
+		name @0 :Text;
+		accesstype @1 :Text;
+	}
 }

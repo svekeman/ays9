@@ -31,6 +31,8 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - ovf.callbackUrl: callbackurl for calling you back when the machine is exported
 - disk: list of disk instances to be attached to the VM
 
+- uservdc: List of users to that access the machine with the type of access rights for each user e.g 'R' for read only access, 'RCX' for Write and 'ARCXDU' for Admin
+
 
 
 ### Changing port forwardings
@@ -183,7 +185,7 @@ actions:
     service: demo
 ```
 
-## Example for resetting machine
+## Example for adding user to a machine
 ```yaml
 g8client__env:
     url: '<env_url>'
@@ -194,10 +196,22 @@ g8client__env:
 vdc__vdcname:
     location: '<location>'
 
+uservdc__demo_user:
+    password: '<password>'
+    email: '<email>'
+    provider: 'itsyouonline'
+    groups: '<list of groups>'
+    g8client: env
+
 node.ovc__demo:
+  uservdc:
+    - name: demo_user
+      accesstype: ACDRUX
 
 actions:
-  - action: reset
+  - action: add_user
     actor: node.ovc
     service: demo
+
+
 ```

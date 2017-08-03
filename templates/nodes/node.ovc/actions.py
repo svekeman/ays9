@@ -13,6 +13,47 @@ def init(job):
     os_actor = service.aysrepo.actorGet('os.ssh.ubuntu')
     os_actor.serviceCreate(service.name, args={'node': service.name, 'sshkey': service.model.data.sshkey})
 
+    users = service.model.data.uservdc
+    for user in users:
+        uservdc = service.aysrepo.serviceGet('uservdc', user.name)
+        service.consume(uservdc)
+
+def _authorization_user(machine, service):
+    from JumpScale9Lib.clients.portal.PortalClient import ApiError
+
+    userslist = service.producers.get('uservdc', [])
+    users = []
+    for uvdc in service.model.data.uservdc:
+        if u.model.data.provider != '':
+            users.append(u.model.dbobj.name + "@" + u.model.data.provider)
+        else:
+            users.append(u.model.dbobj.name)
+    try:
+        machine_info = machine.client.api.cloudapi.machines.get(machineId=machine.id)
+    except ApiError, err:
+        j.logger.logging.error('Failed to retrieve machine information for machine {}'.format(machine.id))
+        raise
+    # get acl info
+    acl_info = {}
+    for item in machine_info['acl']:
+        acl_info[item['userGroupId'] = item
+
+
+    # Authorize users
+    for user in users:
+        if user not in acl_info:
+            for uvdc in service.model.data.uservdc:
+                if uvdc.name == user.split('@')[0]:
+                    if uvdc.accesstype:
+                        space.authorize_user(username=user, right=uvdc.accesstype)
+                    else:
+                        space.authorize_user(username=user)
+
+    # Unauthorize users not in the schema
+    for user in authorized_users:
+        if user not in users:
+            space.unauthorize_user(username=user)
+
 
 def install(job):
     service = job.service
@@ -583,3 +624,25 @@ def reset(job):
 
 def mail(job):
     print('hello world')
+
+
+
+def add_user(job):
+    """
+    Give a registered user access rights to the machine
+    """
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue reset of %s" % service)
+    g8client = vdc.producers["g8client"][0]
+
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
