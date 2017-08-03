@@ -70,7 +70,6 @@ def test(job):
         # check if user added to account
         if response.status_code == 200:
             content = response.json()
-            job.logger.info("!!!!!!! CONTENT: " + str(content))
             for user in content['acl']:
                 if user_name in user['userGroupId']:
                     service.model.data.result = RESULT_OK % 'user added to account'

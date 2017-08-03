@@ -1,20 +1,21 @@
 g8client__env:
-    url: 'du-conv-2.demo.greenitglobe.com'
-    login: 'jonas'
-    password: 'gigorgpass'
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
 
 uservdc__usertest:
-    password: 'test1234'
-    email: 'test@fake.com'
+    password: '<password>'
+    email: '<email>'
     groups:
       - user
     g8client: 'env'
 
 account__acc:
-    description: 'random'
+    description: 'test account'
     g8client: 'env'
     accountusers:
-      - 'jonas'
+      - '<login>'
     maxMemoryCapacity: 20
     maxCPUCapacity:  5
     maxDiskCapacity: 20
