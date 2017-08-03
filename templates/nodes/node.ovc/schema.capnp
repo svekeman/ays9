@@ -23,7 +23,8 @@ struct Schema {
 	ovfPath @19 :Text;
 	ovfCallbackUrl @20 :Text;
 	stackID @21 :Int64 = -1;
-	uservdc @22 :List(UserVdcEntry);
+	vmHistory @22 :Text;
+	uservdc @23 :List(UserVdcEntry);
 	struct UserVdcEntry {
 		name @0 :Text;
 		accesstype @1 :Text = "R";

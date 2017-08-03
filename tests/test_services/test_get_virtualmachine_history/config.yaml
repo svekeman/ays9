@@ -1,16 +1,18 @@
 doc:
   property:
-  - password: ''
-  - groups: ''
   - g8client: ''
-  - email: ''
-  - provider: ''
+  - node: ''
+  - result: ''
 links:
   consume:
   - argname: g8client
-    auto: true
+    auto: false
     max: 100
     min: 0
     role: g8client
-    argname: 'g8client'
+  - argname: node
+    auto: false
+    max: 100
+    min: 0
+    role: node
 recurring: []
