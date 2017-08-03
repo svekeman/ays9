@@ -1,6 +1,6 @@
 def init_actions_(service, args):
     """
-    this needs to returns an array of actions representing the depencies between actions.
+    This needs to return an array of actions representing the depencies between actions.
     Looks at ACTION_DEPS in this module for an example of what is expected
     """
 
@@ -31,13 +31,13 @@ def test(job):
         accounts = service.producers['account']
         API_URL = url + '/restmachine/cloudapi/accounts/get'
 
-        for account  in accounts:
-            accountId=account.model.data.accountID
-            account_specs=[account.model.data.maxMemoryCapacity,account.model.data.maxDiskCapacity,
+        for account in accounts:
+            accountId = account.model.data.accountID
+            account_specs = [account.model.data.maxMemoryCapacity,account.model.data.maxDiskCapacity,
                            account.model.data.maxNumPublicIP,account.model.data.maxCPUCapacity]
             API_BODY = {'accountId': accountId}
             response = session.post(url=API_URL, data=API_BODY)
-            specs= response.json()['resourceLimits']
+            specs = response.json()['resourceLimits']
             actual_account_specs = [specs['CU_M'],specs['CU_D'], specs['CU_I'], specs['CU_C']]
             if (response.status_code != 200) or (actual_account_specs != account_specs) :
                 response_data = {'status_code': response.status_code, 'content': response.content}
