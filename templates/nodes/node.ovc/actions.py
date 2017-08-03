@@ -312,6 +312,7 @@ def init_actions_(service, args):
         'import_': ['init'],
         'monitor': ['start'],
         'stop': [],
+        'getHistory': ['install'],
         'uninstall': ['stop'],
     }
 
@@ -580,6 +581,27 @@ def reset(job):
     machine = space.machines[service.name]
     machine.reset()
 
+
+def getHistory(job):
+    import json
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue reset of %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    res = machine.getHistory(10)
+    service.model.data.vmHistory = json.dumps(res)
+    service.saveAll()
 
 def mail(job):
     print('hello world')
