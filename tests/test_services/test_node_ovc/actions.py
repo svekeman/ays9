@@ -89,3 +89,47 @@ def test_delete(job):
     except Exception as e:
         service.model.data.result = RESULT_ERROR % (str(sys.exc_info()[:2]) + str(e))
     service.save()
+
+
+def test_node_disks(job):
+    import requests
+    import sys
+    RESULT_OK = 'OK : %s '
+    RESULT_FAILED = 'FAILED : %s'
+    RESULT_ERROR = 'ERROR : %s'
+
+    service = job.service
+    try:
+        g8client = service.producers['g8client'][0]
+        url = 'https://' + g8client.model.data.url
+        username = g8client.model.data.login
+        password = g8client.model.data.password
+        login_url = url + '/restmachine/system/usermanager/authenticate'
+        credential = {'name': username,
+                      'secret': password}
+        session = requests.Session()
+        session.post(url=login_url, data=credential)
+
+        vm = service.producers['node'][0]
+        vm_id = vm.model.data.machineId
+
+        api_url = url + '/restmachine/cloudapi/machines/get'
+        api_body = {'machineId': vm_id}
+
+        response = session.post(url=api_url, data=api_body)
+        if response.status_code == 200:
+            content = response.json()
+            disks = vm.producers.get('disk', [])
+            # length of service disks +1(boot disk) should equal the actual number of machine disks
+            if (len(disks) + 1) != len(content['disks']):
+                failure = 'Machine Model Disks({}) != Actual Machine Disks({})'.format(len(disks)+1, len(content['disks']))
+                service.model.data.result = RESULT_FAILED % failure
+            else:
+                service.model.data.result = RESULT_OK % 'test_attach_disk'
+        else:
+            response_data = {'status_code': response.status_code,
+                             'content': response.content}
+            service.model.data.result = RESULT_ERROR % str(response_data)+str(vm_id)
+    except Exception as e:
+        service.model.data.result = RESULT_ERROR % (str(sys.exc_info()[:2]) + str(e))
+    service.save()
