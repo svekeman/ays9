@@ -276,7 +276,7 @@ class Actor():
 
         actionmethodsRequired = ["input", "init", "install", "stop", "start", "monitor", "halt", "check_up", "check_down",
                                  "check_requirements", "cleanup", "data_export", "data_import", "uninstall", "removedata",
-                                 "consume", "action_pre_", "action_post_", "init_actions_"]
+                                 "consume", "action_pre_", "action_post_", "init_actions_", "delete"]
 
         actorMethods = ["input", "build"]
         parsedActorMethods = actionmethodsRequired[:]
@@ -397,6 +397,11 @@ class Actor():
                     if actionname == "input":
                         amSource = "return None"
                         self._addAction(actionName="input", amSource=amSource,
+                                        amDecorator="actor", amMethodArgs="job", amDoc="")
+
+                    elif actionname == "delete":
+                        amSource = "j.tools.async.wrappers.sync(job.service.delete())"
+                        self._addAction(actionName="delete", amSource=amSource,
                                         amDecorator="actor", amMethodArgs="job", amDoc="")
                     else:
                         self._addAction(actionName=actionname, amSource="",

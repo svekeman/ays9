@@ -30,7 +30,7 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - ovf.path: path to put the exported machine in e.g /exported_vms/machine.ovf
 - ovf.callbackUrl: callbackurl for calling you back when the machine is exported
 - disk: list of disk instances to be attached to the VM
-
+- vmHistory: stores VM history which includes the actions performed on this machine and the time these actions were performed. **fill automatically, don't specify it in Blueprint**
 
 
 ### Changing port forwardings
@@ -235,4 +235,21 @@ If you need to detach disks from an already created machine you can execute a bl
 node.ovc__demo:
     disk:
       - 'disk1'
+
+## Example for getting VM history
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+
+actions:
+  - action: getHistory
+    actor: node.ovc
 ```

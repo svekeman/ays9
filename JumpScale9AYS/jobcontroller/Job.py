@@ -229,7 +229,8 @@ class Job:
                 try:
                     self._service = repo.serviceGetByKey(self.model.dbobj.serviceKey)
                 except j.exceptions.NotFound:
-                    self.logger.warning("job {} tried to access a non existing service {}".format(self,self.model.dbobj.serviceKey))
+                    # If run contains a delete, this is perfectly acceptable
+                    self.logger.warning("job {} tried to access a non existing service {}.".format(self,self.model.dbobj.serviceKey))
                     return None
         return self._service
 
@@ -290,8 +291,18 @@ class Job:
         raise RuntimeError(errormsg)
 
     def save(self):
+        if self.saveService and self.service is not None:
+            if self.model.dbobj.actionName in self.service.model.actions:
+                service_action_obj = self.service.model.actions[self.model.dbobj.actionName]
+                service_action_obj.state = str(self.model.dbobj.state)
+
+            if self.model.dbobj.actionName == "delete" and self.model.dbobj.state == 'ok':
+                self.service.save()
+            else:
+                self.service.saveAll()
+
         if not j.sal.fs.exists(j.sal.fs.joinPaths(self.service.aysrepo.path, "services")):
-            return # repo destroyed.
+            return # repo destroyed or service is deleted.
         # fill the context list in capnp obj before save
         self.model.dbobj.init('context', len(self.context))
         i = 0
@@ -303,11 +314,6 @@ class Job:
 
         self.model.save()
 
-        if self.saveService and self.service is not None:
-            if self.model.dbobj.actionName in self.service.model.actions:
-                service_action_obj = self.service.model.actions[self.model.dbobj.actionName]
-                service_action_obj.state = str(self.model.dbobj.state)
-            self.service.saveAll()
 
     def executeInProcess(self):
         """
