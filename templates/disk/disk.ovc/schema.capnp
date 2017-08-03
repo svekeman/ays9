@@ -7,5 +7,6 @@ struct Schema {
 	maxIOPS @3 :Int64 = 0;
 	devicename @4 :Text;
 	ssdSize @5 :Int64 = 10;
-
+    g8client @6 :Text;
+    location @7 :Text;
 }

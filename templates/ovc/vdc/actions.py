@@ -81,6 +81,7 @@ def install(job):
                           maxVDiskCapacity=service.model.data.maxDiskCapacity,
                           maxCPUCapacity=service.model.data.maxCPUCapacity,
                           maxNumPublicIP=service.model.data.maxNumPublicIP,
+                          maxNetworkPeerTransfer=service.model.data.maxNetworkPeerTransfer,
                           externalnetworkId=externalnetworkId
                           )
 
@@ -94,6 +95,7 @@ def install(job):
     space.model['maxVDiskCapacity'] = service.model.data.maxDiskCapacity
     space.model['maxNumPublicIP'] = service.model.data.maxNumPublicIP
     space.model['maxCPUCapacity'] = service.model.data.maxCPUCapacity
+    space.model['maxNetworkPeerTransfer'] = service.model.data.maxNetworkPeerTransfer
     space.save()
 
 

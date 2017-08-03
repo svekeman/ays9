@@ -19,7 +19,7 @@ def install(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue install of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -142,7 +142,7 @@ def processChange(job):
     service = job.service
     vdc = service.parent
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue process change of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -228,7 +228,7 @@ def export(job):
     service = job.service
     vdc = service.parent
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue export of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -252,7 +252,7 @@ def import_(job):
     service = job.service
     vdc = service.parent
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue import of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -322,7 +322,7 @@ def add_disk(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue 'add_disk' of %s" % service)
 
     # find os
     os = None
@@ -403,7 +403,7 @@ def open_port(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue 'open_port' of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -453,7 +453,7 @@ def uninstall(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.RuntimeError("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue uninstall of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -461,6 +461,7 @@ def uninstall(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.delete()
@@ -471,7 +472,7 @@ def start(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.RuntimeError("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue start of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -479,6 +480,7 @@ def start(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.start()
@@ -489,7 +491,7 @@ def stop(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.RuntimeError("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue stop of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -497,6 +499,7 @@ def stop(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.stop()
@@ -507,7 +510,7 @@ def restart(job):
     vdc = service.parent
 
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.RuntimeError("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue restart of %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
@@ -515,9 +518,67 @@ def restart(job):
     space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
 
     if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
         return
     machine = space.machines[service.name]
     machine.restart()
+
+
+def pause(job):
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue pause of %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    machine.pause()
+
+
+def resume(job):
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue resume of %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    machine.resume()
+
+
+def reset(job):
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue reset of %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    machine.reset()
 
 
 def mail(job):
