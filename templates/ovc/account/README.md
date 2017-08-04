@@ -10,7 +10,7 @@ This actor template is responsible for creating an account on any openVCloud env
 
 - g8client: Name of the g8client used to connect to the environment.
 
-- accountusers: List of usernames that will be authorized.
+- accountusers: List of uservdcs that will be authorized on the account.
 
 - accountID: The ID of the account. **Filled in automatically, don't specify it in the blueprint**
 
@@ -31,13 +31,15 @@ g8client__env:
   url: '<env_url>'
   login: '<username>'
   password: '<password>'
-  account: '<account>'
+
+uservdc__<username>:
 
 account__acc:
-  description: '<random>'
+  description: 'test account'
   g8client: 'env'
   accountusers:
-    - '<username>'
+    - name: '<username>'
+      accesstype: '<accesstype>'
   maxMemoryCapacity: <value>
   maxCPUCapacity:  <value>
   maxDiskCapacity: <value>
@@ -46,6 +48,47 @@ account__acc:
 actions:
   - action: install
 ```
+
+## Example for adding user 'usertest' to account
+
+```yaml
+uservdc__usertest:
+    password: 'test1234'
+    email: 'fake@example.com'
+    groups:
+      - 'user'
+    g8client: 'env'
+
+account__acc:
+  accountusers:
+      - name: '<username>'
+        accesstype: '<accesstype>'
+      - name: 'usertest'
+        accesstype: '<accesstype>'
+
+```
+
+## Example for changing access rights of user 'usertest'
+
+```yaml
+account__acc:
+  accountusers:
+      - name: '<username>'
+        accesstype: '<accesstype>'
+      - name: 'usertest'
+        accesstype: '<changed_accesstype>'
+
+```
+
+## Example for removing user 'usertest' from account
+
+```yaml
+account__acc:
+  accountusers:
+    - name: '<username>'
+      accesstype: '<accesstype>'
+```
+
 
 ## Example for listing disks associated with account:
 
