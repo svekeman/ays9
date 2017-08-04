@@ -22,7 +22,9 @@ This actor template is responsible for creating an account on any openVCloud env
 
 - maxDiskCapacity: The limit on the disk capacity that can be used by the account. Default: -1 (unlimited)
 
+## Add/remove/update user
 
+It is possible to add, remove and update user access to the account. To add a user after creating the account, a new uservdc has to be added in the blueprint. Executing the blueprint will trigger the process change and add it to the account. In the same way a user can be removed from the account by deleting the entry from the accountusers in the blueprint. Changing the accesstype of as user will update the user access to the account when executing the blueprint.
 
 ## Example for creating an account
 
@@ -87,6 +89,16 @@ account__acc:
   accountusers:
     - name: '<username>'
       accesstype: '<accesstype>'
+```
+
+## Example for updating the limits of the account
+
+```yaml
+account__acc:
+    maxMemoryCapacity: <changed_value>
+    maxCPUCapacity: <changed_value>
+    maxDiskCapacity: <changed_value>
+    maxNumPublicIP: <changed_value>
 ```
 
 
