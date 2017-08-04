@@ -84,42 +84,44 @@ def test(job):
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
 
+        # TODO: enable when support for access update is available
+        
         # execute blueprint for access change
-        res = cl.executeBlueprint(data=None, blueprint='changeaccess.yaml', repository=repo).json()
-        bp_job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-        while bp_job['state'] != 'ok':
-            time.sleep(2)
-            bp_job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
-
-        account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
-
-        accesstype = 'ACDRUX'
-        if account['data']['useraccounts'][0]['accesstype'] != accesstype:
-            failures.append(RESULT_FAILED % 'accesstype not updated in data')
-
-        accountId = account['data']['accountID']
-        API_BODY = {'accountId': accountId}
-
-        response = session.post(url=API_URL, data=API_BODY)
-
-        if response.status_code == 200:
-            content = response.json()
-            for user in content['acl']:
-                if user_name in user['userGroupId']:
-                    if user['right'] == accesstype:
-                        service.model.data.result = RESULT_OK % ' successfully updated account access right'
-                    else:
-                        failures.append(RESULT_FAILED % 'failed to update account access right')
-                    break
-                else:
-                    continue
-            else:
-                failure = '%s not in %i account' % (username, accountid)
-                failures.append(RESULT_ERROR % failure)
-        else:
-            response_data = {'status_code': response.status_code,
-                             'content': response.content}
-            failures.append(RESULT_ERROR % str(response_data) + str(vdcId))
+        # res = cl.executeBlueprint(data=None, blueprint='changeaccess.yaml', repository=repo).json()
+        # bp_job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+        # while bp_job['state'] != 'ok':
+        #     time.sleep(2)
+        #     bp_job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
+        #
+        # account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
+        #
+        # accesstype = 'ACDRUX'
+        # if account['data']['useraccounts'][0]['accesstype'] != accesstype:
+        #     failures.append(RESULT_FAILED % 'accesstype not updated in data')
+        #
+        # accountId = account['data']['accountID']
+        # API_BODY = {'accountId': accountId}
+        #
+        # response = session.post(url=API_URL, data=API_BODY)
+        #
+        # if response.status_code == 200:
+        #     content = response.json()
+        #     for user in content['acl']:
+        #         if user_name in user['userGroupId']:
+        #             if user['right'] == accesstype:
+        #                 service.model.data.result = RESULT_OK % ' successfully updated account access right'
+        #             else:
+        #                 failures.append(RESULT_FAILED % 'failed to update account access right')
+        #             break
+        #         else:
+        #             continue
+        #     else:
+        #         failure = '%s not in %i account' % (username, accountid)
+        #         failures.append(RESULT_ERROR % failure)
+        # else:
+        #     response_data = {'status_code': response.status_code,
+        #                      'content': response.content}
+        #     failures.append(RESULT_ERROR % str(response_data) + str(vdcId))
 
         # execute blueprint to delete user
         res = cl.executeBlueprint(data=None, blueprint='deleteuser.yaml', repository=repo).json()
@@ -158,6 +160,9 @@ def test(job):
             bp_job = cl.getJob(repository=repo, jobid=res['processChangeJobs'][0]).json()
 
         account = cl.getServiceByName(role="account", name="acc", repository=repo).json()
+        API_BODY = {'accountId': accountId}
+
+        response = session.post(url=API_URL, data=API_BODY)
 
         # check if limits are updated
         if response.status_code == 200:

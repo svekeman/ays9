@@ -1,25 +1,38 @@
 g8client__env:
-    url: '<env_url>'
-    login: '<login>'
-    password: '<password>'
-    account: '<account>'
+    url: 'du-conv-2.demo.greenitglobe.com'
+    login: 'jonas'
+    password: 'gigorgpass'
 
 uservdc__usertest:
-    password: '<password>'
-    email: '<email>'
+    password: 'test1234'
+    email: 'fake@example.com'
     groups:
-      - user
+      - 'user'
     g8client: 'env'
+
+uservdc__jonas:
+  password: 'gigorgpass'
+  email: 'fake@unreal.com'
+  groups:
+    - 'admin'
+    - 'level1'
+    - 'level2'
+    - 'level3'
+    - 'finance'
+    - 'ovs_admin'
+    - 'user'
+  g8client: 'env'
 
 account__acc:
     description: 'test account'
     g8client: 'env'
     accountusers:
-      - '<login>'
+      - name: 'jonas'
+        accesstype: 'CXDRAU'
     maxMemoryCapacity: 20
     maxCPUCapacity:  5
     maxDiskCapacity: 20
     maxNumPublicIP: 5
 
 actions:
-   - action: install
+- action: install

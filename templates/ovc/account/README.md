@@ -14,13 +14,13 @@ This actor template is responsible for creating an account on any openVCloud env
 
 - accountID: The ID of the account. **Filled in automatically, don't specify it in the blueprint**
 
-- maxMemoryCapacity: The limit on the memory capacity that can be used by the account.
+- maxMemoryCapacity: The limit on the memory capacity that can be used by the account. Default: -1 (unlimited)
 
-- maxCPUCapacity: The limit on the CPUs that can be used by the account.
+- maxCPUCapacity: The limit on the CPUs that can be used by the account. Default: -1 (unlimited)
 
-- maxNumPublicIP: The limit on the number of public IPs that can be used by the account.
+- maxNumPublicIP: The limit on the number of public IPs that can be used by the account. Default: -1 (unlimited)
 
-- maxDiskCapacity: The limit on the disk capacity that can be used by the account.
+- maxDiskCapacity: The limit on the disk capacity that can be used by the account. Default: -1 (unlimited)
 
 
 
