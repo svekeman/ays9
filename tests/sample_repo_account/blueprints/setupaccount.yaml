@@ -11,17 +11,6 @@ uservdc__usertest:
     g8client: 'env'
 
 uservdc__jonas:
-  password: 'gigorgpass'
-  email: 'fake@unreal.com'
-  groups:
-    - 'admin'
-    - 'level1'
-    - 'level2'
-    - 'level3'
-    - 'finance'
-    - 'ovs_admin'
-    - 'user'
-  g8client: 'env'
 
 account__acc:
     description: 'test account'

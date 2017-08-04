@@ -86,11 +86,13 @@ def install(job):
 
 def processChange(job):
     service = job.service
+
+    if 'g8client' not in service.producers:
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue processChange of %s" % service)
+
     g8client = service.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
-    # Get given account, raise error if not found
-    account = cl.account_get(name=service.model.dbobj.name,
-                             create=False)
+    account = cl.account_get(name=service.model.dbobj.name, create=False)
 
     args = job.model.args
     category = args.pop('changeCategory')
@@ -108,18 +110,13 @@ def processChange(job):
                         accessRight = v.get('accesstype', '')
                         if v['name'] == s.name and accessRight != get_user_accessright(s.name, service) and accessRight:
                             name = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
-                            # TODO: enable when fully supported
-                            # account.update_access(name, v['accesstype'])
+                            account.update_access(name, v['accesstype'])
 
                 for v in value:
                     userservice = service.aysrepo.serviceGet('uservdc', v['name'])
                     if userservice not in service.producers.get('uservdc', []):
                         service.consume(userservice)
             setattr(service.model.data, key, value)
-
-        if 'g8client' not in service.producers:
-            raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue processChange of %s" % service)
-
 
         authorization_user(account, service, True)
 
