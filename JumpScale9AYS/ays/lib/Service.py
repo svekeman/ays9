@@ -337,6 +337,9 @@ class Service:
         delete this service completly.
         remove it from db and from filesystem
         all the children of this service are going to be deleted too
+        
+        @param force bool=False: force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete. 
+
         """
         # TODO should probably warn user relation may be broken
         if self.children:
@@ -344,7 +347,7 @@ class Service:
                 raise j.exceptions.RuntimeError("Can't remove service {} : parent of # {} children: {}.".format(self, len(self.children), self.children))
             else:
                 for service in self.children:
-                    await service.delete()
+                    await service.delete(force=force)
 
         # cancel all recurring tasks
         self.stop()
