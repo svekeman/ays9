@@ -40,6 +40,13 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
  - Editing port foward in blueprint = removing the old portforward and creating new one.
  > port 22 is special case we keep it even if edited or deleted.
 
+### Changing Disks
+
+ - Removing disk from blueprint `disk` section will detach the disk from the machine.
+ - Adding new disk in the blueprint will create a new disk and attach it to the machine, then set its IO limit.
+ - Removing boot disks will be ignored.
+
+
 Replace \<with actual value \>
 
 ## Example for creating machine
@@ -56,6 +63,9 @@ vdc__vdcname:
     account: '<account>'
     location: '<location>'
 
+disk.ovc__disk1:
+  size: 5
+
 # create the vm.
 # expose ports 22. Map it to 2210.
 node.ovc__demo:
@@ -64,6 +74,8 @@ node.ovc__demo:
     os.image: 'Ubuntu 16.04 x64'
     ports:
         - '2210:22'
+    disk:
+      - 'disk1'
 
 actions:
   - action: install
@@ -201,6 +213,28 @@ actions:
     actor: node.ovc
     service: demo
 ```
+
+If you need to attach disks from an already created machine you can execute a blueprint with the node added to it all new disks
+- The following example attaches a new disk `disk2` to the machine called `demo`
+#### Example for attaching new disks
+```yaml
+disk.ovc__disk2:
+  size: 7
+
+
+node.ovc__demo:
+    disk:
+      - 'disk1' # MUST be there to avoid detaching it
+      - 'disk2'
+```
+
+If you need to detach disks from an already created machine you can execute a blueprint with the node removed from it the disks you need to detach:
+- The following example detaches `disk2` which was attached to node `demo` in the previous example, and leave `disk1` attached as it is
+#### Example for detaching disks
+```yaml
+node.ovc__demo:
+    disk:
+      - 'disk1'
 
 ## Example for getting VM history
 ```yaml
