@@ -340,33 +340,27 @@ class Service:
         """
 
         if self.children:
-            return False, "Can't remove service {} has children {}.".format(self, self.children)
+            return False, "Can't remove {} has children {}.".format(self, self.children)
         for consumers in self.consumers.values():
             for consumer in consumers:
                 constemplate = self.aysrepo.templateGet(name=consumer.model.dbobj.actorName)
                 consumptionconfig = constemplate.consumptionConfig
                 for conf in consumptionconfig:
                     if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)): 
-                        return False, "Can't remove {} without providing minimum of {} to service {}.".format(self, conf['min'], consumer)
+                        return False, "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
         return True, "OK"
 
     async def delete(self, force=False):
         """
-        delete this service completly.
-        remove it from db and from filesystem
-        all the children of this service are going to be deleted too
+        Deletes service and its children from database and filesystem. 
         
-        @param force bool=False: force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete. 
+        @param force bool=False: will execute a dryrun to check if deleting this service won't break anything (force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete. 
 
         """
         if not force:
             oktodelete, msg = await self.oktodelete()
             if not oktodelete:
                 raise j.exceptions.RuntimeError(msg)
-            for child in self.children:
-                oktodelete, msg = await child.oktodelete()
-                if not oktodelete:
-                    raise j.exceptions.RuntimeError(msg)
 
         if self.children:
             for service in self.children:
@@ -392,6 +386,7 @@ class Service:
         j.sal.fs.removeDirTree(self.path)
         if self.model.key in self.aysrepo.db.services.services:
             del self.aysrepo.db.services.services[self.model.key]
+
     @property
     def parent(self):
         self.model.reSerialize()
