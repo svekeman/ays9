@@ -58,7 +58,7 @@ class LongRunningTask(RecurringTask):
         super().__init__(service=service, action=action, period=None, loop=loop)
         self.logger.info("Created long task {} of service {}".format(action, service))
         self.actioncode = service.model.actionsCode[action]
-        
+
     async def _run(self):
         try:
             # create job
