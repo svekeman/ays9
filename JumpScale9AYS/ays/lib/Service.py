@@ -346,15 +346,15 @@ class Service:
                 constemplate = self.aysrepo.templateGet(name=consumer.model.dbobj.actorName)
                 consumptionconfig = constemplate.consumptionConfig
                 for conf in consumptionconfig:
-                    if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)): 
+                    if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)):
                         return False, "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
         return True, "OK"
 
     async def delete(self, force=False):
         """
-        Deletes service and its children from database and filesystem. 
-        
-        @param force bool=False: will execute a dryrun to check if deleting this service won't break anything (force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete. 
+        Deletes service and its children from database and filesystem.
+
+        @param force bool=False: will execute a dryrun to check if deleting this service won't break anything (force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete.
 
         """
         if not force:
@@ -377,7 +377,7 @@ class Service:
 
         for consumers in self.consumers.values():
             for consumer in consumers:
-                # not okay to remove  
+                # not okay to remove
                 consumer.model.producerRemove(self)
                 consumer.model.reSerialize()
                 consumer.saveAll()
@@ -779,7 +779,7 @@ class Service:
         for action, info in self.model.actionsLongRunning.items():
             self.logger.info("Starting long running job {} with {} ".format(action, info))
             if action not in self._longrunning_tasks:
-                task = LongRunningTask(service=self, action=action)
+                task = LongRunningTask(service=self, action=action, loop=self._loop)
                 task.start()
                 self._longrunning_tasks[action] = task
 
