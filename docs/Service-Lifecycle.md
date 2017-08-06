@@ -69,6 +69,20 @@ Imagine you have some service instances already deployed and a new version of th
   - Add these new field and their value to the blueprint.
   - execute `ays blueprint`. This command will walk over the blueprints and update the data accordingly. If there is some new fields they will be added to the `data.json`.
 
+
+## Service deletion (service.delete(force=False))
+Deleting services can cause problems and broken services state if not used with care, 
+
+setting `force = True` in `service.delete` call
+is a very damaging parameter, as It may delete its children or break a minimum required consumption of a consumer. 
+
+setting `force = False` in `service.delete` will do a dryrun to see if you can delete services with no problems in the beginning. 
+
+> it's always safer to use `force=False` and reason about your delete methods.
+
+### Default implementation for delete action
+It uses `j.tools.async.wrappers.sync(job.service.delete())` meaning `force=False` for safe deletions by default.
+
 ```
 !!!
 title = "Service Lifecycle"
