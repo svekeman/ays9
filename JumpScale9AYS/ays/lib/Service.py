@@ -339,9 +339,12 @@ class Service:
         all the children of this service are going to be deleted too
         """
         # TODO should probably warn user relation may be broken
-
-        for service in self.children:
-            await service.delete()
+        if self.children:
+            if not force:
+                raise j.exceptions.RuntimeError("Can't remove service {} : parent of # {} children: {}.".format(self, len(self.children), self.children))
+            else:
+                for service in self.children:
+                    await service.delete()
 
         # cancel all recurring tasks
         self.stop()
@@ -358,7 +361,6 @@ class Service:
                 constemplate = self.aysrepo.templateGet(name=consumer.model.dbobj.actorName)
                 consumptionconfig = constemplate.consumptionConfig
                 for conf in consumptionconfig:
-                    if conf['role'] == self.model.role: import ipdb; ipdb.set_trace()
                     if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)):
                        # not okay to remove  
                         if not force:
