@@ -80,8 +80,8 @@ setting `force = False` in `service.delete` will do a dryrun to see if you can d
 
 > it's always safer to use `force=False` and reason about your delete methods.
 
-### Default implementation for delete function
-It uses `force=False` for safe deletions by default.
+### Default implementation for delete action
+It uses `j.tools.async.wrappers.sync(job.service.delete())` meaning `force=False` for safe deletions by default.
 
 ```
 !!!
