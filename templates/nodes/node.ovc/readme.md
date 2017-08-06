@@ -216,6 +216,6 @@ vdc__vdcname:
 node.ovc__demo:
 
 actions:
-  - action: getHistory
+  - action: get_history
     actor: node.ovc
 ```

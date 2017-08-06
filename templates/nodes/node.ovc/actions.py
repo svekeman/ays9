@@ -312,7 +312,7 @@ def init_actions_(service, args):
         'import_': ['init'],
         'monitor': ['start'],
         'stop': [],
-        'getHistory': ['install'],
+        'get_history': ['install'],
         'uninstall': ['stop'],
     }
 
@@ -582,7 +582,7 @@ def reset(job):
     machine.reset()
 
 
-def getHistory(job):
+def get_history(job):
     import json
     service = job.service
     vdc = service.parent
