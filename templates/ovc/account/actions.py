@@ -13,8 +13,44 @@ def init(job):
     if 'g8client' not in service.producers:
         raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue init of %s" % service)
 
+    users = service.model.data.accountusers
+    for user in users:
+        uservdc = service.aysrepo.serviceGet('uservdc', user.name)
+        service.consume(uservdc)
+
     service.saveAll()
 
+def authorization_user(account, service, update=False):
+    authorized_users = account.authorized_users
+
+    userslist = service.producers.get('uservdc', [])
+    users = []
+    for u in userslist:
+        if u.model.data.provider != '':
+            users.append(u.model.dbobj.name + "@" + u.model.data.provider)
+        else:
+            users.append(u.model.dbobj.name)
+
+    # Authorize users
+    for user in users:
+        if user not in authorized_users:
+            for uvdc in service.model.data.accountusers:
+                if uvdc.name == user.split('@')[0]:
+                    if uvdc.accesstype:
+                        account.authorize_user(username=user, right=uvdc.accesstype)
+                    else:
+                        account.authorize_user(username=user)
+
+    if update:
+        # Unauthorize users not in the schema
+        for user in authorized_users:
+            if user not in users:
+                account.unauthorize_user(username=user)
+
+def get_user_accessright(username, service):
+    for u in service.model.data.accountusers:
+        if u.name == username:
+            return u.accesstype
 
 def install(job):
     service = job.service
@@ -35,21 +71,12 @@ def install(job):
     service.model.data.accountID = account.model['id']
     service.model.save()
 
-    authorized_users = account.authorized_users
-    users = service.model.data.accountusers
-
-    # Authorize users
-    for user in users:
-        if user not in authorized_users:
-            account.authorize_user(username=user)
-
+    authorization_user(account, service, False)
     # Unauthorize users not in the schema
     # THIS FUNCTIONALITY IS DISABLED UNTIL OVC DOESN'T REQUIRE USERS TO BE ADMIN
-    # for user in authorized_users:
-    #     if user not in users:
-    #         account.unauthorize_user(username=user)
 
-    # update capacity incase acount already existed update it
+
+    # update capacity in case account already existed
     account.model['maxMemoryCapacity'] = service.model.data.maxMemoryCapacity
     account.model['maxVDiskCapacity'] = service.model.data.maxDiskCapacity
     account.model['maxNumPublicIP'] = service.model.data.maxNumPublicIP
@@ -60,44 +87,38 @@ def install(job):
 def processChange(job):
     service = job.service
 
+    if 'g8client' not in service.producers:
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue processChange of %s" % service)
+
+    g8client = service.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    account = cl.account_get(name=service.model.dbobj.name, create=False)
+
     args = job.model.args
     category = args.pop('changeCategory')
     if category == "dataschema" and service.model.actionsState['install'] == 'ok':
         for key, value in args.items():
-            if key == 'uservdc':
+            if key == 'accountusers':
                 # value is a list of (uservdc)
                 if not isinstance(value, list):
                     raise j.exceptions.Input(message="Value is not a list.")
+
                 for s in service.producers['uservdc']:
-                    if s.name not in value:
+                    if not any(v['name'] == s.name for v in value):
                         service.model.producerRemove(s)
+                    for v in value:
+                        accessRight = v.get('accesstype', '')
+                        if v['name'] == s.name and accessRight != get_user_accessright(s.name, service) and accessRight:
+                            name = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
+                            account.update_access(name, v['accesstype'])
+
                 for v in value:
-                    userservice = service.aysrepo.serviceGet('uservdc', v)
+                    userservice = service.aysrepo.serviceGet('uservdc', v['name'])
                     if userservice not in service.producers.get('uservdc', []):
                         service.consume(userservice)
             setattr(service.model.data, key, value)
 
-        if 'g8client' not in service.producers:
-            raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue processChange of %s" % service)
-
-        g8client = service.producers["g8client"][0]
-        cl = j.clients.openvcloud.getFromService(g8client)
-        # Get given space, raise error if not found
-        account = cl.account_get(name=service.model.dbobj.name,
-                                 create=False)
-
-        authorized_users = account.authorized_users
-        users = service.model.data.accountusers
-
-        # Authorize users
-        for user in users:
-            if user not in authorized_users:
-                account.authorize_user(username=user)
-
-        # Unauthorize users not in the schema
-        for user in authorized_users:
-            if user not in users:
-                account.unauthorize_user(username=user)
+        authorization_user(account, service, True)
 
         # update capacity
         account.model['maxMemoryCapacity'] = service.model.data.maxMemoryCapacity
