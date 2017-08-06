@@ -332,7 +332,7 @@ class Service:
         # service are kept in memory so we never need to relad anyomre
         pass
 
-    async def delete(self):
+    async def delete(self, force=False):
         """
         delete this service completly.
         remove it from db and from filesystem
@@ -354,15 +354,25 @@ class Service:
 
         for consumers in self.consumers.values():
             for consumer in consumers:
-                consumer.model.producerRemove(self)
-                consumer.model.reSerialize()
-                consumer.saveAll()
+                # get consumer's actor template to find the state of needed min/max services of the actor of producer.
+                constemplate = self.aysrepo.templateGet(name=consumer.model.dbobj.actorName)
+                consumptionconfig = constemplate.consumptionConfig
+                for conf in consumptionconfig:
+                    if conf['role'] == self.model.role: import ipdb; ipdb.set_trace()
+                    if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)):
+                       # not okay to remove  
+                        if not force:
+                            raise j.exceptions.RuntimeError("Can't remove {} without providing minimum of {} to service {}.".format(self, conf['min'], consumer))
+                        else:
+                            consumer.model.producerRemove(self)
+                            consumer.model.reSerialize()
+                            consumer.saveAll()
+                        break
 
         self.model.delete()
         j.sal.fs.removeDirTree(self.path)
         if self.model.key in self.aysrepo.db.services.services:
             del self.aysrepo.db.services.services[self.model.key]
-
     @property
     def parent(self):
         self.model.reSerialize()
