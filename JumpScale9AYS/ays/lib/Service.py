@@ -5,14 +5,14 @@ import asyncio
 
 class Service:
 
-    def __init__(self, aysrepo, loop=None):
+    def __init__(self, aysrepo):
         """
         init from a template or from a model
         """
         self.model = None
         self._schema = None
         self._path = ""
-        self._loop = loop or asyncio.get_event_loop()
+        self._loop = j.atyourservice.server.loop or asyncio.get_event_loop()
         self._recurring_tasks = {}  # for recurring jobs
         self._longrunning_tasks = {}  # for long running jobs.
         self.aysrepo = aysrepo
