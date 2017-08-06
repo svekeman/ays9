@@ -333,6 +333,12 @@ class Service:
         pass
 
     async def oktodelete(self):
+        """
+        Executes a dryrun to check if deleting service is OK.
+        Deleting a service will remove its children and may break a minimum consumption required by a consumer.
+
+        """
+
         if self.children:
             return False, "Can't remove service {} has children {}.".format(self, self.children)
         for consumers in self.consumers.values():
