@@ -39,6 +39,7 @@ def init(job):
 def authorization_user(space, service):
     authorized_users = space.authorized_users
     userslist = service.producers.get('uservdc', [])
+    user_exists = True
     users = []
     for u in userslist:
         if u.model.data.provider != '':
@@ -49,17 +50,13 @@ def authorization_user(space, service):
     # Authorize users
     for user in users:
         if user not in authorized_users:
-            for uvdc in service.model.data.uservdc:
-                if uvdc.name == user.split('@')[0]:
-                    if uvdc.accesstype:
-                        space.authorize_user(username=user, right=uvdc.accesstype)
-                    else:
-                        space.authorize_user(username=user)
-        else:
-            for uvdc in service.model.data.uservdc:
-                if uvdc.name == user.split('@')[0]:
-                    if uvdc.accesstype:
-                        space.update_access(username=user, right=uvdc.accesstype)
+            user_exists = False
+        for uvdc in service.model.data.uservdc:
+            if uvdc.name == user.split('@')[0]:
+                if user_exists:
+                    space.update_access(username=user, right=uvdc.accesstype)
+                else:
+                    space.authorize_user(username=user, right=uvdc.accesstype)
 
     # Unauthorize users not in the schema
     for user in authorized_users:
@@ -133,9 +130,9 @@ def processChange(job):
                             service.model.producerRemove(s)
                         for v in value:
                             accessRight = v.get('accesstype', '')
-                            if v['name'] == s.name and accessRight != get_user_accessright(s.name, service) and accessRight:
+                            if v['name'] == s.name and accessRight != get_user_accessright(s.name, service):
                                 name = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
-                                space.update_access(name, v['accesstype'])
+                                space.update_access(name, accessRight)
                 for v in value:
                     userservice = service.aysrepo.serviceGet('uservdc', v['name'])
                     if userservice not in service.producers.get('uservdc', []):
