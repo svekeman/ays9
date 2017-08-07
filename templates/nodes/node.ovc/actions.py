@@ -13,6 +13,80 @@ def init(job):
     os_actor = service.aysrepo.actorGet('os.ssh.ubuntu')
     os_actor.serviceCreate(service.name, args={'node': service.name, 'sshkey': service.model.data.sshkey})
 
+    users = service.model.data.uservdc
+    for user in users:
+        uservdc = service.aysrepo.serviceGet('uservdc', user.name)
+        service.consume(uservdc)
+
+def _authorization_user(machine, service, action=""):
+    from JumpScale9Lib.clients.portal.PortalClient import ApiError
+
+    userslist = service.producers.get('uservdc', [])
+    if not userslist:
+        return
+
+    users = []
+    for u in userslist:
+        if u.model.data.provider != '':
+            users.append(u.model.dbobj.name + "@" + u.model.data.provider)
+        else:
+            users.append(u.model.dbobj.name)
+    try:
+        machine_info = machine.client.api.cloudapi.machines.get(machineId=machine.id)
+    except ApiError as err:
+        j.logger.logging.error('Failed to retrieve machine information for machine {}. Error: {}'.format(machine.id, err))
+        raise
+    # get acl info
+    acl_info = {}
+    for item in machine_info['acl']:
+        acl_info[item['userGroupId']] = item
+
+
+    # Authorize users
+    for user in users:
+        # user is not registred...then add it
+        if user not in acl_info:
+            if not action or action == 'add':
+                for uvdc in service.model.data.uservdc:
+                    if uvdc.name == user.split('@')[0]:
+                        try:
+                            result = machine.client.api.cloudapi.machines.addUser(machineId=machine.id, userId=user, accesstype=uvdc.accesstype)
+                        except ApiError as err:
+                            service.logger.logging.error('Failed to register access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
+                            raise
+                        if result is not True:
+                            service.logger.logging.error('Failed to register access rights for user {} on machine {}'.format(user, machine.name))
+            elif action == 'delete':
+                service.logger.logging.warning('User {} does not have access rights on machine {}'.format(user, machine.name))
+            else:
+                # user is not registred while action is not add, then we need to fail to prevent users from registering users by mistake
+                msg = 'User {} is not registred to have access rights on machine {}. If you want to register user, please use add_user action'.format(user, machine.name)
+                service.logger.logging.error(msg)
+                raise RuntimeError(msg)
+
+        else:
+            # user already registered, check if the acl changed
+            existing_acl = acl_info[user]['right']
+            for uvdc in service.model.data.uservdc:
+                if uvdc.name == user.split('@')[0]:
+                    if not action or action == "update" or (action == "add" and existing_acl != uvdc.accesstype):
+                        try:
+                            result = machine.client.api.cloudapi.machines.updateUser(machineId=machine.id, userId=user, accesstype=uvdc.accesstype)
+                        except ApiError as err:
+                            service.logger.logging.error('Failed to update access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
+                            raise
+                        if result is not True:
+                            service.logger.logging.error('Failed to update access rights for user {} on machine {}'.format(user, machine.name))
+                    elif action == 'delete':
+                        try:
+                            machine.client.api.cloudapi.machines.deleteUser(machineId=machine.id, userId=user)
+                        except ApiError as err:
+                            service.logger.logging.error('Failed to delete access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
+                            raise
+                    elif action == 'add' and existing_acl == uvdc.accesstype:
+                        service.logger.info('User {} already have the required access type on machine {}'.format(user, machine.name))
+
+
 
 def install(job):
     service = job.service
@@ -42,6 +116,9 @@ def install(job):
 
     service.model.data.machineId = machine.id
     service.model.data.ipPublic = machine.space.model['publicipaddress'] or space.get_space_ip()
+
+    # register users acls
+    _authorization_user(machine, service)
 
     ip, vm_info = machine.get_machine_ip()
     if not ip:
@@ -346,6 +423,9 @@ def init_actions_(service, args):
         'stop': [],
         'get_history': ['install'],
         'uninstall': ['stop'],
+        'add_user': ['install'],
+        'update_user': ['install'],
+        'delete_user': ['install'],
     }
 
 
@@ -637,3 +717,48 @@ def get_history(job):
 
 def mail(job):
     print('hello world')
+
+
+def _update_user_acl(job, action):
+    """
+    Updates user access rights on the machine
+    """
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue reset of %s" % service)
+    g8client = vdc.producers["g8client"][0]
+
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        msg = "Machine {} doesn't exist in the cloud space {}".format(service.name, space.name)
+        service.logger.warning(msg)
+        raise RuntimeError(msg)
+    machine = space.machines[service.name]
+    _authorization_user(machine, service, action=action)
+    service.saveAll()
+
+
+def add_user(job):
+    """
+    Give a registered user access rights to the machine
+    """
+    _update_user_acl(job=job, action='add')
+
+
+def update_user(job):
+    """
+    Update a registered user access rights to the machine
+    """
+    _update_user_acl(job=job, action='update')
+
+
+def delete_user(job):
+    """
+    Remove a registered user access rights to the machine
+    """
+    _update_user_acl(job=job, action='delete')

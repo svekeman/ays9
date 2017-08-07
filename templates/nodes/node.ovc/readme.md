@@ -31,6 +31,7 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - ovf.callbackUrl: callbackurl for calling you back when the machine is exported
 - disk: list of disk instances to be attached to the VM
 - vmHistory: stores VM history which includes the actions performed on this machine and the time these actions were performed. **fill automatically, don't specify it in Blueprint**
+- uservdc: List of users to that access the machine with the type of access rights for each user e.g 'R' for read only access, 'RCX' for Write and 'ARCXDU' for Admin
 
 
 ### Changing port forwardings
@@ -236,6 +237,7 @@ node.ovc__demo:
     disk:
       - 'disk1'
 ```
+
 ## Example for getting VM history
 ```yaml
 g8client__env:
@@ -252,4 +254,78 @@ node.ovc__demo:
 actions:
   - action: get_history
     actor: node.ovc
+```
+
+## Example for adding user to a machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+uservdc__demo_user:
+    g8client: env
+
+node.ovc__demo:
+  uservdc:
+    - name: demo_user
+      accesstype: ACDRUX
+
+actions:
+  - action: add_user
+    actor: node.ovc
+    service: demo
+```
+
+## Example for updating user access right on a machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+uservdc__demo_user:
+    g8client: env
+
+node.ovc__demo:
+  uservdc:
+    - name: demo_user
+      accesstype: R
+
+actions:
+  - action: update_user
+    actor: node.ovc
+    service: demo
+```
+
+## Example for delete user access right from a machine
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+uservdc__demo_user:
+    g8client: env
+
+node.ovc__demo:
+  uservdc:
+    - name: demo_user
+
+actions:
+  - action: delete_user
+    actor: node.ovc
+    service: demo
 ```
