@@ -345,6 +345,8 @@ def init_actions_(service, args):
         'monitor': ['start'],
         'stop': [],
         'get_history': ['install'],
+        'attach_external_network': ['install'],
+        'detach_external_network': ['install'],
         'uninstall': ['stop'],
     }
 
@@ -634,6 +636,42 @@ def get_history(job):
     res = machine.getHistory(10)
     service.model.data.vmHistory = json.dumps(res)
     service.saveAll()
+
+def attach_external_network(job):
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue attaching external network to %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    machine.attach_external_network()
+
+def detach_external_network(job):
+    service = job.service
+    vdc = service.parent
+    
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue attaching external network to %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    machine.detach_external_network()
 
 def mail(job):
     print('hello world')

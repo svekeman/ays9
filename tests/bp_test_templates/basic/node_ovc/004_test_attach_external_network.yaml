@@ -1,0 +1,9 @@
+node.ovc__testn:
+
+test_node_ovc__node:
+
+actions:
+  - action: attach_external_network
+  - action: test_attach_external_network
+    actor: test_node_ovc
+    service: node
