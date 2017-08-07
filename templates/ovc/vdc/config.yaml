@@ -13,6 +13,7 @@ doc:
   - location: ''
   - externalNetworkID: ''
   - maxDiskCapacity: GiB
+  - maxNetworkPeerTransfer: ''
 links:
   consume:
   - argname: uservdc

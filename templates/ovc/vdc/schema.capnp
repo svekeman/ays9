@@ -1,5 +1,5 @@
 
-@0xe0283c28624942f8;
+@0xafb1b67b5480d100;
 struct Schema {
 	description @0 :Text;
 	vdcfarm @1 :Text;
@@ -14,6 +14,7 @@ struct Schema {
 	maxDiskCapacity @10 :Int64 = -1;
 	maxNumPublicIP @11 :Int64 = -1;
 	externalNetworkID @12 :Int64 = -1;
+	maxNetworkPeerTransfer @13 :Int64 = -1;
 	struct UserVdcEntry {
 		name @0 :Text;
 		accesstype @1 :Text;

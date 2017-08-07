@@ -14,17 +14,24 @@ This actor template creates a cloudspace (Virtual Data Center) on the specified 
 - uservdc: Users to have access to this cloudpsace. Name is name of user service to be consumed and accesstype is the user access right to this cloudspace.
 - allowedVMSizes: Specify the allowed size ids for virtual machines on this cloudspace.
 - cloudspaceID: id of the cloudspace (leave empty).
-- maxMemoryCapacity: Cloudspace limits, maximum memory.
+- maxMemoryCapacity: Cloudspace limits, maximum memory(GB).
 - maxCPUCapacity: Cloudspace limits, maximum CPU capacity.
-- maxDiskCapacity: Cloudspace limits, maximum disk capacity.
+- maxDiskCapacity: Cloudspace limits, maximum disk capacity(GB).
 - maxNumPublicIP: Cloudspace limits, maximum allowed number of public IPs.
 - externalNetworkID: External network to be attached to this cloudspace.
+- maxNetworkPeerTransfer: Cloudspace limits, max sent/received network transfer peering(GB).
 
 ## User access rights
 
 Using process change it is possible to add, remove and update user access to the cloudspace. To add user after executing the run and creating the vdc, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. changing the accesstype will update the user access when executing the blueprint.
 
 ## Example for creating VDC
+
+For authentication `g8client` service is needed to represent the user sending the requests to the environment API. The user needs to exist in the environment. The `account` will be the owner of the cloudpsace, the `account` service is created automatically if not specified in the blueprint. if the account exists it will be used otherwise it will be created.
+
+The `g8client` and `account` services need to be consumed by the `vdc` service(see blueprint below). The blueprint will create a cloudspace on the specified environment and give access to users specified in the `uservdc` parameter, and set the cloudspace limits as specified.
+
+For the creation of the vdc the action specified is install, to delete the vdc action uninstall needs to be specified in the `actions` parameter as seen in the second example below.
 
 ```yaml
 g8client__example:
@@ -55,6 +62,11 @@ vdc__cs2:
     allowedVMSizes:
         - 1
         - 2
+    maxMemoryCapacity: 10
+    maxDiskCapacity: 15
+    maxCPUCapacity: 4
+    maxNetworkPeerTransfer: 15
+    maxNumPublicIP: 7
 actions:
   - action: install
 ```

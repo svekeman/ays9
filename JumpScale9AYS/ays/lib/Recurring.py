@@ -1,6 +1,7 @@
 from js9 import j
 import asyncio
 
+
 class RecurringTask:
     """Execute a job periodicly"""
     def __init__(self, service, action, period, loop=None):
@@ -58,7 +59,7 @@ class LongRunningTask(RecurringTask):
         super().__init__(service=service, action=action, period=None, loop=loop)
         self.logger.info("Created long task {} of service {}".format(action, service))
         self.actioncode = service.model.actionsCode[action]
-        
+
     async def _run(self):
         try:
             # create job
@@ -81,9 +82,10 @@ if __name__ == '__main__':
 
     j.atyourservice.server.aysRepos._load()
     repo = j.atyourservice.server.aysRepos.get('/opt/code/cockpit_repos/testrepo')
-    s = repo.serviceGet('node','demo')
-    t = RecurringTask(s,'monitor', 10, loop=loop)
+    s = repo.serviceGet('node', 'demo')
+    t = RecurringTask(s, 'monitor', 10, loop=loop)
     t.start()
+
     def cb(t):
         t.stop()
     loop.call_later(20, cb, t)

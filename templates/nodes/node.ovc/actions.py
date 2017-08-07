@@ -134,11 +134,15 @@ def install(job):
     service.saveAll()
 
 def processChange(job):
-    # HERE we take care of changing ports in the blueprints.
-    # REMOVING PORT FORWARDING IN BLUEPRINTS REFLECTS WILL REMOVE THE PORTFORWARD.
-    # ADDING NEW PORT FORWARD IN BLUEPRINT WILL ADD A NEW PORTFORWARD.
-    # EDITING PORT FOWARD IN BLUEPRINT = REMOVING THE OLD PORTFORWARD AND CREATING NEW ONE.
-    # PORT 22 IS SPECIAL CASE WE KEEP IT EVEN IF EDITED OR DELETED.
+    # HERE we take care of changing ports and disks in the blueprints.
+    #   ports:
+    #       -REMOVING PORT FORWARDING IN BLUEPRINTS REFLECTS WILL REMOVE THE PORTFORWARD.
+    #       -ADDING NEW PORT FORWARD IN BLUEPRINT WILL ADD A NEW PORTFORWARD.
+    #       -EDITING PORT FOWARD IN BLUEPRINT = REMOVING THE OLD PORTFORWARD AND CREATING NEW ONE.
+    #       -PORT 22 IS SPECIAL CASE WE KEEP IT EVEN IF EDITED OR DELETED.
+    #   Disks:
+    #       -add/delete data disk services = add/detach data disk to/from the machine.
+    #       -delete boot disks will be ignored.
     service = job.service
     vdc = service.parent
     if 'g8client' not in vdc.producers:
@@ -218,6 +222,34 @@ def processChange(job):
 
                 # KEEP THE OLDSSH PART
                 ports.append("%s:%s"%(oldpublic22, oldlocal22))
+
+                setattr(service.model.data, key, value)
+
+            if key == 'disk':
+                # Get machine data disks only
+                machine_disks = {disk['name']: disk['id'] for disk in machine.disks if disk['type'] != 'B'}
+                old_disks_services = service.producers.get('disk', [])
+
+                # Check for removed disk services which aren't of type B(boot), and delete them
+                for old_disk_service in old_disks_services:
+                    if old_disk_service.name not in value and old_disk_service.model.data.type != 'B':
+                        service.model.producerRemove(old_disk_service)
+                        device_name = old_disk_service.model.dbobj.name
+                        if device_name in machine_disks:
+                            machine.detach_disk(machine_disks[device_name])
+
+                # Check for the new disk services and add them
+                for disk_service_name in value:
+                    disk_service = service.aysrepo.serviceGet('disk.ovc', disk_service_name)
+                    if disk_service not in old_disks_services:
+                        service.consume(disk_service)
+                        disk_args = disk_service.model.data
+                        disk_id = machine.add_disk(name=disk_service.name,
+                                                   description=disk_args.description,
+                                                   size=disk_args.size,
+                                                   type=disk_args.type.upper(),
+                                                   ssdSize=disk_args.ssdSize)
+                        machine.disk_limit_io(disk_id, disk_args.maxIOPS)
 
                 setattr(service.model.data, key, value)
 
@@ -312,6 +344,7 @@ def init_actions_(service, args):
         'import_': ['init'],
         'monitor': ['start'],
         'stop': [],
+        'get_history': ['install'],
         'uninstall': ['stop'],
     }
 
@@ -580,6 +613,27 @@ def reset(job):
     machine = space.machines[service.name]
     machine.reset()
 
+
+def get_history(job):
+    import json
+    service = job.service
+    vdc = service.parent
+
+    if 'g8client' not in vdc.producers:
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue reset of %s" % service)
+
+    g8client = vdc.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(vdc.model.data.account)
+    space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
+
+    if service.name not in space.machines:
+        service.logger.warning("Machine doesn't exist in the cloud space")
+        return
+    machine = space.machines[service.name]
+    res = machine.getHistory(10)
+    service.model.data.vmHistory = json.dumps(res)
+    service.saveAll()
 
 def mail(job):
     print('hello world')
