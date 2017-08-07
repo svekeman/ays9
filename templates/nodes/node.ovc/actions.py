@@ -69,7 +69,7 @@ def _authorization_user(machine, service, action=""):
             existing_acl = acl_info[user]['right']
             for uvdc in service.model.data.uservdc:
                 if uvdc.name == user.split('@')[0]:
-                    if not action or action == "update":
+                    if not action or action == "update" or (action == "add" and existing_acl != uvdc.accesstype):
                         try:
                             result = machine.client.api.cloudapi.machines.updateUser(machineId=machine.id, userId=user, accesstype=uvdc.accesstype)
                         except ApiError as err:
@@ -83,13 +83,8 @@ def _authorization_user(machine, service, action=""):
                         except ApiError as err:
                             service.logger.logging.error('Failed to delete access rights for user {} on machine {}. Error: {}'.format(user, machine.name, err))
                             raise
-                    elif action == 'add' and existing_acl == uuvdc.accesstype:
+                    elif action == 'add' and existing_acl == uvdc.accesstype:
                         service.logger.info('User {} already have the required access type on machine {}'.format(user, machine.name))
-                    else:
-                        # user already registered but the action was not update, then we need to fail to prevernt users from updating users by mistake
-                        msg = 'User {} already have the required access type on machine {}. If you want to update the access rights, please your update_user action'.format(user, machine.name)
-                        service.logger.error(msg)
-                        raise RuntimeError(msg)
 
 
 
