@@ -15,7 +15,7 @@ struct Schema {
 	maxNumPublicIP @11 :Int64 = -1;
 	externalNetworkID @12 :Int64 = -1;
 	maxNetworkPeerTransfer @13 :Int64 = -1;
-	disabled @14 :Bool = False;
+	disabled @14 :Bool = false;
 
 	struct UserVdcEntry {
 		name @0 :Text;
