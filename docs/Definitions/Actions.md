@@ -83,6 +83,9 @@ def uninstall(job):
     machine.delete()
 ```
 
+## Default behavior 
+   - action delete: will call service.delete()
+
 ```toml
 !!!
 title = "AYS Actions"

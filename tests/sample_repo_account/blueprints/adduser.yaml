@@ -1,0 +1,6 @@
+account__acc:
+  accountusers:
+      - name: 'jonas'
+        accesstype: 'CXDRAU'
+      - name: 'usertest'
+        accesstype: 'R'

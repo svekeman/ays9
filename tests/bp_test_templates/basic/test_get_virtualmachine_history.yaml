@@ -24,7 +24,7 @@ test_get_virtualmachine_history__ts:
     node: 'demo'
 
 actions:
-  - action: getHistory
+  - action: get_history
     actor: node.ovc
   - action: test
     actor: test_get_virtualmachine_history

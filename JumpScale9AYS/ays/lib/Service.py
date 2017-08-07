@@ -5,14 +5,14 @@ import asyncio
 
 class Service:
 
-    def __init__(self, aysrepo, loop=None):
+    def __init__(self, aysrepo):
         """
         init from a template or from a model
         """
         self.model = None
         self._schema = None
         self._path = ""
-        self._loop = loop or asyncio.get_event_loop()
+        self._loop = j.atyourservice.server.loop or asyncio.get_event_loop()
         self._recurring_tasks = {}  # for recurring jobs
         self._longrunning_tasks = {}  # for long running jobs.
         self.aysrepo = aysrepo
@@ -332,16 +332,39 @@ class Service:
         # service are kept in memory so we never need to relad anyomre
         pass
 
-    async def delete(self):
+    async def oktodelete(self):
         """
-        delete this service completly.
-        remove it from db and from filesystem
-        all the children of this service are going to be deleted too
-        """
-        # TODO should probably warn user relation may be broken
+        Executes a dryrun to check if deleting service is OK.
+        Deleting a service will remove its children and may break a minimum consumption required by a consumer.
 
-        for service in self.children:
-            await service.delete()
+        """
+
+        if self.children:
+            return False, "Can't remove {} has children {}.".format(self, self.children)
+        for consumers in self.consumers.values():
+            for consumer in consumers:
+                constemplate = self.aysrepo.templateGet(name=consumer.model.dbobj.actorName)
+                consumptionconfig = constemplate.consumptionConfig
+                for conf in consumptionconfig:
+                    if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)):
+                        return False, "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
+        return True, "OK"
+
+    async def delete(self, force=False):
+        """
+        Deletes service and its children from database and filesystem.
+
+        @param force bool=False: will execute a dryrun to check if deleting this service won't break anything (force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete.
+
+        """
+        if not force:
+            oktodelete, msg = await self.oktodelete()
+            if not oktodelete:
+                raise j.exceptions.RuntimeError(msg)
+
+        if self.children:
+            for service in self.children:
+                await service.delete(force=force)
 
         # cancel all recurring tasks
         self.stop()
@@ -354,6 +377,7 @@ class Service:
 
         for consumers in self.consumers.values():
             for consumer in consumers:
+                # not okay to remove
                 consumer.model.producerRemove(self)
                 consumer.model.reSerialize()
                 consumer.saveAll()
@@ -755,7 +779,7 @@ class Service:
         for action, info in self.model.actionsLongRunning.items():
             self.logger.info("Starting long running job {} with {} ".format(action, info))
             if action not in self._longrunning_tasks:
-                task = LongRunningTask(service=self, action=action)
+                task = LongRunningTask(service=self, action=action, loop=self._loop)
                 task.start()
                 self._longrunning_tasks[action] = task
 
