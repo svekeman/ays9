@@ -1,6 +1,8 @@
 def init_actions_(service, args):
     return {
         'test_create': ['init'],
+        'test_disable': ['init'],
+        'test_enable': ['init'],
         'test_delete': ['init'],
     }
 
@@ -83,3 +85,9 @@ def test_delete(job):
     except Exception as e:
         service.model.data.result = RESULT_ERROR % (str(sys.exc_info()[:2]) + str(e))
     service.save()
+
+def test_enable(job):
+    pass
+
+def test_disable(job):
+    pass

@@ -1,16 +1,23 @@
 from js9 import j
 
+def init_actions_(service, args):
+    dependencies = {
+        'enable': ['install'],
+        'disable': ['install']
+    }
+    return dependencies
+
 
 def input(job):
     service = job.service
     if job.model.args.get('location', "") == "":
-        raise j.exceptions.Input("location argument cannot be empty, cannot continue init of %s" % service)
+        raise j.exceptions.Input("Location argument cannot be empty. Cannot continue input of %s" % service)
 
 
 def init(job):
     service = job.service
     if 'g8client' not in service.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue init of %s" % service)
     g8client = service.producers["g8client"][0]
 
     users = service.model.data.uservdc
@@ -65,7 +72,7 @@ def authorization_user(space, service):
 def install(job):
     service = job.service
     if 'g8client' not in service.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue install of %s" % service)
     g8client = service.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
     acc = cl.account_get(service.model.data.account)
@@ -110,9 +117,15 @@ def processChange(job):
 
     args = job.model.args
     category = args.pop('changeCategory')
+
+    if 'g8client' not in service.producers:
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue processChange of %s" % service)
     g8client = service.producers["g8client"][0]
+
     cl = j.clients.openvcloud.getFromService(g8client)
     acc = cl.account_get(service.model.data.account)
+
+    # Get given space, raise error if not found
     space = acc.space_get(name=service.model.dbobj.name,
                           location=service.model.data.location,
                           create=False)
@@ -136,13 +149,8 @@ def processChange(job):
                     if userservice not in service.producers.get('uservdc', []):
                         service.consume(userservice)
             elif key == 'location' and service.model.data.location != value:
-                raise RuntimeError("Can not change attribute location")
+                raise RuntimeError("Cannot change attribute location")
             setattr(service.model.data, key, value)
-
-        if 'g8client' not in service.producers:
-            raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
-
-        # Get given space, raise error if not found
 
         authorization_user(space, service)
 
@@ -159,10 +167,44 @@ def processChange(job):
 def uninstall(job):
     service = job.service
     if 'g8client' not in service.producers:
-        raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue uninstall of %s" % service)
 
     g8client = service.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
     acc = cl.account_get(service.model.data.account)
     space = acc.space_get(service.model.dbobj.name, service.model.data.location)
     space.delete()
+
+def enable(job):
+    service = job.service
+
+    if 'g8client' not in service.producers:
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue enabling  %s" % service)
+
+    g8client = service.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(service.model.data.account)
+    # Get space, raise error if not found
+    space = acc.space_get(name=service.model.dbobj.name,
+                          location=service.model.data.location,
+                          create=False)
+    space.enable()
+    service.model.data.disabled = False
+    service.save()
+
+def disable(job):
+    service = job.service
+
+    if 'g8client' not in service.producers:
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue disabling  %s" % service)
+
+    g8client = service.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(service.model.data.account)
+    # Get space, raise error if not found
+    space = acc.space_get(name=service.model.dbobj.name,
+                          location=service.model.data.location,
+                          create=False)
+    space.disable()
+    service.model.data.disabled = True
+    service.save()
