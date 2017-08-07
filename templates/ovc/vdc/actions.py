@@ -55,6 +55,11 @@ def authorization_user(space, service):
                         space.authorize_user(username=user, right=uvdc.accesstype)
                     else:
                         space.authorize_user(username=user)
+        else:
+            for uvdc in service.model.data.uservdc:
+                if uvdc.name == user.split('@')[0]:
+                    if uvdc.accesstype:
+                        space.update_access(username=user, right=uvdc.accesstype)
 
     # Unauthorize users not in the schema
     for user in authorized_users:
