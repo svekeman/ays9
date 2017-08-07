@@ -1,6 +1,6 @@
-from js9 import j
-from JumpScale9AYS.ays.lib.Recurring import RecurringTask, LongRunningTask
 import asyncio
+from js9 import j
+from JumpScale9AYS.ays.lib.Recurring import LongRunningTask, RecurringTask
 
 
 class Service:
@@ -357,6 +357,8 @@ class Service:
         @param force bool=False: will execute a dryrun to check if deleting this service won't break anything (force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete.
 
         """
+        producer_removed = "{}!{}".format(self.model.role, self.name)
+
         if not force:
             oktodelete, msg = await self.oktodelete()
             if not oktodelete:
@@ -381,6 +383,8 @@ class Service:
                 consumer.model.producerRemove(self)
                 consumer.model.reSerialize()
                 consumer.saveAll()
+                # here we trigger processChange with `links` category with args of removed producer role and name
+                consumer.processChange(actor=self.aysrepo.actorGet(consumer.model.dbobj.actorName), changeCategory="links", args={"producer_removed":producer_removed})
 
         self.model.delete()
         j.sal.fs.removeDirTree(self.path)
@@ -541,6 +545,7 @@ class Service:
         template action change
         categories :
             - dataschema
+            - links
             - ui
             - config
             - action_new_actionname
@@ -552,7 +557,9 @@ class Service:
         if changeCategory == 'dataschema':
             # We use the args passed without change
             pass
-
+        elif changeCategory == 'links':
+            # used to trigger link update(prod/consumer, parent/child)
+            pass
         elif changeCategory == 'ui':
             # TODO
             pass

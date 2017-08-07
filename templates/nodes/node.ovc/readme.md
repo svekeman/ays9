@@ -31,6 +31,7 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - ovf.callbackUrl: callbackurl for calling you back when the machine is exported
 - disk: list of disk instances to be attached to the VM
 - vmHistory: stores VM history which includes the actions performed on this machine and the time these actions were performed. **fill automatically, don't specify it in Blueprint**
+- uservdc: List of users to that access the machine with the type of access rights for each user e.g 'R' for read only access, 'RCX' for Write and 'ARCXDU' for Admin
 
 
 ### Changing port forwardings
