@@ -127,7 +127,7 @@ def test_node_disks(job):
                 failure = 'Machine Model Disks({}) != Actual Machine Disks({})'.format(len(disks)+1, len(content['disks']))
                 service.model.data.result = RESULT_FAILED % failure
             else:
-                service.model.data.result = RESULT_OK % 'test_attach_disk'
+                service.model.data.result = RESULT_OK % 'test_node_disks'
         else:
             response_data = {'status_code': response.status_code,
                              'content': response.content}
@@ -213,7 +213,7 @@ def test_detach_external_network(job):
                 failure = 'Machine is not detached from external network '
                 service.model.data.result = RESULT_FAILED % failure
             else:
-                service.model.data.result = RESULT_OK % 'test_attach_external_network'
+                service.model.data.result = RESULT_OK % 'test_detach_external_network'
         else:
             response_data = {'status_code': response.status_code,
                              'content': response.content}

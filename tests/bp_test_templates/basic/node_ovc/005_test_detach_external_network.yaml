@@ -1,9 +1,9 @@
-node.ovc__testn:
+node.ovc__testnode:
 
-test_node_ovc__node:
+test_node_ovc__test:
 
 actions:
   - action: detach_external_network
   - action: test_detach_external_network
     actor: test_node_ovc
-    service: node
+    service: test
