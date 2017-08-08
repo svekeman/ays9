@@ -154,12 +154,16 @@ class Blueprint:
                         await actor.asyncServiceCreate(instance=bpinstance, args=args, context=context)
 
         # first we had to make sure all services do exist, then we can add these properties
-        for action_info in self.actions:
-            for service in self.aysrepo.servicesFind(name=action_info['service'], actor=action_info['actor']):
-                if action_info['action_name'] == "delete" and action_info['force'] is False:
+        for idx, action_info in enumerate(self.actions):
+            if action_info['action_name'] == "delete" and action_info['force'] is False:
+                for service in self.aysrepo.servicesFind(name=action_info['service'], actor=action_info['actor']):
                     ok, msg = await service.oktodelete()
                     if not ok:
-                        raise RuntimeError("Delete action won't be able to complete successfully:  " + msg)
+                        self.logger.warning("Delete action won't be able to complete successfully:  " + msg)
+                        self.actions.pop(idx)  # we pop the delete action here.
+
+        for action_info in self.actions:
+            for service in self.aysrepo.servicesFind(name=action_info['service'], actor=action_info['actor']):
                 service.scheduleAction(action_info['action_name'], period=action_info['recurring_period'], force=action_info['force'])
                 service.saveAll()
 
