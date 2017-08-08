@@ -24,7 +24,11 @@ This actor template creates a cloudspace (Virtual Data Center) on the specified 
 
 ## User access rights
 
-Using process change it is possible to add, remove and update user access to the cloudspace. To add user after executing the run and creating the vdc, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. changing the accesstype will update the user access when executing the blueprint.
+Use the uservdc parameter to specify the user access right to the vdc. Note that if only name exist in the entry(no accesstype) then the access right will be by default `ACDRUX`.
+
+Note that the data in the blueprint is always reflected in the vdc, which means that removing an entry in the blueprint will remove or change it in the vdc. If the user only wants to edit some data then it is possible to do so by using processChange action.
+
+Using process change it is possible to add, remove and update user access to the cloudspace. To add user after executing the run and creating the vdc, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. changing the accesstype will update the user access when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
 
 ## Example for creating VDC
 
