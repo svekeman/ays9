@@ -738,9 +738,9 @@ def attach_external_network(job):
 def detach_external_network(job):
     service = job.service
     vdc = service.parent
-    
+
     if 'g8client' not in vdc.producers:
-        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue attaching external network to %s" % service)
+        raise j.exceptions.RuntimeError("No producer g8client found. Cannot continue detaching external network from %s" % service)
 
     g8client = vdc.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
