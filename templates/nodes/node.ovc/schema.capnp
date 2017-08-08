@@ -29,4 +29,5 @@ struct Schema {
 		name @0 :Text;
 		accesstype @1 :Text = "R";
 	}
+	sshAuthorized @24 :Bool = false;
 }
