@@ -115,7 +115,12 @@ def test_enable(job):
 
         if response.status_code == 200:
             content = response.json()
-            # TODO: check if vdc is enabled
+            # check if vdc is enabled
+            if content['status'] != 'DEPLOYED':
+                failure = 'vdc is not deployed'
+                service.model.data.result = RESULT_FAILED % failure
+            else:
+                service.model.data.result = RESULT_OK % 'test_enable_vdc'
         else:
             response_data = {'status_code': response.status_code,
                              'content': response.content}
@@ -153,7 +158,12 @@ def test_disable(job):
 
         if response.status_code == 200:
             content = response.json()
-            # TODO: check if vdc is disabled
+            # check if vdc is disabled
+            if content['status'] != 'DISABLED':
+                failure = 'vdc is not disabled'
+                service.model.data.result = RESULT_FAILED % failure
+            else:
+                service.model.data.result = RESULT_OK % 'test_disable_vdc'
         else:
             response_data = {'status_code': response.status_code,
                              'content': response.content}

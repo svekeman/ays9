@@ -190,7 +190,7 @@ def enable(job):
     space = acc.space_get(name=service.model.dbobj.name,
                           location=service.model.data.location,
                           create=False)
-    space.enable()
+    space.enable('The space should be enabled.')
     service.model.data.disabled = False
     service.save()
 
@@ -207,6 +207,6 @@ def disable(job):
     space = acc.space_get(name=service.model.dbobj.name,
                           location=service.model.data.location,
                           create=False)
-    space.disable()
+    space.disable('The space should be disabled.')
     service.model.data.disabled = True
     service.save()

@@ -91,3 +91,35 @@ vdc__cs2:
 actions:
   - action: uninstall
 ```
+
+## Example for disabling VDC
+
+```yaml
+g8client__example:
+    url: '<url of the environment>'
+    login: '<username>'
+    password: '<password>'
+    account: '<account name>'
+
+vdc__cs2:
+    location: '<name of the environment>'
+
+actions:
+  - action: disable
+```
+
+## Example for enabling VDC
+
+```yaml
+g8client__example:
+    url: '<url of the environment>'
+    login: '<username>'
+    password: '<password>'
+    account: '<account name>'
+
+vdc__cs2:
+    location: '<name of the environment>'
+
+actions:
+  - action: enable
+```
