@@ -335,21 +335,17 @@ class Service:
         # service are kept in memory so we never need to relad anyomre
         pass
 
-
-    async def checkDelete(self, indent=0):
+    async def checkDelete(self):
         """
         Executes a dryrun to check if deleting service is OK.
         To ensure that removal won't break minimum consumption required by a consumer for the service or any of its children.
 
         """
-        servicename = self.name
-        errormsg = lambda errmsg:  "\n{}Error in deleting service {}:\n {} ".format("  "*indent, servicename, errmsg)
-
         if self.children:
             for child in self.children:
-                oktodelete, msg = await child.checkDelete(indent=indent+1)
+                oktodelete, msg = await child.checkDelete()
                 if not oktodelete:
-                    return False, errormsg(msg)
+                    return False, msg 
 
         for consumers in self.consumers.values():
             for consumer in consumers:
@@ -360,9 +356,8 @@ class Service:
                     if minimum == 0:
                         continue
                     if conf['role'] == self.model.role and minimum <= len(consumer.producers.get(self.model.role, [])):
-                        msg = "{}Can't remove {} without providing minimum of {} {} services to {}.".format("  "*(indent+1), self, conf['min'], conf['role'], consumer)
-
-                        return False, errormsg(msg) 
+                        msg = "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
+                        return False, msg 
         return True, "OK"
 
     async def delete(self):
@@ -405,7 +400,6 @@ class Service:
             del self.aysrepo.db.services.services[self.model.key]
 
         self._deleted = True
-
 
     @property
     def parent(self):

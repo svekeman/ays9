@@ -71,9 +71,7 @@ Imagine you have some service instances already deployed and a new version of th
 
 
 ## Service deletion (service.delete())
-To safely delete a service it shouldn't 
- - Be a parent of another service: in that case you need to remove the children first.
- - Break minimum producers required by another consumer.
+Service cannot be deleted if itself or any of its children break the minimum requirements of any of their consumers upon deletion.
 
 ### producer_removed
 In case of producer removal a change in the `links` category would be propagated to its consumers

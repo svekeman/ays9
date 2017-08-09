@@ -685,7 +685,8 @@ def blueprint(name, follow, message):
             if follow:
                 print(resp.json())
             else:
-                print("Blueprint {} executed".format(name))
+                msg = resp.json()['msg']
+                print(msg)
         except Exception as e:
             print('error during execution of the blueprint {}: {}'.format(name, _extract_error(e)))
             return

@@ -477,6 +477,7 @@ class AtYourServiceRepo():
 
     async def blueprintExecute(self, path="", content="", role="", instance="", context=None,
                                message=""):
+        msg = "OK"
         curr_time = j.data.time.epoch
         if path == "" and content == "":
             for bp in self.blueprints:
@@ -484,7 +485,7 @@ class AtYourServiceRepo():
                     self.logger.warning(
                         "blueprint %s not executed because it doesn't have a valid format" % bp.path)
                     raise j.exceptions.Input(bp.valid_msg)
-                await bp.load(role=role, instance=instance, context=context)
+                msg = await bp.load(role=role, instance=instance, context=context)
         else:
             bp = Blueprint(self, path=path, content=content)
             # self._blueprints[bp.path] = bp
@@ -492,7 +493,7 @@ class AtYourServiceRepo():
                 self.logger.warning(
                     "blueprint %s not executed because it doesn't have a valid format" % bp.path)
                 raise j.exceptions.Input(bp.valid_msg)
-            await bp.load(role=role, instance=instance, context=context)
+            msg = await bp.load(role=role, instance=instance, context=context)
 
         await self.init(role=role, instance=instance, context=context)
         # Gets all process change job keys created after executing the blueprint, to make it possible to retrieve process change jobs information.
@@ -504,7 +505,7 @@ class AtYourServiceRepo():
             if not message:
                 message = "Auto Commit By AYS"
             self.commit(message=message)
-        return jobkeys
+        return jobkeys, msg
 
     def blueprintGet(self, bname):
         bpath = j.sal.fs.joinPaths(self.path, 'blueprints', bname)
