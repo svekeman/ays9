@@ -476,7 +476,7 @@ async def executeBlueprint(request, blueprint, repository):
         j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(e)}, 500)
     # Returns json containing list of jobkeys in addition to the message. Will only return jobs with action process change.
-    return json({'msg': 'Blueprint {} executed {}'.format(blueprint, msg), 'processChangeJobs': jobkeys})
+    return json({'msg': msg, 'processChangeJobs': jobkeys})
 
 
 async def updateBlueprint(request, blueprint, repository):

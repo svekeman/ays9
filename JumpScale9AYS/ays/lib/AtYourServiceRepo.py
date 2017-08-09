@@ -477,7 +477,6 @@ class AtYourServiceRepo():
 
     async def blueprintExecute(self, path="", content="", role="", instance="", context=None,
                                message=""):
-        msg = "OK"
         curr_time = j.data.time.epoch
         if path == "" and content == "":
             for bp in self.blueprints:
