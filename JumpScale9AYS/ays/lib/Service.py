@@ -332,34 +332,46 @@ class Service:
         # service are kept in memory so we never need to relad anyomre
         pass
 
-    async def oktodelete(self):
+
+    async def checkDelete(self, indent=0):
         """
         Executes a dryrun to check if deleting service is OK.
-        Deleting a service will remove its children and may break a minimum consumption required by a consumer.
+        To ensure that removal won't break minimum consumption required by a consumer for the service or any of its children.
 
         """
+        servicename = self.name
+        errormsg = lambda errmsg:  "\n{}Error in deleting service {}:\n {} ".format("  "*indent, servicename, errmsg)
 
         if self.children:
-            return False, "Can't remove {} has children {}.".format(self, self.children)
+            for child in self.children:
+                oktodelete, msg = await child.checkDelete(indent=indent+1)
+                if not oktodelete:
+                    return False, errormsg(msg)
+
         for consumers in self.consumers.values():
             for consumer in consumers:
                 constemplate = self.aysrepo.templateGet(name=consumer.model.dbobj.actorName)
                 consumptionconfig = constemplate.consumptionConfig
                 for conf in consumptionconfig:
-                    if conf['role'] == self.model.role and conf['min'] == len(consumer.producers.get(self.model.role)):
-                        return False, "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
+                    minimum = conf.get('min', 0)  >= len(consumer.producers.get(self.model.role, []))
+                    if minimum == 0:
+                        continue
+                    if conf['role'] == self.model.role and minimum <= len(consumer.producers.get(self.model.role, [])):
+                        msg = "{}Can't remove {} without providing minimum of {} {} services to {}.".format("  "*(indent+1), self, conf['min'], conf['role'], consumer)
+
+                        return False, errormsg(msg) 
         return True, "OK"
 
     async def delete(self):
         """
-        Deletes service and its children from database and filesystem.
+        Deletes service and its children from database and filesystem if safe. 
 
-        @param force bool=False: will execute a dryrun to check if deleting this service won't break anything (force will remove children and consumption link with consumers even if minimum consumption isn't statisified after delete.
-
+        if removal won't break minimum consumption required by a consumer for the service or any of its children.
         """
+
         producer_removed = "{}!{}".format(self.model.role, self.name)
 
-        oktodelete, msg = await self.oktodelete()
+        oktodelete, msg = await self.checkDelete()
         if not oktodelete:
             raise j.exceptions.RuntimeError(msg)
 

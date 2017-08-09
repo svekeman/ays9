@@ -157,7 +157,7 @@ class Blueprint:
         for idx, action_info in enumerate(self.actions):
             if action_info['action_name'] == "delete":
                 for service in self.aysrepo.servicesFind(name=action_info['service'], actor=action_info['actor']):
-                    ok, msg = await service.oktodelete()
+                    ok, msg = await service.checkDelete()
                     if not ok:
                         raise j.exceptions.RuntimeError(msg)
                         # self.actions.pop(idx)  # we pop the delete action here if you don't want to raise exception and continue with the rest of actions.
