@@ -1,11 +1,11 @@
 g8client__env:
-    url: 'du-conv-2.demo.greenitglobe.com'
-    login: 'hamdya'
-    password: 'Abdoholmez.1'
-    account: 'hamdya'
+    url: '<url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
 
 vdc__vdc001:
-    location: 'du-conv-2'
+    location: '<location>'
 
 test_vdc__vdc:
 

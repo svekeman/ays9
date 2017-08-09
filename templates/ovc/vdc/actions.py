@@ -178,6 +178,9 @@ def uninstall(job):
     space.delete()
 
 def enable(job):
+    """
+    This action will enable the vdc.
+    """
     service = job.service
 
     if 'g8client' not in service.producers:
@@ -192,9 +195,12 @@ def enable(job):
                           create=False)
     space.enable('The space should be enabled.')
     service.model.data.disabled = False
-    service.save()
+    service.saveAll()
 
 def disable(job):
+    """
+    This action will disable the vdc.
+    """
     service = job.service
 
     if 'g8client' not in service.producers:
@@ -209,4 +215,4 @@ def disable(job):
                           create=False)
     space.disable('The space should be disabled.')
     service.model.data.disabled = True
-    service.save()
+    service.saveAll()
