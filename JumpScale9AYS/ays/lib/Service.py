@@ -345,7 +345,7 @@ class Service:
             for child in self.children:
                 oktodelete, msg = await child.checkDelete()
                 if not oktodelete:
-                    return False, msg 
+                    return False, msg
 
         for consumers in self.consumers.values():
             for consumer in consumers:
@@ -357,12 +357,12 @@ class Service:
                         continue
                     if conf['role'] == self.model.role and minimum <= len(consumer.producers.get(self.model.role, [])):
                         msg = "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
-                        return False, msg 
+                        return False, msg
         return True, "OK"
 
     async def delete(self):
         """
-        Deletes service and its children from database and filesystem if safe. 
+        Deletes service and its children from database and filesystem if safe.
 
         if removal won't break minimum consumption required by a consumer for the service or any of its children.
         """
@@ -707,7 +707,6 @@ class Service:
             # save period into actionCode model
             action_model.period = period
             self._ensure_recurring()
-
 
         if not force and action_model.state == 'ok':
             self.logger.info("action %s already in ok state, don't schedule again" % action_model.name)
