@@ -532,7 +532,7 @@ def create(assume_yes, force, debug, profile, follow):
             try:
                 resp = ayscl.api.ays.getRun(runid=run['key'], repository=_current_repo_name())
             except Exception as e:
-                print("Error during retreive of the run {}: {}".format(key, _extract_error(e)))
+                print("Error during retreive of the run {}: {}".format(run['key'], _extract_error(e)))
                 return
 
             run = resp.json()

@@ -17,6 +17,7 @@ class Service:
         self._longrunning_tasks = {}  # for long running jobs.
         self.aysrepo = aysrepo
         self.logger = j.logger.get('j.atyourservice.server.service')
+        self._deleted = False
 
     @classmethod
     async def init_from_actor(cls, aysrepo, actor, args, name, context=None):
@@ -322,11 +323,13 @@ class Service:
         j.sal.fs.writeFile(path4, self.model.dbobj.dataSchema)
 
     def save(self):
-        self.model.save()
+        if not self._deleted:
+            self.model.save()
 
     def saveAll(self):
-        self.model.save()
-        self.saveToFS()
+        if not self._deleted:
+            self.model.save()
+            self.saveToFS()
 
     def reload(self):
         # service are kept in memory so we never need to relad anyomre
@@ -368,7 +371,6 @@ class Service:
 
         if removal won't break minimum consumption required by a consumer for the service or any of its children.
         """
-
         producer_removed = "{}!{}".format(self.model.role, self.name)
 
         oktodelete, msg = await self.checkDelete()
@@ -401,6 +403,9 @@ class Service:
         j.sal.fs.removeDirTree(self.path)
         if self.model.key in self.aysrepo.db.services.services:
             del self.aysrepo.db.services.services[self.model.key]
+
+        self._deleted = True
+
 
     @property
     def parent(self):
