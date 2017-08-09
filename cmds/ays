@@ -774,7 +774,7 @@ def action(action, assume_yes, actor, service, force, message):
         ayscl.api.ays.createBlueprint(bp, _current_repo_name())
         resp = ayscl.api.ays.executeBlueprint(data={"message": message}, blueprint=name, repository=_current_repo_name())
         ayscl.api.ays.deleteBlueprint(blueprint=name, repository=_current_repo_name())
-        print("blueprint {} executed".format(name))
+        print(resp.json()['msg'])
     except Exception as e:
         print('error during execution of the blueprint {}: {}'.format(name, _extract_error(e)))
         return
