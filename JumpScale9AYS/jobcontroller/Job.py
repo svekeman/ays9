@@ -296,8 +296,8 @@ class Job:
                 service_action_obj = self.service.model.actions[self.model.dbobj.actionName]
                 service_action_obj.state = str(self.model.dbobj.state)
 
-            if self.model.dbobj.actionName == "delete" and self.model.dbobj.state == 'ok':
-                self.service.save()
+            if self.model.dbobj.actionName == "delete" or not  j.sal.fs.exists(self.service.path): 
+                return
             else:
                 self.service.saveAll()
 

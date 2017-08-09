@@ -350,7 +350,7 @@ class Service:
                         return False, "Can't remove {} without providing minimum of {} {} services to {}.".format(self, conf['min'], conf['role'], consumer)
         return True, "OK"
 
-    async def delete(self, force=False):
+    async def delete(self):
         """
         Deletes service and its children from database and filesystem.
 
@@ -359,14 +359,13 @@ class Service:
         """
         producer_removed = "{}!{}".format(self.model.role, self.name)
 
-        if not force:
-            oktodelete, msg = await self.oktodelete()
-            if not oktodelete:
-                raise j.exceptions.RuntimeError(msg)
+        oktodelete, msg = await self.oktodelete()
+        if not oktodelete:
+            raise j.exceptions.RuntimeError(msg)
 
         if self.children:
             for service in self.children:
-                await service.delete(force=force)
+                await service.delete()
 
         # cancel all recurring tasks
         self.stop()

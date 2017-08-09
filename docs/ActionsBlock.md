@@ -25,9 +25,8 @@ actions:
 
 - service: is used to specify the execution of action `ACTIONNAME` on a certain service `SERVICENAME`
 - actor: is used to specify the execution of action only on services of actor `ACTORNAME`
-
 - force (false/true): is used to `reschedule` action `ACTIONNAME` even if its state is `ok` to get picked up again by the `runscheduler`
-force has a special meaning in the `delete action` context if it's set to `False` it'll execute checks if the delete action is doable and won't break `parent/child` or the minimum required producers of a current consumer.
+
 
 
 ## using the commandline
