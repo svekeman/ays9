@@ -56,8 +56,8 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'JumpScale9>=9.0.3',
-        'JumpScale9Lib>=9.0.3',
+        'JumpScale9>=9.1.0',
+        'JumpScale9Lib>=9.1.0',
         'jsonschema>=2.6.0',
         'python-jose>=1.3.2',
         'sanic>=0.5.4'
