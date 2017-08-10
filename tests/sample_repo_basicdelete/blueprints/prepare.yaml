@@ -1,0 +1,16 @@
+sshkey__k1:
+sshkey__k2:
+sshkey__k3:
+
+
+sshkey__kp:
+
+chi__kid:
+    parent: kp
+
+cons__cons1:
+   sshkeys: [k1, k2, k3]
+   consumedkid: kid
+
+actions:
+    - action: install
