@@ -3,7 +3,10 @@ sshkey__k2:
 sshkey__k3:
 
 
+sshkey__knotconsumed:
+
 sshkey__kp:
+
 
 chi__kid:
     parent: kp
