@@ -26,7 +26,7 @@ def _create_machine(service, space):
 
 
 def _configure_ports(service, machine):
-    ssh_present = any([ports for ports in service.model.data.ports if ports.startswith('22')])
+    ssh_present = any([port_forward for port_forward in service.model.data.ports if port_forward.startswith('22')])
 
     # check if the machine was created before and has a port forward
     # for port 22 to avoid multiple port forward for the same port
@@ -89,7 +89,7 @@ def _check_ssh_authorization(service, machine):
 def _ssh_authorize(service, vm_info):
     if 'sshkey' not in service.producers:
         raise j.exceptions.AYSNotFound("No sshkey service consumed. please consume an sshkey service")
-    service.logger.info("authorize ssh key to machine")
+    service.logger.info("Authorizing ssh key to machine {}".format(vm_info['name']))
 
     sshkey = service.producers['sshkey'][0]
     key_path = j.sal.fs.joinPaths(sshkey.path, 'id_rsa')
@@ -112,7 +112,7 @@ def _configure_disks(service, machine, prefab):
     # if available instead of creating disks
     rc, out, err = prefab.core.run("lsblk -J", die=False)
     if rc != 0:
-        raise j.exceptions.RuntimeError("Couldn't load json from lsblk -J")
+        raise j.exceptions.RuntimeError("Unexpected Error: {}".format(err))
     jsonout = j.data.serializer.json.loads(out)
     available_devices = [x['name'] for x in jsonout['blockdevices'] if
                          x['mountpoint'] is None and x['type'] == 'disk' and 'children' not in x]  # should be only 1
@@ -137,7 +137,7 @@ def _configure_disks(service, machine, prefab):
             machine.disk_limit_io(disk_id, disk_args.maxIOPS)
             rc, out, err = prefab.core.run("lsblk -J", die=False)
             if rc != 0:
-                raise j.exceptions.RuntimeError("Couldn't load json from lsblk -J")
+                raise j.exceptions.RuntimeError("Unexpected Error: {}".format(err))
             jsonout = j.data.serializer.json.loads(out)
             available_devices = [x['name'] for x in jsonout['blockdevices'] if
                                  x['mountpoint'] is None and x['type'] == 'disk' and 'children' not in x and x[
@@ -185,8 +185,9 @@ def _authorization_user(machine, service, action=""):
     try:
         machine_info = machine.client.api.cloudapi.machines.get(machineId=machine.id)
     except ApiError as err:
-        msg = 'Failed to retrieve machine information for machine {}. Error: {}'.format(machine.id, err)
-        j.logger.logging.error(msg)
+        j.logger.logging.error(
+            'Failed to retrieve machine information for machine {}. Error: {}'.format(machine.id, err)
+        )
         raise
     # get acl info
     acl_info = {}
@@ -205,11 +206,12 @@ def _authorization_user(machine, service, action=""):
                                 machineId=machine.id, userId=user, accesstype=uvdc.accesstype
                             )
                         except ApiError as err:
-                            msg = """
-                            Failed to register access rights for user {} on machine {}. 
-                            Error: {}
-                            """.format(user, machine.name, err)
-                            service.logger.logging.error(msg)
+                            service.logger.logging.error(
+                                """
+                                Failed to register access rights for user {} on machine {}. 
+                                Error: {}
+                                """.format(user, machine.name, err)
+                            )
                             raise
                         if result is not True:
                             service.logger.logging.error(
@@ -223,7 +225,7 @@ def _authorization_user(machine, service, action=""):
                 # user is not registered while action is not add,
                 # then we need to fail to prevent users from registering users by mistake
                 msg = """
-                User {} is not registred to have access rights on machine {}. 
+                User {} is not registered to have access rights on machine {}. 
                 If you want to register user, please use add_user action
                 """.format(user, machine.name)
                 service.logger.logging.error(msg)
@@ -240,10 +242,11 @@ def _authorization_user(machine, service, action=""):
                                 machineId=machine.id, userId=user, accesstype=uvdc.accesstype
                             )
                         except ApiError as err:
-                            msg = """
-                            Failed to update access rights for user {} on machine {}. 
-                            Error: {}""".format(user, machine.name, err)
-                            service.logger.logging.error(msg)
+                            service.logger.logging.error(
+                                """
+                                Failed to update access rights for user {} on machine {}. 
+                                Error: {}""".format(user, machine.name, err)
+                            )
                             raise
                         if result is not True:
                             service.logger.logging.error(
@@ -253,10 +256,11 @@ def _authorization_user(machine, service, action=""):
                         try:
                             machine.client.api.cloudapi.machines.deleteUser(machineId=machine.id, userId=user)
                         except ApiError as err:
-                            msg = """
-                            Failed to delete access rights for user {} on machine {}. 
-                            Error: {}""".format(user, machine.name, err)
-                            service.logger.logging.error(msg)
+                            service.logger.logging.error(
+                                """
+                                Failed to delete access rights for user {} on machine {}. 
+                                Error: {}""".format(user, machine.name, err)
+                            )
                             raise
                     elif action == 'add' and existing_acl == uvdc.accesstype:
                         service.logger.info(
@@ -340,7 +344,7 @@ def processChange(job):
                 if not isinstance(value, list):
                     raise j.exceptions.Input(message="Value is not a list.")
 
-                for i, port in enumerate(new_ports_list):
+                for port in new_ports_list:
                     ss = port.split(':')
                     if len(ss) == 2:
                         public_port, local_port = ss
@@ -353,12 +357,12 @@ def processChange(job):
                 to_remove = old_pfs_set - new_pfs_set
                 to_create = new_pfs_set - old_pfs_set
 
-                for idx, (public_port, local_port) in enumerate(to_remove):
+                for public_port, local_port in to_remove:
                     if local_port == 22:
                         continue
                     machine.delete_portforwarding(public_port)
 
-                for idx, (public_port, local_port) in enumerate(to_create):
+                for public_port, local_port in to_create:
                     machine.create_portforwarding(
                         publicport=public_port, localport=local_port, protocol='tcp'
                     )
