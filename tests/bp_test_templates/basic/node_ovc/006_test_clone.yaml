@@ -1,11 +1,13 @@
+vdc__vdcname:
+
 node.ovc__testnode:
 
 test_node_ovc__test:
 
 actions:
-  - action: attach_external_network
+  - action: clone
     actor: node.ovc
     service: testnode
-  - action: test_attach_external_network
+  - action: test_clone
     actor: test_node_ovc
     service: test

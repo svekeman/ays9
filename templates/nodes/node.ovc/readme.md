@@ -32,6 +32,7 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - disk: list of disk instances to be attached to the VM
 - vmHistory: stores VM history which includes the actions performed on this machine and the time these actions were performed. **filled in automatically, don't specify it in the blueprint**
 - uservdc: List of users to that access the machine with the type of access rights for each user e.g 'R' for read only access, 'RCX' for Write and 'ARCXDU' for Admin
+- cloneName: The name of the machine that will be created when executing the clone action.
 
 
 ### Changing port forwardings
@@ -213,10 +214,32 @@ actions:
     service: demo
 ```
 
+## Example for cloning machine
+
+Executing the following blueprint will create a clone of the machine `demo` with name `demo_clone` in the same cloudspace.
+
+```yaml
+g8client__env:
+    url: '<env_url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__vdcname:
+    location: '<location>'
+
+node.ovc__demo:
+  cloneName: 'demo_clone'
+
+actions:
+  - action: clone
+    actor: node.ovc
+    service: demo
+```
+
 ## Example for attaching new disks
 If you need to attach disks to an already created machine you can execute a blueprint with the node adding to it all new disks.
-The following example attaches a new disk `disk2` to the machine called `demo`
-
+The following example attaches a new disk `disk2` to the machine called `demo`.
 ```yaml
 disk.ovc__disk2:
   size: 7
