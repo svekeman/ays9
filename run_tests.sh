@@ -10,7 +10,5 @@ ssh -A -i ~/.ssh/main root@localhost -p 2222 "cd /tmp/;curl -O https://capnproto
 # install RQ (http://python-rq.org/)
 ssh -A -i ~/.ssh/main root@localhost -p 2222 "pip install rq"
 
-# start rq worker
-ssh -A -i ~/.ssh/main root@localhost -p 2222 "js9 \"j.tools.prefab.get().tmux.executeInScreen('main', 'rq', cmd='rq worker', wait=0)\""
-
+# Run tests
 ssh -A -i ~/.ssh/main root@localhost -p 2222 'cd /root/gig/code/github/jumpscale/ays9; /bin/bash test.sh'
