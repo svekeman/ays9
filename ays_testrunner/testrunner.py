@@ -363,7 +363,7 @@ class AYSCoreTestRunner(BaseRunner):
         if self._failed_tests:
             print("Errors:\n")
             for name, failed_test in self._failed_tests.items():
-                header = 'Test {}'.format('name')
+                header = 'Test {}'.format(name)
                 print(header)
                 print('-' * len(header))
                 if failed_test.result:

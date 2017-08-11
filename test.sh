@@ -17,6 +17,10 @@ for schema in $(find -name schema.capnp); do
   capnp compile -oc++ $schema
 done
 
+# run rq workers
+echo "Starting RQ workers"
+js9 "j.tools.prefab.get().tmux.executeInScreen('main', 'rq', cmd='rq worker', wait=0)"
+
 # running testsuite
 echo "Running ays tests"
-js9 "import testrunner; testrunner.main()"
+js9 "from ays_testrunner.testrunner import AYSCoreTestRunner;AYSCoreTestRunner(name='core').run()"
