@@ -330,7 +330,7 @@ class AYSCoreTestRunner(BaseRunner):
         # block until all jobs are done
         while True:
             for name, job in jobs.copy().items():
-                self._logger.info('Checking status of test {}'.format(name))
+                self._logger.debug('Checking status of test {}'.format(name))
                 if job.result is None:
                     self._logger.info('Test {} still running'.format(name))
                 elif job.result == []:

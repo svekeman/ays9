@@ -19,7 +19,8 @@ done
 
 # run rq workers
 echo "Starting RQ workers"
-js9 "j.tools.prefab.get().tmux.executeInScreen('main', 'rq', cmd='rq worker', wait=0)"
+js9 "for index in range(10): j.tools.prefab.get().tmux.executeInScreen('main', 'rqworker{}'.format(index), cmd='rq worker', wait=0)"
+
 
 # running testsuite
 echo "Running ays tests"
