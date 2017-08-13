@@ -31,102 +31,86 @@ def test(job):
     cl = j.clients.atyourservice.get().api.ays
     repo = "sample_repo_basicdelete"
 
-    # prepare the repo.
-    try:
-        cl.executeBlueprint(data=None, repository=repo, blueprint="prepare.yaml")
-    except Exception as ex:
-        failures.append(str(ex))
+    def ensure_run():
+        # execute run. (action install)
+        run = cl.createRun(data=None, repository=repo).json()
+        runid = run['key']
 
-    # execute run. (action install)
-    run = cl.createRun(data=None, repository=repo).json()
-    runid = cl.getRun(repository=repo, runid=run['key']).json()
-
-    run = cl.executeRun(repository=repo, data=None, runid=runid).json()
-    run = cl.getRun(repository=repo, runid=run['key']).json()
-    while run['state'] != 'ok':
-        time.sleep(2)
         run = cl.getRun(repository=repo, runid=runid).json()
-   
-   # delete knotconsumed 
-    try:
-        cl.executeBlueprint(data=None, repository=repo, blueprint="delete_knotconsumed.yaml")
-    except Exception as ex:
-        failures.append(str(ex))
-    
-    run = cl.createRun(data=None, repository=repo).json()
-    runid = cl.getRun(repository=repo, runid=run['key']).json()
-
-    run = cl.executeRun(repository=repo, data=None, runid=runid).json()
-    run = cl.getRun(repository=repo, runid=run['key']).json()
-    while run['state'] != 'ok':
-        time.sleep(2)
+        run = cl.executeRun(repository=repo, data=None, runid=runid).json()
         run = cl.getRun(repository=repo, runid=runid).json()
+        while run['state'] != 'ok':
+            time.sleep(2)
+            run = cl.getRun(repository=repo, runid=runid).json()
+        return run
 
-
-    expectedsteps = [[('knotconsumed', "stop")], [("knotconsumed", "uninstall")], [("knotconsumed", "delete")]] 
-    tobesteps = []
-    for step in run['steps']:
-        for job in step['jobs']:
-            tobesteps.append([(job['service_name'], job['action_name'])])
-    for i, s in enumerate(tobesteps):
-        if len(s) != len(expectedsteps[i]):
-            failures.append("Expected step to have #{} jobs but it has #{} jobs.".format(len(s), len(expectedsteps[i])))
-        for jidx, job in enumerate(s):
-            expectedjob = expectedsteps[i][jidx]
-            failures.append("Expected to have {}{} job but it has {}{}.".format(*expectedjob, *job)) 
-
-    while run['state'] != 'ok':
-        time.sleep(2)
-        run = cl.getRun(repository=repo, runid=run['key']).json()
-
-    # delete cons1  
-    try:
-        cl.executeBlueprint(data=None, repository=repo, blueprint="delete_cons1.yaml")
-    except Exception as ex:
-        failures.append(str(ex))
     
-    run = cl.createRun(data=None, repository=repo).json()
-    runid = cl.getRun(repository=repo, runid=run['key']).json()
+    def validate_runsteps(expectedsteps, run):
+        tobesteps = [[] for x in range(len(run['steps']))]
+        if len(expectedsteps) != len(tobesteps):
+            failures.append("Expected to have #{} steps but got #{} steps.".format(len(expectedsteps), len(tobesteps)))    
+        stepsinfo = []
+        for s in run['steps']:
+            stepsinfo.append([])
+            for job in s['jobs']:
+                stepsinfo[-1].append((job['service_name'], job['action_name']))
+        
+        print("Expected\n", expectedsteps)
+        print("Got\n", stepsinfo)
+        for stepidx, step in enumerate(run['steps']):
+            jobset = set([(job['service_name'], job['action_name']) for job in step['jobs']]) 
+            for expectedjob in expectedsteps[stepidx]:
+                if expectedjob not in jobset:
+                    failures.append("Expected to have {} - {} job.".format(*expectedjob))
 
-    run = cl.executeRun(repository=repo, data=None, runid=runid).json()
-    run = cl.getRun(repository=repo, runid=run['key']).json()
-    while run['state'] != 'ok':
-        time.sleep(2)
-        run = cl.getRun(repository=repo, runid=runid).json()
-    expectedsteps = [[('cons1', "stop")], [("cons1", "uninstall")], [("cons1", "delete")]]     
-    tobesteps = []
-    for step in run['steps']:
-        for job in step['jobs']:
-            tobesteps.append([(job['service_name'], job['action_name'])])
-    for i, s in enumerate(tobesteps):
-        if len(s) != len(expectedsteps[i]):
-            failures.append("Expected step to have #{} jobs but it has #{} jobs.".format(len(s), len(expectedsteps[i])))
-        for jidx, job in enumerate(s):
-            expectedjob = expectedsteps[i][jidx]
-            failures.append("Expected to have {}{} job but it has {}{}.".format(*expectedjob, *job)) 
-
-    # delete kp  
     try:
-        cl.executeBlueprint(data=None, repository=repo, blueprint="delete_kp.yaml")
-    except Exception as ex:
-        failures.append(str(ex))
+        # prepare the repo.
+        try:
+            cl.executeBlueprint(data=None, repository=repo, blueprint="prepare.yaml")
+        except Exception as ex:
+            failures.append(str(ex))
+
+
+    # delete knotconsumed 
+        try:
+            cl.executeBlueprint(data=None, repository=repo, blueprint="delete_knotconsumed.yaml")
+        except Exception as ex:
+            failures.append(str(ex))
+        run = ensure_run()
+
+        expectedsteps = [[('knotconsumed', "stop")], [("knotconsumed", "uninstall")], [("knotconsumed", "delete")]] 
+        validate_runsteps(expectedsteps, run)
+
+        print("********** DONE WITH KNOTCONSUMED")
+        # # delete cons1  
+        try:
+            cl.executeBlueprint(data=None, repository=repo, blueprint="delete_cons1.yaml")
+        except Exception as ex:
+            failures.append(str(ex))
+        
+        run = ensure_run()
     
-    # execute run.
-    run = cl.createRun(data=None, repository=repo).json()
-    # run = cl.executeRun(repository=repo, data=None, runid=run.json()['key']).json()
-    run = cl.getRun(repository=repo, runid=run['key']).json()
+        expectedsteps = [[('cons1', "stop")], [("cons1", "uninstall")], [("cons1", "delete")]]     
+        validate_runsteps(expectedsteps, run)
 
-    expectedsteps = [[('kid', "stop")], [("kp", "stop"),("kid", "uninstall")], [("kp", "uninstall"), ("kid", "delete")], [("kp", "delete")]]
-    tobesteps = []
-    for step in run['steps']:
-        for job in step['jobs']:
-            tobesteps.append([(job['service_name'], job['action_name'])])
-    for i, s in enumerate(tobesteps):
-        if len(s) != len(expectedsteps[i]):
-            failures.append("Expected step to have #{} jobs but it has #{} jobs.".format(len(s), len(expectedsteps[i])))
-        for jidx, job in enumerate(s):
-            expectedjob = expectedsteps[i][jidx]
-            failures.append("Expected to have {}{} job but it has {}{}.".format(*expectedjob, *job)) 
+        print("********** DONE WITH CONS1")
+        # delete kp  
+        try:
+            cl.executeBlueprint(data=None, repository=repo, blueprint="delete_kp.yaml")
+        except Exception as ex:
+            failures.append(str(ex))
+        
+        
+        run = ensure_run()
+    
+        expectedsteps = [[('kid', 'stop')], [('kid', 'uninstall'), ('kp', 'stop')], [('kid', 'delete'), ('kp', 'uninstall')], [('kp', 'delete')]]
+        validate_runsteps(expectedsteps, run)
 
-    if failures:
-        model.data.result = RESULT_FAILED % '\n'.join(failures)
+        print("********** DONE WITH KP")
+        if failures:
+            model.data.result = RESULT_FAILED % '\n'.join(failures)
+    except Exception as e:
+        raise e
+    finally:
+        cl.destroyRepository(repository=repo)
+    
