@@ -61,7 +61,7 @@ def test(job):
             jobset = set([(job['service_name'], job['action_name']) for job in step['jobs']]) 
             for expectedjob in expectedsteps[stepidx]:
                 if expectedjob not in jobset:
-                    failures.append("Expected to have {} - {} job.".format(*expectedjob))
+                    failures.append("Expected to have {} - {} job. {}".format(*expectedjob, str(stepsinfo)))
 
     try:
         # prepare the repo.
@@ -70,14 +70,14 @@ def test(job):
         except Exception as ex:
             failures.append(str(ex))
 
-
-    # delete knotconsumed 
+        run = ensure_run()
+        # delete knotconsumed 
         try:
             cl.executeBlueprint(data=None, repository=repo, blueprint="delete_knotconsumed.yaml")
         except Exception as ex:
             failures.append(str(ex))
-        run = ensure_run()
 
+        run = ensure_run()
         expectedsteps = [[('knotconsumed', "stop")], [("knotconsumed", "uninstall")], [("knotconsumed", "delete")]] 
         validate_runsteps(expectedsteps, run)
 
@@ -89,7 +89,6 @@ def test(job):
             failures.append(str(ex))
         
         run = ensure_run()
-    
         expectedsteps = [[('cons1', "stop")], [("cons1", "uninstall")], [("cons1", "delete")]]     
         validate_runsteps(expectedsteps, run)
 
@@ -112,5 +111,5 @@ def test(job):
     except Exception as e:
         raise e
     finally:
-        cl.destroyRepository(repository=repo)
+        cl.destroyRepository(data=None, repository=repo)
     
