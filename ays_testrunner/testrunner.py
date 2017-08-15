@@ -29,7 +29,6 @@ def check_status_code(res, expected_status_code=200, logger=None):
         return res, True
     return res, False
 
-
 def ensure_test_repo(cli, repo_name, logger=None):
     """
     Ensure a new repo for running tests is created with unique name
@@ -63,7 +62,6 @@ def ensure_test_repo(cli, repo_name, logger=None):
 
     return result
 
-
 def execute_blueprint(cli, blueprint, repo_info, logger=None):
     """
     Execute a blueprint
@@ -84,7 +82,6 @@ def execute_blueprint(cli, blueprint, repo_info, logger=None):
         j.sal.fs.changeDir(curdir)
     return errors
 
-
 def create_run(cli, repo_info, logger=None):
     """
     Create a run and execute it
@@ -103,7 +100,6 @@ def create_run(cli, repo_info, logger=None):
         errors.append('Failed to create run. Error: {}'.format(e))
 
     return errors
-
 
 def report_run(cli, repo_info, logger=None):
     """
@@ -162,6 +158,35 @@ def report_run(cli, repo_info, logger=None):
 
     return errors
 
+def collect_tests(paths, logger=None, setup=None, teardown=None):
+    """
+    Collects all test bp from the given paths
+    This will only scan only one level of the paths and collect all the files that that ends with .yaml and .bp files
+    If path in the list is a file then it will be considered a test file
+    For all the directories on the same level, a group test will be created for each directory
+    """
+    if logger is None:
+        logger = j.logger.logging
+
+    result = []
+    logger.info('Collecting tests from paths {}'.format(paths))
+    for path in paths:
+        if not j.sal.fs.exists(path):
+            logger.error('Path {} does not exist'.format(path))
+            continue
+        if j.sal.fs.isFile(path):
+            name = j.sal.fs.getBaseName(path)
+            result.append(AYSTest(name=name, path=path))
+            continue
+        for root, dirs, files in os.walk(path):
+            for dir_ in dirs:
+                result.append(AYSGroupTest(name=dir_, path=j.sal.fs.joinPaths(root, dir_)))
+
+            for file_ in sroted([file__ for file__ in files if not file__.startswith('_') and  (file__.endswith('{}yaml'.format(os.path.extsep)) or
+                                                        file__.endswith('{}bp'.format(os.path.extsep))
+                                                        )]):
+                result.append(AYSTest(name=file_, path=j.sal.fs.joinPaths(root, file_), setup=setup, teardown=teardown))
+    return result
 
 
 class AYSGroupTest:
@@ -179,22 +204,72 @@ class AYSGroupTest:
         """
         self._name = name
         self._path = path
+        self._errors = []
         if logger is None:
             # FIXME: problem with using the js logger when pickling the object
             # self._logger = j.logger.get('aystestrunner.AYSTest.{}'.format(name))
             self._logger = logging.getLogger()
         else:
             self._logger = logger
+        self._tests = collect_tests(paths=[path], logger=self._logger, setup=self.setup, teardown=self.teardown)
+
+
+    def setup(self):
+        """
+        Setup steps
+        """
+        pass
+
+
+    def teardown(self):
+        """
+        Teardown steps
+        """
+        try:
+            for test in self._tests:
+                test.teardown()
+        except Exception as err:
+            self._errors.append('Errors while executing teardown for group test {}. Errors: {}'.format(self._name, err))
+
+
+    def replace_placehlders(self, config):
+        """
+        Use a given configuration to replace the content of the bp after replacing all the placeholder with values
+        from the configuration
+        """
+        for test in tests:
+            test.replace_placehlders(config=config)
+
+
+    def run(self):
+        """
+        Run Tests in the group
+        """
+        self._logger.info("Running gourp tests {}".format(self._name))
+        self.setup()
+        for test in self._tests:
+            test.run()
+            if test.errors:
+                self._errors = test.errors
+                break
+
+        self.teardown()
+
+
 
 class AYSTest:
     """
     Represents an AYS test bp
     """
-    def __init__(self, name, path, logger=None):
+    def __init__(self, name, path, logger=None, setup=None, teardown=None):
         """
         Initialize the test
 
+        @param name: Name of the test
         @param path: Path to the test bp
+        @param logger: Logger object to use for logging
+        @param setup: Setup function to be called before the test
+        @param teardown: Teardown function to be called after the test
         """
         self._path = path
         self._name = name
@@ -202,6 +277,11 @@ class AYSTest:
         self._repo_info = {}
         self._errors = []
         self._cli  = None
+        if setup is None:
+            self._setup = self.setup
+        if teardown is None:
+            self._teardown = self.teardown
+
         if logger is None:
             # FIXME: problem with using the js logger when pickling the object
             # self._logger = j.logger.get('aystestrunner.AYSTest.{}'.format(name))
@@ -233,10 +313,22 @@ class AYSTest:
         """
         Execute any teardown steps
         """
+        repo_exist = False
         try:
-            self._cli.deleteRepository(data={}, repository=self._repo_info['name'])
+            res, ok = check_status_code(self._cli.listRepositories())
+            if ok:
+                for repo_info in res.json():
+                    if repo_info['name'] == self._repo_info.get('name', None):
+                        repo_exist = True
+                        break
+
+            if repo_exist:
+                # destroy repo
+                self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
+                # delete repo
+                self._cli.deleteRepository(data={}, repository=self._repo_info['name'])
         except Exception as err:
-            self._errors.append('Failed to delete repository {}. Error: {}'.format(self._repo_info['name'], err))
+            self._errors.append('Failed to destroy/delete repository {}. Error: {}'.format(self._repo_info['name'], err))
 
 
     def run(self):
@@ -250,6 +342,7 @@ class AYSTest:
         - Destroy repo
         """
         self.setup()
+
         try:
             self._cli = j.clients.atyourservice.get().api.ays
             self._repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
@@ -263,12 +356,11 @@ class AYSTest:
                 self._errors.extend(create_run(self._cli, self._repo_info, logger=self._logger))
                 # report run
                 self._errors.extend(report_run(self._cli, self._repo_info, logger=self._logger))
-                # destroy repo
-                self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
         except Exception as err:
             self._errors.append('Test {} failed withe error: {}'.format(self._name, err))
 
         self.teardown()
+
         return self._errors
 
 
@@ -279,6 +371,14 @@ class AYSTest:
     @property
     def errors(self, errors):
         self._errors = errors
+
+    @property
+    def errors(self):
+        return self._errors
+
+    @property
+    def repo_info(self):
+        return self._repo_info
 
 
 class BaseRunner:
@@ -318,30 +418,6 @@ class AYSCoreTestRunner(BaseRunner):
     Test Runner to run ays core tets
     """
 
-    def _collect_tests(self, paths):
-        """
-        Collects all test bp from the given paths
-        This will only scan only one level of the paths and collect all the files that that ends with .yaml and .bp files
-        If path in the list is a file then it will be considered a test file
-        """
-        result = []
-        self._logger.info('Collecting tests from paths {}'.format(paths))
-        for path in paths:
-            if not j.sal.fs.exists(path):
-                self._logger.error('Path {} does not exist'.format(path))
-                continue
-            if j.sal.fs.isFile(path):
-                name = j.sal.fs.getBaseName(path)
-                result.append(AYSTest(name=name, path=path))
-                continue
-            for root, _, files in os.walk(path):
-                for file_ in [file__ for file__ in files if not file__.startswith('_') and  (file__.endswith('{}yaml'.format(os.path.extsep)) or
-                                                            file__.endswith('{}bp'.format(os.path.extsep))
-                                                            )]:
-                    result.append(AYSTest(name=file_, path=j.sal.fs.joinPaths(root, file_)))
-        return result
-
-
     def _pre_process_tests(self):
         """
         Execute any required pre-processing steps
@@ -361,7 +437,7 @@ class AYSCoreTestRunner(BaseRunner):
         report tests
         """
         jobs = {}
-        self._tests = self._collect_tests(paths=self._config.get('bp_paths', [AYS_CORE_BP_TESTS_PATH]))
+        self._tests = collect_tests(paths=self._config.get('bp_paths', [AYS_CORE_BP_TESTS_PATH]), logger=self._logger)
         self._pre_process_tests()
         for test in self._tests:
             self._logger.info('Scheduling test {}'.format(test.name))
