@@ -322,12 +322,17 @@ class AYSCoreTestRunner(BaseRunner):
         """
         Collects all test bp from the given paths
         This will only scan only one level of the paths and collect all the files that that ends with .yaml and .bp files
+        If path in the list is a file then it will be considered a test file
         """
         result = []
         self._logger.info('Collecting tests from paths {}'.format(paths))
         for path in paths:
             if not j.sal.fs.exists(path):
                 self._logger.error('Path {} does not exist'.format(path))
+                continue
+            if j.sal.fs.isFile(path):
+                name = j.sal.fs.getBaseName(path)
+                result.append(AYSTest(name=name, path=path))
                 continue
             for root, _, files in os.walk(path):
                 for file_ in [file__ for file__ in files if not file__.startswith('_') and  (file__.endswith('{}yaml'.format(os.path.extsep)) or

@@ -11,6 +11,8 @@ import logging
 from js9 import j
 from JumpScale9AYS.ays.server.app import app as sanic_app
 
+sanic_app.config['REQUEST_TIMEOUT'] = 3600
+
 
 def configure_logger(level):
     if level == 'DEBUG':
