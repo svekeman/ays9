@@ -1,5 +1,11 @@
 """
 Test runner module for AYS9
+
+How to use it:
+from ays_testrunner.testrunner import AYSCoreTestRunner
+g8_config = {'G8_URL': 'du-conv-2.demo.greenitglobe.com', 'G8_LOGIN': 'aystestrunner@itsyouonline', 'G8_PASSWORD': 'aystestrunner', 'G8_ACCOUNT': 'aystestrunner', 'G8_LOCATION': 'du-conv-2'}
+core = AYSCoreTestRunner('core', config={'bp_paths': ['/root/gig/code/github/jumpscale/ays9/tests/bp_test_templates/core/test_auto_behavior.yaml', "/tmp/grouptest"], 'G8ENV': g8_config})
+core.run()
 """
 from js9 import j
 import os
@@ -182,7 +188,7 @@ def collect_tests(paths, logger=None, setup=None, teardown=None):
             for dir_ in dirs:
                 result.append(AYSGroupTest(name=dir_, path=j.sal.fs.joinPaths(root, dir_)))
 
-            for file_ in sroted([file__ for file__ in files if not file__.startswith('_') and  (file__.endswith('{}yaml'.format(os.path.extsep)) or
+            for file_ in sorted([file__ for file__ in files if not file__.startswith('_') and  (file__.endswith('{}yaml'.format(os.path.extsep)) or
                                                         file__.endswith('{}bp'.format(os.path.extsep))
                                                         )]):
                 result.append(AYSTest(name=file_, path=j.sal.fs.joinPaths(root, file_), setup=setup, teardown=teardown))
@@ -214,6 +220,10 @@ class AYSGroupTest:
         self._tests = collect_tests(paths=[path], logger=self._logger, setup=self.setup, teardown=self.teardown)
 
 
+    @property
+    def name(self):
+        return self._name
+
     def setup(self):
         """
         Setup steps
@@ -237,7 +247,7 @@ class AYSGroupTest:
         Use a given configuration to replace the content of the bp after replacing all the placeholder with values
         from the configuration
         """
-        for test in tests:
+        for test in self._tests:
             test.replace_placehlders(config=config)
 
 
@@ -254,6 +264,7 @@ class AYSGroupTest:
                 break
 
         self.teardown()
+        return self._errors
 
 
 
@@ -326,7 +337,7 @@ class AYSTest:
                 # destroy repo
                 self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
                 # delete repo
-                self._cli.deleteRepository(data={}, repository=self._repo_info['name'])
+                self._cli.deleteRepository(repository=self._repo_info['name'])
         except Exception as err:
             self._errors.append('Failed to destroy/delete repository {}. Error: {}'.format(self._repo_info['name'], err))
 
@@ -345,11 +356,11 @@ class AYSTest:
 
         try:
             self._cli = j.clients.atyourservice.get().api.ays
-            self._repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
+            self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
             if self._repo_info is None:
                 self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
             else:
-                j.sal.fs.copyFile(self._path, j.sal.fs.joinPaths(repo_info['path'], 'blueprints', self._name))
+                j.sal.fs.copyFile(self._path, j.sal.fs.joinPaths(self._repo_info['path'], 'blueprints', self._name))
                 # execute bp
                 self._errors.extend(execute_blueprint(self._cli, self._name, self._repo_info, logger=self._logger))
                 # create run and execute it
@@ -369,12 +380,12 @@ class AYSTest:
         return self._name
 
     @property
-    def errors(self, errors):
-        self._errors = errors
-
-    @property
     def errors(self):
         return self._errors
+
+    @errors.setter
+    def errors(self, errors):
+        self._errors = errors
 
     @property
     def repo_info(self):
