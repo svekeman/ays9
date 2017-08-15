@@ -620,7 +620,6 @@ class Service:
             args.update({'changeCategory': changeCategory})
             job = self.getJob("processChange", args=args, context=context)
             args = job.executeInProcess()
-            job.model.save()
 
     async def processEvent(self, channel=None, command=None, secret=None, tags={}, payload=None):
         coros = []
