@@ -164,6 +164,28 @@ def report_run(cli, repo_info, logger=None):
 
 
 
+class AYSGroupTest:
+    """
+    Represet a group of test bps that depend on each other
+    These tests will be executed in order(based on the file name)
+    """
+    def __init__(self, name, path, logger=None):
+        """
+        Initialize group test
+
+        @param name: Name of the group
+        @param path: Path to the hosting folder of the test bps
+        @param logger: Logger object to use for logging
+        """
+        self._name = name
+        self._path = path
+        if logger is None:
+            # FIXME: problem with using the js logger when pickling the object
+            # self._logger = j.logger.get('aystestrunner.AYSTest.{}'.format(name))
+            self._logger = logging.getLogger()
+        else:
+            self._logger = logger
+
 class AYSTest:
     """
     Represents an AYS test bp
@@ -177,6 +199,9 @@ class AYSTest:
         self._path = path
         self._name = name
         self._prefab = j.tools.prefab.get()
+        self._repo_info = {}
+        self._errors = []
+        self._cli  = None
         if logger is None:
             # FIXME: problem with using the js logger when pickling the object
             # self._logger = j.logger.get('aystestrunner.AYSTest.{}'.format(name))
@@ -194,7 +219,7 @@ class AYSTest:
         self._logger.info('Replacing placeholders for test blueprint {}'.format(self._path))
         for item, value in config.items():
             cmd = sed_base_command.format(key=item, value=value, path=self._path)
-            j.tools.prefab.get().core.run(cmd)
+            self._prefab.core.run(cmd)
 
 
     def setup(self):
@@ -203,11 +228,15 @@ class AYSTest:
         """
         pass
 
+
     def teardown(self):
         """
         Execute any teardown steps
         """
-        pass
+        try:
+            self._cli.deleteRepository(data={}, repository=self._repo_info['name'])
+        except Exception as err:
+            self._errors.append('Failed to delete repository {}. Error: {}'.format(self._repo_info['name'], err))
 
 
     def run(self):
@@ -221,30 +250,35 @@ class AYSTest:
         - Destroy repo
         """
         self.setup()
-        errors = []
-        cli = j.clients.atyourservice.get().api.ays
-        repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
-        if repo_info is None:
-            errors.append('Failed to create new ays repository for test {}'.format(self._name))
-        else:
-            j.sal.fs.copyFile(self._path, j.sal.fs.joinPaths(repo_info['path'], 'blueprints', self._name))
-            # execute bp
-            errors.extend(execute_blueprint(cli, self._name, repo_info, logger=self._logger))
-            # create run and execute it
-            errors.extend(create_run(cli, repo_info, logger=self._logger))
-            # report run
-            errors.extend(report_run(cli, repo_info, logger=self._logger))
-            self._errors = errors
-            # destroy repo
-            cli.destroyRepository(data={}, repository=repo_info['name'])
+        try:
+            self._cli = j.clients.atyourservice.get().api.ays
+            self._repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
+            if self._repo_info is None:
+                self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
+            else:
+                j.sal.fs.copyFile(self._path, j.sal.fs.joinPaths(repo_info['path'], 'blueprints', self._name))
+                # execute bp
+                self._errors.extend(execute_blueprint(self._cli, self._name, self._repo_info, logger=self._logger))
+                # create run and execute it
+                self._errors.extend(create_run(self._cli, self._repo_info, logger=self._logger))
+                # report run
+                self._errors.extend(report_run(self._cli, self._repo_info, logger=self._logger))
+                # destroy repo
+                self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
+        except Exception as err:
+            self._errors.append('Test {} failed withe error: {}'.format(self._name, err))
 
         self.teardown()
-        return errors
+        return self._errors
 
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def errors(self, errors):
+        self._errors = errors
 
 
 class BaseRunner:
@@ -326,20 +360,21 @@ class AYSCoreTestRunner(BaseRunner):
         self._pre_process_tests()
         for test in self._tests:
             self._logger.info('Scheduling test {}'.format(test.name))
-            jobs[test.name] = self._task_queue.enqueue(test.run)
+            jobs[test] = self._task_queue.enqueue(test.run)
         # block until all jobs are done
         while True:
-            for name, job in jobs.copy().items():
-                self._logger.debug('Checking status of test {}'.format(name))
+            for test, job in jobs.copy().items():
+                self._logger.debug('Checking status of test {}'.format(test.name))
                 if job.result is None:
-                    self._logger.info('Test {} still running'.format(name))
+                    self._logger.info('Test {} still running'.format(test.name))
                 elif job.result == []:
-                    self._logger.info('Test {} completed successfully'.format(name))
-                    jobs.pop(name)
+                    self._logger.info('Test {} completed successfully'.format(test.name))
+                    jobs.pop(test)
                 elif job.result is not None or job.exc_info is not None:
-                    self._logger.error('Test {} failed'.format(name))
-                    jobs.pop(name)
-                    self._failed_tests[name] = job
+                    self._logger.error('Test {} failed'.format(test.name))
+                    test.errors = job.result or [job.exc_info]
+                    jobs.pop(test)
+                    self._failed_tests[test] = job
             if jobs:
                 time.sleep(30)
             else:
@@ -362,8 +397,8 @@ class AYSCoreTestRunner(BaseRunner):
         print("Number of failed/error tests: %s" % nr_of_failed)
         if self._failed_tests:
             print("Errors:\n")
-            for name, failed_test in self._failed_tests.items():
-                header = 'Test {}'.format(name)
+            for test, failed_test in self._failed_tests.items():
+                header = 'Test {}'.format(test.name)
                 print(header)
                 print('-' * len(header))
                 if failed_test.result:
