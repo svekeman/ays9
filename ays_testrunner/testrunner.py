@@ -224,6 +224,20 @@ class AYSGroupTest:
     def name(self):
         return self._name
 
+    @property
+    def duration(self):
+        """
+        Returns the duration of the test. If any of the member tests are still running or not started yet then return -1
+        """
+        result = -1
+        for test in self._tests:
+            if test.duration == -1:
+                result = -1
+                break
+            else:
+                result += test.duration
+        return result
+
     def setup(self):
         """
         Setup steps
@@ -288,6 +302,8 @@ class AYSTest:
         self._repo_info = {}
         self._errors = []
         self._cli  = None
+        self._starttime = None
+        self._endtime = None
         if setup is None:
             self._setup = self.setup
         if teardown is None:
@@ -299,6 +315,30 @@ class AYSTest:
             self._logger = logging.getLogger()
         else:
             self._logger = logger
+
+    @property
+    def starttime(self):
+        return self._starttime
+
+    @starttime.setter
+    def starttime(self, value):
+        self._starttime = value
+
+    @property
+    def endtime(self):
+        return self._endtime
+
+    @starttime.setter
+    def endtime(self, value):
+        self._endtime = value
+
+    @property
+    def duration(self):
+        if self._starttime and self._endtime:
+            return self._endtime - self._starttime
+        else:
+            return -1
+
 
 
     def replace_placehlders(self, config):
@@ -453,6 +493,7 @@ class AYSCoreTestRunner(BaseRunner):
         for test in self._tests:
             self._logger.info('Scheduling test {}'.format(test.name))
             jobs[test] = self._task_queue.enqueue(test.run)
+            test.starttime = time.time()
         # block until all jobs are done
         while True:
             for test, job in jobs.copy().items():
@@ -462,11 +503,13 @@ class AYSCoreTestRunner(BaseRunner):
                 elif job.result == []:
                     self._logger.info('Test {} completed successfully'.format(test.name))
                     jobs.pop(test)
+                    test.endtime = time.time()
                 elif job.result is not None or job.exc_info is not None:
                     self._logger.error('Test {} failed'.format(test.name))
                     test.errors = job.result or [job.exc_info]
                     jobs.pop(test)
                     self._failed_tests[test] = job
+                    test.endtime = time.time()
             if jobs:
                 time.sleep(30)
             else:
