@@ -1,0 +1,17 @@
+g8client__env:
+    url: '<url>'
+    login: '<login>'
+    password: '<password>'
+    account: '<account>'
+
+vdc__testvdc:
+    g8client: 'env'
+    account: '<account>'
+    location: '<location>'
+
+test_vdc__test:
+
+actions:
+  - action: install
+  - action: test_create
+    service: test
