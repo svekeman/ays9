@@ -49,12 +49,18 @@ def ensure_test_repo(cli, repo_name):
 
     return result
 
-def copy_blueprints(test_bp_path, repo_info):
+def copy_blueprints(test_bp_path, repo_info, test_names=None):
     """
     Copies the ays core test bluepprints to the test runner ays repo
     """
     dest = j.sal.fs.joinPaths(repo_info['path'], 'blueprints')
-    j.sal.fs.copyDirTree(test_bp_path, dest)
+    if test_names is None:
+        j.sal.fs.copyDirTree(test_bp_path, dest)
+    else:
+        for test_name in test_names:
+            bpath = j.sal.fs.joinPaths(test_bp_path, test_name)
+            bdest = j.sal.fs.joinPaths(dest, test_name)
+            j.sal.fs.copyFile(bpath, bdest)
 
 def execute_blueprint(cli, blueprint, repo_info):
     """
@@ -168,13 +174,16 @@ def execute_blueprints(cli, repo_info):
             raise RuntimeError('Failures while executing blueprint %s. Errors: %s' %(blueprint, bp_errors))
     return errors
 
-def main():
+def main(test_names=None):
+    """
+    @param test_names list[str]: list of test_names if test_names=None will execute all the core tests. 
+    """
     cli = j.clients.atyourservice.get().api.ays
     repo_info = ensure_test_repo(cli, AYS_TESTRUNNER_REPO_NAME)
     errors = []
     if repo_info:
         try:
-            copy_blueprints(AYS_CORE_BP_TESTS_PATH, repo_info)
+            copy_blueprints(AYS_CORE_BP_TESTS_PATH, repo_info, test_names=test_names)
             result = execute_blueprints(cli, repo_info)
             # report final results
             nr_ok = 0
