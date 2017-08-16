@@ -4,13 +4,13 @@ Contains information about the actor behavior and how services interact with eac
 - Links which can be:
     - Parenting, for more details see [Parents & Children](../Definitions/Parents-Children.md)
     - Consumption, for more details see [Producers & Consumers](../Definitions/Producers-Consumers.md)
-- [Recurring actions](#Recurring Actions), specifying repeatedly occurring actions
+- [Recurring Actions](#RecurringActions), specifying repeatedly occurring actions
 - [Events](#Events)
 - [Timeouts](#Timeouts)
 
 See [Example](#Example) for complete usage of these configs.
 
-## Recurring Actions:
+## RecurringActions:
 Recurring actions are actions that are periodically (configured) fired up actions that are managed by the AYS server.
 They are executed asynchronously with no runs.
 
