@@ -101,7 +101,7 @@ def create_run(cli, repo_info, logger=None):
     j.sal.fs.changeDir(repo_info['path'])
     cmd = 'ays run create -y --force -f'
     try:
-        j.tools.prefab.get().core.run(cmd)
+        j.tools.prefab.get().core.run(cmd, timeout=0)
     except Exception as e:
         errors.append('Failed to create run. Error: {}'.format(e))
 
@@ -184,14 +184,14 @@ def collect_tests(paths, logger=None, setup=None, teardown=None):
             name = j.sal.fs.getBaseName(path)
             result.append(AYSTest(name=name, path=path))
             continue
-        for root, dirs, files in os.walk(path):
-            for dir_ in dirs:
-                result.append(AYSGroupTest(name=dir_, path=j.sal.fs.joinPaths(root, dir_)))
-
-            for file_ in sorted([file__ for file__ in files if not file__.startswith('_') and  (file__.endswith('{}yaml'.format(os.path.extsep)) or
-                                                        file__.endswith('{}bp'.format(os.path.extsep))
-                                                        )]):
-                result.append(AYSTest(name=file_, path=j.sal.fs.joinPaths(root, file_), setup=setup, teardown=teardown))
+        for dir_ in j.sal.fs.listDirsInDir(path):
+            logger.debug('Creating group test for path {}'.format(dir_))
+            result.append(AYSGroupTest(name=j.sal.fs.getBaseName(dir_), path=dir_))
+        for file_ in sorted([file__ for file__ in j.sal.fs.listFilesInDir(path) if not j.sal.fs.getBaseName(file__).startswith('_') and
+                                                                                  (file__.endswith('{}yaml'.format(os.path.extsep)) or
+                                                                                  file__.endswith('{}bp'.format(os.path.extsep)))]):
+            logger.debug('Creating test for path {}'.format(file_))
+            result.append(AYSTest(name=j.sal.fs.getBaseName(file_), path=file_, setup=setup, teardown=teardown))
     return result
 
 
@@ -487,36 +487,49 @@ class AYSCoreTestRunner(BaseRunner):
         execute teardown setps
         report tests
         """
-        jobs = {}
-        self._tests = collect_tests(paths=self._config.get('bp_paths', [AYS_CORE_BP_TESTS_PATH]), logger=self._logger)
-        self._pre_process_tests()
-        for test in self._tests:
-            self._logger.info('Scheduling test {}'.format(test.name))
-            jobs[test] = self._task_queue.enqueue(test.run)
-            test.starttime = time.time()
-        # block until all jobs are done
-        while True:
-            for test, job in jobs.copy().items():
-                self._logger.debug('Checking status of test {}'.format(test.name))
-                if job.result is None:
-                    self._logger.info('Test {} still running'.format(test.name))
-                elif job.result == []:
-                    self._logger.info('Test {} completed successfully'.format(test.name))
-                    jobs.pop(test)
-                    test.endtime = time.time()
-                elif job.result is not None or job.exc_info is not None:
-                    self._logger.error('Test {} failed'.format(test.name))
-                    test.errors = job.result or [job.exc_info]
-                    jobs.pop(test)
-                    self._failed_tests[test] = job
-                    test.endtime = time.time()
-            if jobs:
-                time.sleep(30)
-            else:
-                break
+        try:
+            jobs = {}
+            self._tests = collect_tests(paths=self._config.get('bp_paths', [AYS_CORE_BP_TESTS_PATH]), logger=self._logger)
+            self._pre_process_tests()
+            for test in self._tests:
+                self._logger.info('Scheduling test {}'.format(test.name))
+                jobs[test] = self._task_queue.enqueue(test.run)
+                test.starttime = time.time()
+            # block until all jobs are done
+            while True:
+                for test, job in jobs.copy().items():
+                    self._logger.debug('Checking status of test {}'.format(test.name))
+                    if job.result is None:
+                        self._logger.info('Test {} still running'.format(test.name))
+                    elif job.result == []:
+                        self._logger.info('Test {} completed successfully'.format(test.name))
+                        jobs.pop(test)
+                        test.endtime = time.time()
+                    elif job.result is not None or job.exc_info is not None:
+                        self._logger.error('Test {} failed'.format(test.name))
+                        test.errors = job.result or [job.exc_info]
+                        jobs.pop(test)
+                        self._failed_tests[test] = job
+                        test.endtime = time.time()
+                if jobs:
+                    time.sleep(10)
+                else:
+                    break
 
-        # report final results
-        self._report_results()
+            # report final results
+            self._report_results()
+        finally:
+            # clean up the G8 env if requested
+            if self._config.get('G8ENV_CLEANUP', False):
+                self._cleanup()
+
+
+    def _cleanup(self):
+        """
+        Will clean up a G8 environment. Typically should be called for test environment where all the resources created can be safely cleanup to make sure that tests are
+        starting from a clean state
+        """
+        pass    
 
 
     def _report_results(self):

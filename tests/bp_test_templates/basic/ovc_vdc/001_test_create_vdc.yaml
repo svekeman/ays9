@@ -1,6 +1,6 @@
 g8client__env:
     url: <G8_URL>
-    login: <G8_LOGIN
+    login: <G8_LOGIN>
     password: <G8_PASSWORD>
     account: <G8_ACCOUNT>
 
