@@ -7,14 +7,16 @@ g8client__env:
 vdc__testnodeovc:
     location: <G8_LOCATION>
 
-
 disk.ovc__testnodeovcdisk1:
-  size: 5
+  size: 10
+  maxIOPS: 1000
 
 node.ovc__testnodeovc:
+    sizeID: 1
     os.image: 'Ubuntu 16.04 x64'
     disk:
       - testnodeovcdisk1
+    clone.name: 'testnode_clone'
 
 test_node_ovc__testnodeovc:
 

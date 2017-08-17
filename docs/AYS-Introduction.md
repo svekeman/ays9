@@ -16,7 +16,6 @@ AYS combines functions such as:
 - **Package Management** like Ubuntu's `apt-get`
 - **Service Management** like Ubuntu's `service`
 - **Configuration Management** like [ansible](http://www.ansible.com)
-- **Build Tool** like [ant](http://ant.apache.org)
 - **Monitoring Tool**
 
 ## What is a service?
@@ -49,12 +48,6 @@ Next you will want to learn about:
 - [AYS File System](G8OS-FS.md)
 - [AYS Examples](howTo/README.md)
 
-```toml
-!!!
-title = "ays_intro"
-tags= ["ays"]
-categories= ["ays"]
-```
 
 ```
 !!!

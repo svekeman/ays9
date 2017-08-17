@@ -2,9 +2,14 @@ node.ovc__testnodeovc:
 
 test_node_ovc__testnodeovcdelete:
 
+vdc__testnodeovc:
+
+# also cleanup clone created in previous test
+node.ovc__testnode_clone:
+
+
 actions:
   - action: uninstall
-
   - action: test_delete
     actor: test_node_ovc
     service: testnodeovcdelete

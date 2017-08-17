@@ -1,6 +1,5 @@
 disk.ovc__testnodeovcdisk2:
-  size: 5
-
+  size: 10
 
 node.ovc__testnodeovc:
     disk:
@@ -8,6 +7,7 @@ node.ovc__testnodeovc:
       - testnodeovcdisk2
 
 test_node_ovc__testnodeovcattachdisk:
+
 
 actions:
   - action : test_node_disks
