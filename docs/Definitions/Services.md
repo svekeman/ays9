@@ -1,4 +1,13 @@
-# Service Name & Role
+## Service
+
+A _service_ is a deployed unique instance of an _actor_.
+
+For example a Docker application running on a host node is an service instance of an actor template for that Docker application, for which there is a version-controlled actor specific to that environment.
+
+Read the section about the [Life cycle of an service instance](../Service-Lifecycle.md) for more details.
+
+
+### Service Name & Role
 
 Each AYS service has a name and a role.
 
@@ -14,7 +23,7 @@ For instance, "node.physical", "node.docker" and "node.kvm" all serve the role "
 
 ```toml
 !!!
-title = "AYS Role Version"
+title = "Services"
 tags= ["ays","def"]
 date = "2017-03-02"
 categories= ["ays_def"]

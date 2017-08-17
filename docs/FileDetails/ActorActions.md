@@ -1,17 +1,17 @@
 # AYS Actions
 
 - Manages the life cycle of your AYS
-- you need to implement one or more function (actions) in the actions.py file of the actor of the service
+- you need to implement one or more [functions](http://www.python-course.eu/python3_functions.php) (actions) in the actions.py file of the actor of the service
 
-An action file is a python file that contains multiple function.
-Each function name correspond to an action. In the example below the actor implement two action, _install_ and _uninstall_.
+An action file is a python file that contains multiple functions.
+Each function name correspond to an action. In the example below the actor implement two action, `install` and `uninstall`.
 
 The function need to accept a single argument called job.
 
 The job object let you access multiple other usefull object:
-- **job.service** : the service object on which the action is execute on.
+- **job.service** : the service object on which the action is executed on.
 - **job.model.args** : the arguments passed to this action
-- **job.service.model.data** : the schema value of the service
+- **job.service.model.data** : the schema values of the service
 
 ## Example:
 
@@ -63,8 +63,6 @@ def install(job):
         public, local = machine.create_portforwarding(publicport=public_port, localport=local_port, protocol='tcp')
         service.model.data.ports[i] = "%s:%s" % (public, local)
 
-    service.saveAll()
-
 def uninstall(job):
     service = job.service
     vdc = service.parent
@@ -83,7 +81,7 @@ def uninstall(job):
     machine.delete()
 ```
 
-## Default behavior 
+## Default behavior
    - action delete: will call service.delete()
 
 ```toml

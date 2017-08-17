@@ -1,0 +1,12 @@
+g8client__env:
+
+vdc__testvdc:
+
+test_vdc__test:
+
+actions:
+  - action: enable
+    actor: vdc
+    service: testvdc
+  - action: test_enable
+    service : test
