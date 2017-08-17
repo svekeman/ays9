@@ -3,8 +3,8 @@ Test runner module for AYS9
 
 How to use it:
 from ays_testrunner.testrunner import AYSCoreTestRunner
-g8_config = {'G8_URL': 'du-conv-2.demo.greenitglobe.com', 'G8_LOGIN': 'aystestrunner@itsyouonline', 'G8_PASSWORD': 'aystestrunner', 'G8_ACCOUNT': 'aystestrunner', 'G8_LOCATION': 'du-conv-2'}
-core = AYSCoreTestRunner('core', config={'bp_paths': ['/root/gig/code/github/jumpscale/ays9/tests/bp_test_templates/core/test_auto_behavior.yaml', "/tmp/grouptest"], 'G8ENV': g8_config,
+backend_config = {'URL': 'du-conv-2.demo.greenitglobe.com', 'LOGIN': 'aystestrunner@itsyouonline', 'PASSWORD': 'aystestrunner', 'ACCOUNT': 'aystestrunner', 'LOCATION': 'du-conv-2'}
+core = AYSCoreTestRunner('core', config={'bp_paths': ['/root/gig/code/github/jumpscale/ays9/tests/bp_test_templates/core/test_auto_behavior.yaml', "/tmp/grouptest"], 'BACKEND_ENV': backend_config,
 'TEST_TIMEOUT': 300})
 core.run()
 """
@@ -17,7 +17,7 @@ import logging
 import time
 
 AYS_CORE_BP_TESTS_PATH = j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'core')
-# AYS_DEFAULT_PLACEHOLDERS = ['G8_URL', 'G8_LOGIN', 'G8_ACCOUNT', 'G8_PASSWORD', 'G8_LOCATION']
+# AYS_DEFAULT_PLACEHOLDERS = ['URL', 'LOGIN', 'ACCOUNT', 'PASSWORD', 'LOCATION']
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
 DEFAULT_TEST_TIMEOUT = 600 # 10 min timeout per test
@@ -405,10 +405,11 @@ class AYSTest:
                 j.sal.fs.copyFile(self._path, j.sal.fs.joinPaths(self._repo_info['path'], 'blueprints', self._name))
                 # execute bp
                 self._errors.extend(execute_blueprint(self._cli, self._name, self._repo_info, logger=self._logger))
-                # create run and execute it
-                self._errors.extend(create_run(self._cli, self._repo_info, logger=self._logger))
-                # report run
-                self._errors.extend(report_run(self._cli, self._repo_info, logger=self._logger))
+                if not self._errors:
+                    # create run and execute it
+                    self._errors.extend(create_run(self._cli, self._repo_info, logger=self._logger))
+                    # report run
+                    self._errors.extend(report_run(self._cli, self._repo_info, logger=self._logger))
         except Exception as err:
             self._errors.append('Test {} failed withe error: {}'.format(self._name, err))
 
@@ -476,7 +477,7 @@ class AYSCoreTestRunner(BaseRunner):
         Execute any required pre-processing steps
         """
         for test in self._tests:
-            test.replace_placehlders(self._config.get('G8ENV', {}))
+            test.replace_placehlders(self._config.get('BACKEND_ENV', {}))
 
 
     def run(self):
@@ -521,20 +522,20 @@ class AYSCoreTestRunner(BaseRunner):
             # report final results
             self._report_results()
         finally:
-            # clean up the G8 env if requested
-            if self._config.get('G8ENV_CLEANUP', False):
+            # clean up the BACKEND env if requested
+            if self._config.get('BACKEND_ENV_CLEANUP', False):
                 self._cleanup()
 
 
     def _cleanup(self):
         """
-        Will clean up a G8 environment. Typically should be called for test environment where all the resources created can be safely cleanup to make sure that tests are
+        Will clean up a BACKEND environment. Typically should be called for test environment where all the resources created can be safely cleanup to make sure that tests are
         starting from a clean state
         """
         try:
-            g8_config = self._config.get('G8ENV', {})
-            if g8_config:
-                ovc_cli = j.clients.openvcloud.get(url=g8_config.get('G8_URL'), login=g8_config.get('G8_LOGIN'), password=g8_config.get('G8_PASSWORD'))
+            backend_config = self._config.get('BACKEND_ENV', {})
+            if backend_config:
+                ovc_cli = j.clients.openvcloud.get(url=backend_config.get('URL'), login=backend_config.get('LOGIN'), password=backend_config.get('PASSWORD'))
                 # DELETE ALL THE CREATED CLOUDSPACES
                 for cloudspace_info in ovc_cli.api.cloudapi.cloudspaces.list():
                     ovc_cli.api.cloudapi.cloudspaces.delete(cloudspaceId=cloudspace_info['id'])

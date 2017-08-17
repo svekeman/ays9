@@ -1,14 +1,14 @@
 g8client__client:
-    url: <G8_URL>
-    login: <G8_LOGIN>
-    password: <G8_PASSWORD>
-    account: <G8_ACCOUNT>
+    url: <URL>
+    login: <LOGIN>
+    password: <PASSWORD>
+    account: <ACCOUNT>
 
 
 vdc__testupdateuserovc:
     g8client: client
-    account: <G8_ACCOUNT>
-    location: <G8_LOCATION>
+    account: <ACCOUNT>
+    location: <LOCATION>
 
 uservdc__testupdateuserovc:
   password: testupdateuserovc

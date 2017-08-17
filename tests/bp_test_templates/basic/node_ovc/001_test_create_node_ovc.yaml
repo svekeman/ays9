@@ -1,11 +1,11 @@
 g8client__env:
-    url: <G8_URL>
-    login: <G8_LOGIN>
-    password: <G8_PASSWORD>
-    account: <G8_ACCOUNT>
+    url: <URL>
+    login: <LOGIN>
+    password: <PASSWORD>
+    account: <ACCOUNT>
 
 vdc__testnodeovc:
-    location: <G8_LOCATION>
+    location: <LOCATION>
 
 disk.ovc__testnodeovcdisk1:
   size: 10

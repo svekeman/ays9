@@ -1,13 +1,13 @@
 g8client__env:
-    url: <G8_URL>
-    login: <G8_LOGIN>
-    password: <G8_PASSWORD>
-    account: <G8_ACCOUNT>
+    url: <URL>
+    login: <LOGIN>
+    password: <PASSWORD>
+    account: <ACCOUNT>
 
 vdc__testcreatevdc:
     g8client: env
-    account: <G8_ACCOUNT>
-    location: <G8_LOCATION>
+    account: <ACCOUNT>
+    location: <LOCATION>
 
 test_vdc__testcreatevdc:
 
