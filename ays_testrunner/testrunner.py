@@ -78,15 +78,16 @@ def execute_blueprint(cli, blueprint, repo_info, logger=None):
 
     errors = []
     logger.info('Executing blueprint [{}]'.format(blueprint))
-    curdir = j.sal.fs.getcwd()
-    j.sal.fs.changeDir(repo_info['path'])
-    cmd = 'ays blueprint -f %s' % blueprint
     try:
-        j.tools.prefab.get().core.run(cmd)
-    except Exception as e:
-        errors.append('Failed to execute blueprint [{}]. Error: {}'.format(blueprint, e))
-    finally:
-        j.sal.fs.changeDir(curdir)
+        res, ok = check_status_code(cli.executeBlueprint(data={}, blueprint=blueprint, repository=repo_info['name']))
+        if not ok:
+            msg = 'Failed to execute blueprint {} in repository {}. Error: {}'.format(blueprint, repo_info['name'], res.text)
+            logger.error(msg)
+            errors.append(msg)
+    except Exception as ex:
+        msg = 'Failed to execute blueprint {} in repository {}. Error: {}'.format(blueprint, repo_info['name'], ex)
+        logger.error(msg)
+        errors.append(msg)
     return errors
 
 def create_run(cli, repo_info, logger=None):
