@@ -4,7 +4,8 @@ Test runner module for AYS9
 How to use it:
 from ays_testrunner.testrunner import AYSCoreTestRunner
 g8_config = {'G8_URL': 'du-conv-2.demo.greenitglobe.com', 'G8_LOGIN': 'aystestrunner@itsyouonline', 'G8_PASSWORD': 'aystestrunner', 'G8_ACCOUNT': 'aystestrunner', 'G8_LOCATION': 'du-conv-2'}
-core = AYSCoreTestRunner('core', config={'bp_paths': ['/root/gig/code/github/jumpscale/ays9/tests/bp_test_templates/core/test_auto_behavior.yaml', "/tmp/grouptest"], 'G8ENV': g8_config})
+core = AYSCoreTestRunner('core', config={'bp_paths': ['/root/gig/code/github/jumpscale/ays9/tests/bp_test_templates/core/test_auto_behavior.yaml', "/tmp/grouptest"], 'G8ENV': g8_config,
+'TEST_TIMEOUT': 300})
 core.run()
 """
 from js9 import j
