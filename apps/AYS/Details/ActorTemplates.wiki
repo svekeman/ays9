@@ -18,7 +18,7 @@ h3. Actor Templates
 {{actions:
 {% if reponame %}
 - display: Update Templates
-  action: /restmachine/system/atyourservice/templatesUpdate
+  action: /restmachine/ays/tools/templatesUpdate
   hide: false
   showresponse: true
   input:
@@ -27,7 +27,7 @@ h3. Actor Templates
       type: hidden
 {%else%}
 - display: Update Templates
-  action: /restmachine/system/atyourservice/templatesUpdate
+  action: /restmachine/ays/tools/templatesUpdate
   hide: false
   showresponse: true
 {% endif %}

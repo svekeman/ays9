@@ -16,7 +16,7 @@ h2. Repository: [$$reponame|/AYS/Repo?reponame=$$reponame]
 h4. Actions
 {{actions:
 - display: Execute blueprint
-  action: /restmachine/system/atyourservice/executeBlueprints
+  action: /restmachine/ays/tools/executeBlueprints
   showresponse: True
   input:
   - name: repository
@@ -24,7 +24,7 @@ h4. Actions
     value: $$reponame
 
 - display: Run
-  action: /restmachine/system/atyourservice/createRun
+  action: /restmachine/ays/tools/createRun
   showresponse: True
   input:
   - name: repository
@@ -46,7 +46,7 @@ h2. Links:
 
 @col 6
 {{form:
-  action: /restmachine/system/atyourservice/quickBlueprint
+  action: /restmachine/ays/tools/quickBlueprint
   display: 'Apply'
   showresponse: True
   input:

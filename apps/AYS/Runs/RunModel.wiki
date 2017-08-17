@@ -44,7 +44,7 @@ $(document).ready(function (){
       $.ajax
       ({
         type: "POST",
-        url: "/restmachine/system/atyourservice/getRun",
+        url: "/restmachine/ays/tools/getRun",
         data: 'repository='+'${reponame}'+'&runid='+'$$runid',
         dataType: 'json',
         async: true,

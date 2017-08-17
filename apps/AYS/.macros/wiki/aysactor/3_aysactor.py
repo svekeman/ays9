@@ -4,7 +4,7 @@ def main(j, args, params, tags, tasklet):
         reponame = args.getTag('reponame')
         actorname = args.getTag('actorname')
         ctx = args.requestContext
-        aysactor = j.apps.actorsloader.getActor('system', 'atyourservice')
+        aysactor = j.apps.actorsloader.getActor('ays', 'tools')
         client = aysactor.get_client(ctx=ctx)
         actor = client.getActorByName(actorname, reponame).json()
         if actor:

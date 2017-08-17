@@ -21,7 +21,7 @@ Error : ${error}
 
 {{actions:
 - display: Delete Service
-  action: /restmachine/system/atyourservice/deleteService
+  action: /restmachine/ays/tools/deleteService
   showresponse: True
   hide: True
 }}

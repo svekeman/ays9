@@ -20,7 +20,7 @@
 {{actions:
 
 - display: Update Templates
-  action: /restmachine/system/atyourservice/templatesUpdate
+  action: /restmachine/ays/tools/templatesUpdate
   hide: false
   showresponse: true
   input:

@@ -18,7 +18,7 @@ h3. AYS Repo Runs
 h4. Actions
 {{actions:
 - display: Remove all runs in DB
-  action: /restmachine/system/atyourservice/deleteRuns
+  action: /restmachine/ays/tools/deleteRuns
   input:
     - name: repository
       value: $$reponame
@@ -42,7 +42,7 @@ $(document).ready(function (){
           $.ajax
           ({
             type: "POST",
-            url: "/restmachine/system/atyourservice/getRun",
+            url: "/restmachine/ays/tools/getRun",
             data: 'repository='+'$$reponame'+'&runid='+runid,
             dataType: 'json',
             async: false,

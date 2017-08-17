@@ -15,7 +15,7 @@ h2. Repositories
 
 {{actions:
 - display: Create repository
-  action: /restmachine/system/atyourservice/createRepo
+  action: /restmachine/ays/tools/createRepo
   hide: true
   input:
     - name: name
@@ -28,7 +28,7 @@ h2. Repositories
       required: true
 
 # - display: Commit repositories
-#   action: /restmachine/system/atyourservice/commit
+#   action: /restmachine/ays/tools/commit
 #   showresponse: True
 #   hide: true
 #   input:
@@ -51,11 +51,11 @@ h2. Repositories
 - display: Destroy this repository
   hide: true
   reload: false
-  action: /restmachine/system/atyourservice/deleteRepo
+  action: /restmachine/ays/tools/deleteRepo
 
 # - display: Reload AYS
 #   hide: true
-#   action: /restmachine/system/atyourservice/reload
+#   action: /restmachine/ays/tools/reload
 #   showresponse: True
 }}
 

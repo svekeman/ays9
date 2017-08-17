@@ -7,7 +7,7 @@ def main(j, args, params, tags, tasklet):
     ctx = args.requestContext
 
     try:
-        aysactor = j.apps.actorsloader.getActor('system', 'atyourservice')
+        aysactor = j.apps.actorsloader.getActor('ays', 'tools')
         client = aysactor.get_client(ctx=ctx)
         if not reponame:
             # FIXME: migrate to ays_api calls if not reponame.

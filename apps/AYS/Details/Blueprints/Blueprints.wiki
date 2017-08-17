@@ -37,9 +37,9 @@ $(function() {
       var ss = this.id.split('-')
 
       if (this.innerText == 'active'){
-          var url = '/restmachine/system/atyourservice/archiveBlueprint';
+          var url = '/restmachine/ays/tools/archiveBlueprint';
       }else{
-          var url = '/restmachine/system/atyourservice/restoreBlueprint';
+          var url = '/restmachine/ays/tools/restoreBlueprint';
       }
       $.ajax({
         type: 'POST',

@@ -10,7 +10,13 @@ Using the portal it is possible to view the repositories and templates in the sy
 
 The portal is installed when using the `-p` option during the building of js9(see [js9 installation](https://github.com/Jumpscale/developer/blob/master/README.md)).
 
-To add AYS app to the portal, copy/link apps/AYS to your portal applications directory `/opt/jumpscale9/apps/portals/main/base`
+To add AYS app to the portal, use the following command:
+
+`j.tools.prefab.local.apps.atyourservice.install()`
+
+If portal is not installed you can use the option `install_portal` as follows:
+
+`j.tools.prefab.local.apps.atyourservice.install(install_portal=True)`
 
 For more information about the portal check the docs at [portal](https://github.com/Jumpscale/portal9/tree/master/docs/AYS/walkthrough)
 

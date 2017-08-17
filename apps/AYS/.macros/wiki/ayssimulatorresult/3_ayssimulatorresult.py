@@ -5,7 +5,7 @@ def main(j, args, params, tags, tasklet):
     reponame = query_params.get('reponame', None)
 
     ctx = args.requestContext
-    aysactor = j.apps.actorsloader.getActor('system', 'atyourservice')
+    aysactor = j.apps.actorsloader.getActor('ays', 'tools')
     client = aysactor.get_client(ctx=ctx)
     out = ""
     out = "h3. Result of simulation for repository %s \n" % reponame
