@@ -1,3 +1,7 @@
+# G8 Cockpit
+
+The G8 Cockpit provides a REST API, web portal and chatbot for managing and consuming aggregated G8 capacity through one more G8 Masters using AYS blueprints and AYS service templates, leveraging a single identity controlled by ItsYou.online.
+
 # AYS Portal
 
 AYS services and templates are visualized in the **AYS Portal**.
@@ -5,6 +9,8 @@ AYS services and templates are visualized in the **AYS Portal**.
 Using the portal it is possible to view the repositories and templates in the system. It is possible to navigate to AYS repos and perform various actions such as executing blueprints, editing blueprints, viewing the runs and the service instances created.
 
 The portal is installed when using the `-p` option during the building of js9(see [js9 installation](https://github.com/Jumpscale/developer/blob/master/README.md)).
+
+To add AYS app to the portal, copy/link apps/AYS to your portal applications directory `/opt/jumpscale9/apps/portals/main/base`
 
 For more information about the portal check the docs at [portal](https://github.com/Jumpscale/portal9/tree/master/docs/AYS/walkthrough)
 
