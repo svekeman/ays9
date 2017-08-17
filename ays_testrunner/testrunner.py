@@ -529,7 +529,15 @@ class AYSCoreTestRunner(BaseRunner):
         Will clean up a G8 environment. Typically should be called for test environment where all the resources created can be safely cleanup to make sure that tests are
         starting from a clean state
         """
-        pass    
+        try:
+            g8_config = self._config.get('G8ENV', {})
+            if g8_config:
+                ovc_cli = j.clients.openvcloud.get(url=g8_config.get('G8_URL'), login=g8_config.get('G8_LOGIN'), password=g8_config.get('G8_PASSWORD'))
+                # DELETE ALL THE CREATED CLOUDSPACES
+                for cloudspace_info in ovc_cli.api.cloudapi.cloudspaces.list():
+                    ovc_cli.api.cloudapi.cloudspaces.delete(cloudspaceId=cloudspace_info['id'])
+
+
 
 
     def _report_results(self):
