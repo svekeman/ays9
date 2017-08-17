@@ -1,22 +1,105 @@
 # Parents & Children
 
-A service can be a parent for other services.
+## AYS Parent/Child Relationship
 
-It's just a way of organizing your services and grouping them.
+- It's just a way of organizing your services and grouping them.
+- A service can be the parent of another service.
+- This is a special kind of [Producer/Consumer](Producers-Consumers.md) relationship, where there can only be at most __ONE__ parent for a child.
+- Child services are created in a subdirectory of their parent.
+- It's usally a logical grouping of services
 
-You will typically do it for indicating some kind of child/parent relationship, e.g. an app living inside a node.
+## Example
 
-The parent/child relationship defines the location in the AYS repo directory structure (so purely visualization).
+Example of `parent` in `config.yaml`:
 
-Child services also inherit their parent's executor defined in `getExecutor` by default.
+```yaml
+doc:
+  property:
+  - node: ''
+links:
+  parent:
+    auto: true
+    optional: false
+    role: node
+    argname: 'node'
+```
 
-See the section [Parent/Child](../FileDetails/Parent-Child.md) for more information on this topic.
+- This means that the service has a parent of role `node` and that it should auto create its parent if it doesn't already exist.
+- The `auto` tag is optional and means that we will look if there is a parent if right type if yes will use that one
+- The `optional` tag is optional and means that the parent relationship is not required
 
 
-```toml
+## Example deployed:
+
+Considering the following blueprint:
+
+```yaml
+datacenter__eu:
+    location: 'Europe'
+    description: 'Main datacenter in Europe'
+
+datacenter__us:
+    location: 'USA'
+    description: 'Main datacenter in USA'
+
+
+rack__storage1:
+    datacenter: 'eu'
+    location: 'room1'
+    description: 'rack for storage node'
+
+rack__storage2:
+    datacenter: 'eu'
+    location: 'room1'
+    description: 'rack for storage node'
+
+rack__cpu1:
+    datacenter: 'us'
+    location: 'east building'
+    description: 'rack for cpu node'
+
+rack__storage4:
+    datacenter: 'us'
+    location: 'west buuilding'
+    description: 'rack for cpu node'
+```
+
+In this example the `rack` service use the datacenter service as parent.<br>
+After execution of the command `ays blueprint`, the service tree will look like that:
+
+```shell
+$ tree services/
+services/
+├── datacenter!eu
+│   ├── data.json
+│   ├── schema.capnp
+│   ├── rack!storage1
+│   │   ├── data.json
+│   |   ├── schema.capnp
+│   │   └── service.json
+│   ├── rack!storage2
+│   │   ├── data.json
+│   |   ├── schema.capnp
+│   │   └── service.json
+│   └── service.json
+└── datacenter!us
+    ├── data.json
+    ├── schema.capnp
+    ├── rack!cpu1
+    │   ├── data.json
+    |   ├── schema.capnp
+    │   └── service.json
+    ├── rack!storage4
+    │   ├── data.json
+    |   ├── schema.capnp
+    │   └── service.json
+    └── service.json
+
+```
+
+```
 !!!
-title = "AYS Parent Children"
-tags= ["ays","def"]
-date = "2017-03-02"
-categories= ["ays_def"]
+title = "Parent Child"
+date = "2017-04-08"
+tags = []
 ```

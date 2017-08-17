@@ -1,25 +1,25 @@
 # AYS Blueprints
 
-An AYS _blueprint_ is a [YAML](http://yaml.org/) file used as the entry point for interacting with AYS. It describes the deployment of a specific application.
+An AYS _blueprint_ is a [YAML](http://yaml.org/) file used as the entry point for interacting with AYS [Actor Templates](ActorTemplates.md). It describes the deployment of a specific application/setup or the the reality that will be deployed.
 
-It does so by defining all service instances that make up a specific application and how these AYS services instances interact with each other.
+It does so by defining all service instances that make up a specific application, configuring them and describing how these AYS services instances interact with each other.
 
 Example:
 
 ```yaml
-redis_redis1:
-  description:
-    - "a description"
+actor__service1:
+  configuration_parameter: value
 
-redis_redis2:
-  description:
-    - "a description"
+actor__service2:
+  configuration_parameter: value
 
-myapp_test:
-  redis: 'redis1, redis2'
+actor_with_dependencies__name:
+  key:
+      - service1
+      - service2
 ```
 
-The above example is about the `test` application using two instances of the `Redis`.
+The above example deploys two `actors` and an `actor_with_dependencies` where `actor_with_dependencies` [consumes](Producers-Consumers.md)/uses those services.
 
 ```toml
 !!!
