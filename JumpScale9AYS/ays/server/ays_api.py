@@ -692,10 +692,10 @@ async def deleteServiceByName(request, name, role, repository):
 
     try:
         await service.delete()
-    except Exception as e:
+    except j.exception.RuntimeError as e:
         error_msg = "Error during deletion of service:\n %s" % str(e)
         j.atyourservice.server.logger.exception(error_msg)
-        return json({'error': str(e)}, 400)
+        return json({'error': str(e)}, 405)
  
     return json({}, 204)
 
