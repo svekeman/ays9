@@ -536,7 +536,8 @@ class AYSCoreTestRunner(BaseRunner):
                 # DELETE ALL THE CREATED CLOUDSPACES
                 for cloudspace_info in ovc_cli.api.cloudapi.cloudspaces.list():
                     ovc_cli.api.cloudapi.cloudspaces.delete(cloudspaceId=cloudspace_info['id'])
-
+        except Exception as err:
+            self._logger.error('Failed to execute cleanup. Error {}'.format(err))
 
 
 
