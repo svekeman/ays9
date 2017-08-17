@@ -45,7 +45,7 @@ def test(job):
         try:
             cl.deleteServiceByName(name='kid', role='chi', repository=repo)
         except Exception as e:
-            if e.response.status_code == 405:
+            if e.response.status_code == 403:
                 pass 
         else:
             failures.append("Was able to remove service kid even it's consumed by service cons1")
@@ -54,7 +54,7 @@ def test(job):
         try:
             cl.deleteServiceByName(name='kp', role='dummy', repository=repo)
         except Exception as e:
-            if e.response.status_code == 405:
+            if e.response.status_code == 403:
                 pass 
         else:
             failures.append("Was able to remove service kp even it's a parent of kid which is consumed by service cons1")
@@ -67,7 +67,7 @@ def test(job):
         try:
             cl.deleteServiceByName(name='k2', role='dummy', repository=repo)
         except Exception as e:
-            if e.response.status_code == 405:
+            if e.response.status_code == 403:
                 pass 
         else:
             failures.append("Was able to remove service k2 even it will break the minimum consumption required service cons1")
