@@ -8,7 +8,7 @@ Each function name correspond to an action. In the example below the actor imple
 
 The function need to accept a single argument called job.
 
-The job object let you access multiple other usefull object:
+The job object gives you access to multiple other useful objects:
 - **job.service** : the service object on which the action is executed on.
 - **job.model.args** : the arguments passed to this action
 - **job.service.model.data** : the schema values of the service
