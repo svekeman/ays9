@@ -2,5 +2,5 @@ links:
    parent:
       auto: false 
       optional: false
-      role: sshkey
+      role: dummy 
       argname: parent

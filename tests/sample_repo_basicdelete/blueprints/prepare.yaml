@@ -1,18 +1,18 @@
-sshkey__k1:
-sshkey__k2:
-sshkey__k3:
+dummy__k1:
+dummy__k2:
+dummy__k3:
 
 
-sshkey__knotconsumed:
+dummy__knotconsumed:
 
-sshkey__kp:
+dummy__kp:
 
 
 chi__kid:
-    parent: kp
+   parent: kp
 
 cons__cons1:
-   sshkeys: [k1, k2, k3]
+   consumedlist : [k1, k2, k3]
    consumedkid: kid
 
 actions:

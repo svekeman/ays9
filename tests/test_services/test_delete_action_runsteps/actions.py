@@ -44,21 +44,21 @@ def test(job):
             run = cl.getRun(repository=repo, runid=runid).json()
         return run
 
-    
+
     def validate_runsteps(expectedsteps, run):
         tobesteps = [[] for x in range(len(run['steps']))]
         if len(expectedsteps) != len(tobesteps):
-            failures.append("Expected to have #{} steps but got #{} steps.".format(len(expectedsteps), len(tobesteps)))    
+            failures.append("Expected to have #{} steps but got #{} steps.".format(len(expectedsteps), len(tobesteps)))
         stepsinfo = []
         for s in run['steps']:
             stepsinfo.append([])
             for job in s['jobs']:
                 stepsinfo[-1].append((job['service_name'], job['action_name']))
-        
+
         print("Expected\n", expectedsteps)
         print("Got\n", stepsinfo)
         for stepidx, step in enumerate(run['steps']):
-            jobset = set([(job['service_name'], job['action_name']) for job in step['jobs']]) 
+            jobset = set([(job['service_name'], job['action_name']) for job in step['jobs']])
             for expectedjob in expectedsteps[stepidx]:
                 if expectedjob not in jobset:
                     failures.append("Expected to have {} - {} job. {}".format(*expectedjob, str(stepsinfo)))
@@ -71,45 +71,40 @@ def test(job):
             failures.append(str(ex))
 
         run = ensure_run()
-        # delete knotconsumed 
+        # delete knotconsumed
         try:
             cl.executeBlueprint(data=None, repository=repo, blueprint="delete_knotconsumed.yaml")
         except Exception as ex:
             failures.append(str(ex))
 
         run = ensure_run()
-        expectedsteps = [[('knotconsumed', "stop")], [("knotconsumed", "uninstall")], [("knotconsumed", "delete")]] 
+        expectedsteps = [[('knotconsumed', "stop")], [("knotconsumed", "uninstall")], [("knotconsumed", "delete")]]
         validate_runsteps(expectedsteps, run)
 
-        print("********** DONE WITH KNOTCONSUMED")
-        # # delete cons1  
+        # # delete cons1
         try:
             cl.executeBlueprint(data=None, repository=repo, blueprint="delete_cons1.yaml")
         except Exception as ex:
             failures.append(str(ex))
-        
+
         run = ensure_run()
-        expectedsteps = [[('cons1', "stop")], [("cons1", "uninstall")], [("cons1", "delete")]]     
+        expectedsteps = [[('cons1', "stop")], [("cons1", "uninstall")], [("cons1", "delete")]]
         validate_runsteps(expectedsteps, run)
 
-        print("********** DONE WITH CONS1")
-        # delete kp  
+        # delete kp
         try:
             cl.executeBlueprint(data=None, repository=repo, blueprint="delete_kp.yaml")
         except Exception as ex:
             failures.append(str(ex))
-        
-        
+
         run = ensure_run()
-    
+
         expectedsteps = [[('kid', 'stop')], [('kid', 'uninstall'), ('kp', 'stop')], [('kid', 'delete'), ('kp', 'uninstall')], [('kp', 'delete')]]
         validate_runsteps(expectedsteps, run)
 
-        print("********** DONE WITH KP")
         if failures:
             model.data.result = RESULT_FAILED % '\n'.join(failures)
     except Exception as e:
         raise e
     finally:
         cl.destroyRepository(data=None, repository=repo)
-    

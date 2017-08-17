@@ -1,10 +1,10 @@
 links:
   consume:
-    - argname: sshkeys
+    - argname: consumedlist
       auto: false
       max: 4
       min: 2
-      role: sshkey
+      role: dummy 
     - argname: consumedkid
       auto: false
       min: 1

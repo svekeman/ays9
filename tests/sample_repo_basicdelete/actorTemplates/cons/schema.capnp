@@ -1,6 +1,6 @@
-@0xb06391637284c40b;
+@0x9a7421b00285217e;
 
 struct Schema {
-    sshkeys @0: List(Text);
+    consumedlist @0: List(Text);
     consumedkid @1: Text;
 }
