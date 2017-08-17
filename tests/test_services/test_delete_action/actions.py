@@ -72,9 +72,6 @@ def test(job):
         else:
             failures.append("Was able to remove service k2 even it will break the minimum consumption required service cons1")
 
-        currentservices = cl.listServices(repository=repo).json()
-        print("Remaining services: ", currentservices, len(currentservices))
-
         if failures:
             model.data.result = RESULT_FAILED % '\n'.join(failures)
 

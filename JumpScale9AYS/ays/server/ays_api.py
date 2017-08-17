@@ -690,8 +690,13 @@ async def deleteServiceByName(request, name, role, repository):
     if service is None:
         return json({'error':'Service role:%s name:%s not found in the repo %s' % (role, name, repository)}, 404)
 
-    await service.delete()
-
+    try:
+        await service.delete()
+    except Exception as e:
+        error_msg = "Error during deletion of service:\n %s" % str(e)
+        j.atyourservice.server.logger.exception(error_msg)
+        return json({'error': str(e)}, 400)
+ 
     return json({}, 204)
 
 
