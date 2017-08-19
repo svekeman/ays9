@@ -318,6 +318,13 @@ class AYSTest:
         else:
             self._logger = logger
 
+        # create a repo per test
+        try:
+            self._cli = j.clients.atyourservice.get().api.ays
+            self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
+        except Exception as ex:
+            self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
+
     @property
     def starttime(self):
         return self._starttime
@@ -397,8 +404,6 @@ class AYSTest:
         self.setup()
 
         try:
-            self._cli = j.clients.atyourservice.get().api.ays
-            self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
             if self._repo_info is None:
                 self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
             else:
