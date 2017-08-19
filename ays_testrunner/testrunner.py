@@ -384,9 +384,9 @@ class AYSTest:
 
             if repo_exist:
                 # destroy repo
-                self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
+                # self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
                 # delete repo
-                # self._cli.deleteRepository(repository=self._repo_info['name'])
+                self._cli.deleteRepository(repository=self._repo_info['name'])
         except Exception as err:
             self._errors.append('Failed to destroy/delete repository {}. Error: {}'.format(self._repo_info['name'], err))
 
