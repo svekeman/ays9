@@ -1,14 +1,15 @@
-disk.ovc__disk2:
+disk.ovc__testnodeovcdisk2:
   size: 10
 
-node.ovc__testnode:
-  disk:
-    - disk1
-    - disk2
+node.ovc__testnodeovc:
+    disk:
+      - testnodeovcdisk1
+      - testnodeovcdisk2
 
-test_node_ovc__test:
+test_node_ovc__testnodeovcattachdisk:
+
 
 actions:
   - action : test_node_disks
     actor  : test_node_ovc
-    service: test
+    service: testnodeovcattachdisk
