@@ -103,7 +103,7 @@ def create_run(cli, repo_info, logger=None):
     j.sal.fs.changeDir(repo_info['path'])
     cmd = 'ays run create -y --force -f'
     try:
-        j.tools.prefab.get().core.run(cmd, timeout=0)
+        j.tools.prefab.local.core.run(cmd, timeout=0)
     except Exception as e:
         errors.append('Failed to create run. Error: {}'.format(e))
 
@@ -300,7 +300,7 @@ class AYSTest:
         """
         self._path = path
         self._name = name
-        self._prefab = j.tools.prefab.get()
+        self._prefab = j.tools.prefab.local
         self._repo_info = {}
         self._errors = []
         self._cli  = None
