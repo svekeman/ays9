@@ -40,7 +40,7 @@ async def addTemplateRepo(request):
     except jsonschema.ValidationError as e:
         return text('Bad Request Body', 400)
 
-    path = j.do.pullGitRepo(url=inputs['url'], branch=inputs['branch'])
+    path = j.clients.git.pullGitRepo(url=inputs['url'], branch=inputs['branch'])
 
     # Register/update the cloned/pulled template repo
     template_repo_collection = j.atyourservice.server.templateRepos
@@ -696,7 +696,7 @@ async def deleteServiceByName(request, name, role, repository):
         error_msg = "Error during deletion of service:\n %s" % str(e)
         j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(e)}, 403)
- 
+
     return json({}, 204)
 
 
