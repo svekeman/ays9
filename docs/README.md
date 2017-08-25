@@ -25,7 +25,7 @@ AYS server automates the full lifecycle of the cloud infrastructure and applicat
 
 Interaction with the AYS server is done through the AYS RESTful APIs, the Python client, the AYS command line tool for Linux, or the AYS Portal, also know as the "Cockpit", which is a web user interface. Both the Python client, the AYS command line tool and the AYS Portal as basically clients to the AYS RESTful API.
 
-![](AYSClients.png)
+![](Images/AYSClients.png)
 
 The best way to get acquainted with AYS is using the AYS command line tool, as documented in [AYS Commands](Commands/README.md).
 
@@ -59,9 +59,12 @@ See [Blueprints](Definitions/Blueprints.md) for more details.
 ## Next
 
 Next you will want to learn about:
-
 - [AYS Definitions](Definitions/README.md)
-- [Life Cycle of an AYS Service](Service-Lifecycle.md)
 - [AYS Commands](Commands/README.md)
-- [AYS File Locations & Details](FileDetails/README.md)
-- [AYS Examples](howTo/README.md)
+
+Or jump to:
+- [Getting Started](gettingStarted/README.md)
+- [Walkthroughs](walktrhoughs/README.md)
+- [How To's](Howto/README.md)
+
+See the [Table of Contents](SUMMARY.md) for an overview of all topics.
