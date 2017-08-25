@@ -3,9 +3,9 @@
 In the (optional) `config.yaml` file of an [actor template](../Definitions/ActorTemplates.md) you configure:
 - [Documentation](#documentation)
 - [Relations](#relations)
-- [Recurring actions](#recurringactions)
-- [Long running jobs](#longrunning-jobs)
-- [Timeouts](##timeouts)
+- [Recurring actions](#recurring-actions)
+- [Long running jobs](#long-running-jobs)
+- [Timeouts](#timeouts)
 - [Events](#events)
 
 
