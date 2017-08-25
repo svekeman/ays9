@@ -9,7 +9,7 @@ An AYS actor template defines:
 - Application-specific attributes needed to instantiate the AYS service
 - Which events triggered by other AYS services that need to be monitored and acted upon
 
-An AYS actor template implements:
+An AYS actor template also implements [actions](Actions.md):
 - Actions to install, start, stop and uninstall the actual application
 - Actions to monitor the actual application, and how to act upon findings
 - Actions to backup, restore, fail-over, auto-scale and keep the application healthy
