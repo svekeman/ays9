@@ -1,20 +1,19 @@
-# Long running jobs
+# Long running tasks
 
 AYS is written using asyncio technique to achieve concurrency.
 
-## Introduction
-You can have `recurring tasks` and it'll serve you well to a limit as it's uses `loop.run_in_executor`, so It'll be mapped to a thread which requires a lot of resources compared to a coroutine.
+You can have `recurring tasks` and it will serve you well to a limit as it uses `loop.run_in_executor`, so it will be mapped to a thread which requires a lot of resources compared to a coroutine.
 
-If you are having plenty of `long running tasks` you can make use of `LongRunningTask` feature in `AYS` to overcome the limits of `recurring tasks`.
+If you are having plenty of `long running tasks` you can make use of long running task, which is a coroutine to be executed in the AYS main loop, helping you to overcome the limits of `recurring tasks`.
 
-## How it Works
-a `LongRunningTask` is a coroutine to be executed in the AYS main loop.
-
-## How to define a `Long Running Task`
-
-in `actions.py` of your service.
+Any action can be tagged as being a long running task in the `config.yaml` its actor template, as follows:
+```
+longjobs:
+    - action: long2
 ```
 
+This is for the `long2(job)` action as implementaed in the following `actions.py`:
+```
 def long2(job):
     # check if key "shouldstop" is set in redis
     async def inner(job):
@@ -33,15 +32,8 @@ def long2(job):
             await sleep(1)
         job.logger.info("Completed execution of long job long2")
     return inner(job)
-
 ```
 
-```
-longjobs:
-    - action: long2
-```
-
-
-> Note: code in inner needs to be fully async or the code will block AYS main loop.
+> Note: code in inner(job) needs to be fully async or the code will block AYS main loop.
 
 in `config.yaml` you specify the long running jobs

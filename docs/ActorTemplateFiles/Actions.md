@@ -1,21 +1,23 @@
-# AYS Actions
+# Actions
 
-- Manages the life cycle of your AYS
-- you need to implement one or more [functions](http://www.python-course.eu/python3_functions.php) (actions) in the actions.py file of the actor of the service
+AYS services are controlled through their actions, which are implemented as Python functions in their `actions.py` files.
 
-An action file is a python file that contains multiple functions.
-Each function name correspond to an action. In the example below the actor implement two action, `install` and `uninstall`.
+Each function corresponds to an action. In the example below the actor implements two actions, `install(job)` and `uninstall(job)`.
 
-The function need to accept a single argument called job.
+An action accepts a single argument called job.
 
 The job object gives you access to multiple other useful objects:
-- **job.service** : the service object on which the action is executed on.
-- **job.model.args** : the arguments passed to this action
-- **job.service.model.data** : the schema values of the service
+- **job.service**: the service object on which the action is executed on
+- **job.model.args**: the arguments passed to this action
+- **job.service.model.data**: the schema values of the service
 
-## Example:
+## Example
 
-**actions.py**:
+The below example is an `actions.py` for an OpenvCloud virtual machine:
+- `install(job)` will create a new virtual machine
+- `uninstall(job)` will delete the virtual machine
+
+This AYS service has a parent-child relationship with an AYS service for a virtual data center.
 
 ```python
 def install(job):
@@ -81,13 +83,67 @@ def uninstall(job):
     machine.delete()
 ```
 
-## Default behavior
-   - action delete: will call service.delete()
+## Schedule actions
 
-```toml
-!!!
-title = "AYS Actions"
-date = "2017-03-02"
-tags= ["ays","def"]
-categories= ["ays_def"]
+
+
+## Action states
+
+States of an action:
+
+- scheduled
+- ok
+- error
+- new
+
+
+## Default actions
+
+- `action_post_()`
+- `action_pre_()`
+- `check_down()`
+- `check_requirements()`
+- `check_up`
+- `cleanup`
+- `consume()`
+- `data_export()`
+- `data_import()`
+- `delete()`
+- `halt()`
+- `init()`
+- `input()`
+- `init_actions_()`
+- `monitor()`
+- `processChange()`
+- `removedata()`
+- `start()`
+- `stop()`
+
+
+## Default behavior
+
+Executing a blueprint with the delete action, as shown below, will automatically schedule excution of `service.delete()`. You can override this default behavior by implementing a custom `delete(job)` action.
+
+```yaml
+actions:
+   - action delete
+```
+
+## HTTP request context
+
+In some situations you may want to be able to access the http request context of a request within an action.
+
+AYS allows you to access this context on the job object received in the service actions.  
+
+For example, if you want to access the JWT token used to create a run:
+```python
+# this is an snippet from a service action
+def install(job):
+    jwt_token = job.context['token']
+    # ...
+```
+
+In the case you create a job from within another job, make sure you pass the context around:
+```python
+j.tools.async.wrappers.sync(service.executeAction('start', context=job.context))
 ```

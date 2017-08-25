@@ -1,22 +1,25 @@
-# Walkthrough
+# Create an Actor Template
 
 ## Creating AYS repository
 
 AYS repo contains service files and it is the environment in which a service instance is deployed and executed.
 
-Use the command <i>repo create</i> to create the ays repository, specifying the github repo attached to it and the path where the repo will be created.<br>
+Use the command `ays repo create` to create the AYS repository, specifying the GitHub repository attached to it and the path where the repsitory will be created.
+
 The command will create a directory containing the following:
-- <b>actorTemplates</b>: This folder contains all your locally created templates and their files.
-- <b>blueprints</b>: Contains YAML files to define the nedded operations
-- <b>services</b>:Contains services instances.
-<br><br>
+- `actorTemplates`: This folder contains all your locally created templates and their files
+- `blueprints`: Contains YAML files to define the nedded operations
+- `services`: Contains services instances
+
 An example command:
-	`ays repo create -n {name} -g {github repo url}`
+```bash
+ays repo create -n {name} -g {github repo url}
+```
 
 ## Creating an actor template
-Actor templates defines the life cycle of a service.It defines the service parameters and its interactions with other services as well as specifies the actions that need to be executed by each service.<br>
+Actor templates defines the lifecycle of a service. It defines the service parameters and its interactions with other services as well as specifies the actions that need to be executed by each service.<br>
 
- To create an actor {actor name}, you need to create a directory called {actor name} under <b>actorTemplates</b>. To allow configuration of your actor and establish the relationships between itself and other services, create `schema.capnp` and `config.yaml` files.
+To create an actor {actor name}, you need to create a directory called {actor name} under <b>actorTemplates</b>. To allow configuration of your actor and establish the relationships between itself and other services, create `schema.capnp` and `config.yaml` files.
 Parameter definition is as follows:
  - In the `schema.capnp` file:
 
@@ -100,11 +103,7 @@ We can add these specifications to the interactions:
 
 The functions specified in the blueprints are executed when AYS is run. `install(job)` is usually the main function where the main operations of the service are implemented. In most cases it is the action that is expected to be executed when the AYS is run.
 
-
-
-
 To use the parameters of the service inside the file use the job object as follows:
-
 ```
 def install(job):
     service = job.service
@@ -116,7 +115,9 @@ To access the parameters of the parent and/or producer:
 parent = service.parent.model.data
 appDocker = service.producers['app_docker'][0]
 ```
+
 ## Blueprints
+
 A blueprint is a YAML file that is used for interacting with AYS. It is responsible for specifying the deployment of a specific application. The required services instances are specified in this file and specifies their interactions. Blueprints are also used to indicate which actions should AYS execute.<br><br>
 Create a [YAML](http://yaml.org/start.html) file inside the blueprints directory. The file specifies the instances that need to be created from every actor as well as the actions that need to be executed, for example the `install()` function.
 ```
@@ -130,6 +131,7 @@ node.packet.net__kvm:
     actions:
         - action: install
 ```
+
 In the above sample a new instance kvm is created. The client parameter references the instance of the service which is specified in <i>schema.capnp</i>. The actions field specifies the actions or functions to be executed by this instance.
 
 ## Running the services

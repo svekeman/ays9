@@ -62,8 +62,8 @@ rack__storage4:
     description: 'rack for cpu node'
 ```
 
-In this example the `rack` service use the datacenter service as parent.<br>
-After execution of the command `ays blueprint`, the service tree will look like that:
+In this example the `rack` service use the datacenter service as parent.
+After execution of the command `ays blueprint`, the service tree will look like:
 
 ```shell
 $ tree services/

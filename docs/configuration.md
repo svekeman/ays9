@@ -1,55 +1,30 @@
-# AtYourService configuration
+# AYS Configuration
 
-Now that AYS use a database to store it's data, we need to be able to configure the connection to this database.  
-To do so we use a simple configuration file. It need to be located in `/optvar/cfg/jumpscale/ays.yaml`
+AYS is configured through a simple configuration file: `/optvar/cfg/jumpscale9.toml`.
 
-In this file you need to specify how AYS need to connect to redis, oauth (itsyouonline) information, and where the metadata exists.
+AYS uses Redis to store its data, we need to be able to configure the connection to this database.
 
-## Example
+For Redis two modes are supported: `TCP` and `Unix socket`.
 
-```yaml
-oauth:
-  client_id: portalorg
-  client_secret: ghZYCsRCxEL0YpuBeC91RrFH1P8nW60bADfMHi04Pcj9O7MYkgvS
-  jwt_key: '-----BEGIN PUBLIC KEY-----
-
-    MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
-
-    7MjiGYvqalizeSWTHEpnd7oea9IQ8T5oJjMVH5cc0H5tFSKilFFeh//wngxIyny6
-
-    6+Vq5t5B0V0Ehy01+2ceEon2Y0XDkIKv
-
-    -----END PUBLIC KEY-----
-
-    '
-  organization: portalorg
-  redirect_uri: http://172.17.0.5:8200/api/oauth/callback
-production: false
-redis:
-  unixsocket: /tmp/redis.sock
+TCP example:
+```toml
+[redis]
+addr = "localhost"
+port = 6379
 ```
 
-## For redis config, it supports two mode, TCP or UNIX socket.
-
-Here are two example of configuration file.
-For TCP:
-```yaml
-redis:
-  host: localhost
-  port: 6379
-```
-
-For unix socket
+Unix socket example:
 ```yaml
 redis:
   unixsocket: /tmp/redis.sock
 ```
 
-If no configuration file exists, the default behavior is to try to connect to JS redis (over a unix socket located at `/tmp/redis.sock`)
+If Redis configuration is provided the default behavior is to try to connect to JS redis over a unix socket located at `/tmp/redis.sock`.
 
 
-### Redis server configuration
-By default redis is an in-memory only key value store. But for our use case we want the data to be persistent even after the server has stopped. To do that, we need to configure the redis server to save its data on disk.
+## Redis server configuration
+
+By default Redis is an in-memory only key-value store. But for our use case we want the data to be persisted on disk even after the server has stopped. To do that, we need to configure the Redis server to save its data on disk.
 
 Here is an example of valid redis configuration for AYS:
 ```

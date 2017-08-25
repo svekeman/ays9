@@ -1,11 +1,12 @@
-# Howto Write an AYS test
+# How to Write an AYS test
 
 Tests are AYS driven meaning they are going to be executed within AYS server.
 
 ## Writing a test
-- Create a repo under `tests` directory `i.e` with actorTemplates and blueprints and related blueprints (to create instance of your actorTemplates).
+
+- Create an AYS repository in the `tests` directory
 - Create a test actortemplate under `tests/test_services`
-- In `bp_test_templates` create a blueprint to create a service.
+- In `bp_test_templates` create a blueprint to create an AYS service.
 
 
 ## Test ActorTemplate
@@ -18,6 +19,7 @@ struct Schema {
 
 }
 ```
+
 Make sure to execute the initialization blueprints of your test repository to reach the state you are testing.
 
 
@@ -26,7 +28,6 @@ start `js9` shell in `ays9` directory
 ```
 import testrunner
 testrunner.main()
-
 ```
 
 
@@ -47,6 +48,7 @@ Testing the `LongRunningTask`
         depends: []
 
   ```
+
   `actions.py`
   ```
   def long1(job):
@@ -92,7 +94,7 @@ Testing the `LongRunningTask`
       model = job.service.model
       model.data.result = RESULT_OK % job.service.name
       failures = []
-      # HERE create run in sample_repo_timeout and wait for 10 seconds and check if the actions timedout.
+      # HERE create run in sample_repo_timeout and wait for 10 seconds and check if the actions timed out.
       try:
           repo = 'sample_repo_longjobs'
           cl = j.clients.atyourservice.get().api.ays
@@ -113,7 +115,6 @@ Testing the `LongRunningTask`
       finally:
           job.service.save()
           cl.destroyRepository(data=None, repository=repo)
-
   ```
 
 - ###  Create a test service blueprint
