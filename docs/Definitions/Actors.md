@@ -5,7 +5,7 @@ The actor of an AYS service is actually the combination of the following files i
 - `schema.capnp`: copy of the `schema.capnp` from the actor template
 - `actor.json`: repository-specific metadata of all actions and events as defined in the actor template
 
-As explained in [actor templates](ActorTemplates.md) actor templates are definitions - or templates - for creating [Actors](Actors.md), based on which [AYS services](Services.md) are actually instantiated.
+As explained in [actor templates](ActorTemplates.md) actor templates are definitions - or templates - for creating actors, based on which [AYS services](Services.md) are actually instantiated.
 
 The creation on an actor happens when the first AYS service of a specific actor template is instantiated in the AYS repository. All next AYS service instances in that repository that are based on this actor template are then using the same version of that actor template.
 
