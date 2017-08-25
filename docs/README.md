@@ -1,40 +1,59 @@
 # AYS
 
-# AYS Introduction
-
 ## What is AYS?
-AYS stands for "At Your Service". It is an application lifecycle management system for cloud infrastructure and applications and is installed as part of a JumpScale installation.
 
-### AYS Server
-The AYS server automates the full lifecycle of the cloud infrastructure and applications it manages, from deployment, monitoring, scaling and self-healing to uninstalling.
-
-### AYS Clients
-Interaction with the AYS server is done through the AYS RESTful APIs, the Python client, the command-line client for Linux, or the AYS Cockpit, which is a web interface.
+The elevator pitch:
+- AYS is an abbreviation for "At Your Service"
+- AYS is an application lifecycle management system for cloud infrastructure and applications
+- AYS is installed as part of a JumpScale
 
 AYS combines functions such as:
+- **Package Management** by allowing you to package multi-component applications and have AYS do the installation
+- **Service Management** by making starting and stopping applications simple without having to bother about the details
+- **Configuration Management** by centralizing configuration of all applications and their components
+- **Monitoring Tool** by keeping applications healthy through monitoring of all components and act on problems when needed
 
-- **Package Management** like Ubuntu's `apt-get`
-- **Service Management** like Ubuntu's `service`
-- **Configuration Management** like [ansible](http://www.ansible.com)
-- **Monitoring Tool**
 
-## What is a service?
+## AYS server
+
+AYS server is the core component of AYS.
+
+AYS server automates the full lifecycle of the cloud infrastructure and applications it manages, from deployment, monitoring, auto-scaling, self-healing to uninstalling all components it manages.
+
+
+## AYS clients
+
+Interaction with the AYS server is done through the AYS RESTful APIs, the Python client, the AYS command line tool for Linux, or the AYS Portal, also know as the "Cockpit", which is a web user interface. Both the Python client, the AYS command line tool and the AYS Portal as basically clients to the AYS RESTful API.
+
+![](AYSClients.png)
+
+The best way to get acquainted with AYS is using the AYS command line tool, as documented in [AYS Commands](Commands/README.md).
+
+
+## AYS services
+
+Each application or application component managed by AYS is represented by an AYS service.
+
+So an AYS service can be seen as an AYS server-hosted proxy for an application or any of its components.
 
 A service is an abstraction for almost anything:
 
-- Simple package i.e. `mongodb`
-- Server cluster i.e. `mongodb cluster`
+- Simple package i.e. `MongoDB`
+- Server cluster i.e. `MongoDB cluster`
 - Datacenter infrastructure i.e. `rack(s) or a cluster of machines`
 - Buisness logic i.e. `user` and `team`
-- Abstraction for any number of other services
+- Abstraction for any number of other AYS services
 
-## One command to rule them all
+See [AYS Services](Definitions/Services.md) for more details.
 
-We use only one command `ays` to control everything:
 
-- Convert a blueprint to one or more AYS services by executing `ays blueprint`, which will configure all dependencies of each service.
-- Install services by executing `ays action install`
-- check `ays --help` for a complete list of available commands
+## Blueprints
+
+When interacting with the AYS server you typically send blueprints.
+
+Through a blueprint you specify to AYS what needs to be done, such as instantiating AYS services and having them things done.
+
+See [Blueprints](Definitions/Blueprints.md) for more details.
 
 
 ## Next
@@ -45,14 +64,4 @@ Next you will want to learn about:
 - [Life Cycle of an AYS Service](Service-Lifecycle.md)
 - [AYS Commands](Commands/README.md)
 - [AYS File Locations & Details](FileDetails/README.md)
-- [AYS File System](G8OS-FS.md)
 - [AYS Examples](howTo/README.md)
-
-
-```
-!!!
-title = "ays_intro"
-tags = ["ays"]
-categories = ["ays"]
-date = "2017-04-08"
-```
