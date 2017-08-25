@@ -89,3 +89,7 @@ Checking the state of all actions of a specific AYS service is eays using the AY
 cd /optvar/cockpit_repos/<repository-name>
 ays service state -r <role of the AYS service> -n <name of the AYS service>
 ```
+
+## Debug actions
+
+See: [How to debug actor templates](../Howto/Debug_actor_template/README).

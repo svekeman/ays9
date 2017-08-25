@@ -4,7 +4,7 @@ In the (optional) `config.yaml` file of an [actor template](../Definitions/Actor
 - [Documentation](#documentation)
 - [Relations](#relations)
 - [Recurring actions](#recurring-actions)
-- [Long running jobs](#long-running-jobs)
+- [Long running tasks](#long-running-tasks)
 - [Timeouts](#timeouts)
 - [Events](#events)
 
@@ -185,13 +185,13 @@ recurring:
 This configuration will result in AYS service with the `monitor()` action that is scheduled to be executed every 30 seconds, and a `dosomethingelse()` action scheduled for execution every minute.
 
 
-## Long running task
+## Long running tasks
 
 AYS is using [asyncio](https://docs.python.org/3/library/asyncio.html) for implementing concurrency.
 
 The above discussed [recurring actions](#RecurringActions) will serve you well to a limit as it uses `loop.run_in_executor`, which means it will be mapped to a thread which requires a lot of resources compared to a [coroutine](https://docs.python.org/3/library/asyncio-task.html).
 
-For long actions actions it is recommended to rather use the tag action as a long running task, which is a coroutine to be executed in the AYS main loop, helping you to overcome the limits of `recurring tasks`.
+For long running actions it is recommended to rather tag the action as a long running task, which is a coroutine to be executed in the AYS main loop, helping you to overcome the limits of `recurring tasks`.
 
 Tagging an action as a long running task is achieved by including them in the `longjobs` section of the `config.yaml` file, as follows:
 ```
