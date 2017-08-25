@@ -1,12 +1,12 @@
 # Actor Configuration
 
 In the (optional) `config.yaml` file of an [actor template](../Definitions/ActorTemplates.md) you configure:
-- [Documentation](#Documentation)
-- [Relations](#Relations)
-- [Recurring actions](#RecurringActions)
-- [Long running jobs](#LongRunningJobs)
-- [Timeouts](##Timeouts)
-- [Events](#Events)
+- [Documentation](#documentation)
+- [Relations](#relations)
+- [Recurring actions](#recurringactions)
+- [Long running jobs](#longrunning-jobs)
+- [Timeouts](##timeouts)
+- [Events](#events)
 
 
 ## Documentation
