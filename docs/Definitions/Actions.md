@@ -1,6 +1,6 @@
 # Actions
 
-AYS services are controlled through their actions, which are implemented as Python functions in the `actions.py` files of their [actor](Actors.md). Each function corresponds to an action.
+[AYS services](Services.md) are controlled through their actions, which are implemented as Python functions in the `actions.py` files of their [actor](Actors.md). Each function corresponds to an action.
 
 See [Actor Template Files](../ActorTemplateFiles/Actions.md) for an example of two actions: `install(job)` and `uninstall(job)`.
 
