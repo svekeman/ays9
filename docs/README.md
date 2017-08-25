@@ -64,7 +64,7 @@ Next you will want to learn about:
 
 Or jump to:
 - [Getting Started](gettingstarted/README.md)
-- [Walkthroughs](walktroughs/README.md)
+- [Walkthroughs](walkthroughs/README.md)
 - [How To's](Howto/README.md)
 
 See the [Table of Contents](SUMMARY.md) for an overview of all topics.
