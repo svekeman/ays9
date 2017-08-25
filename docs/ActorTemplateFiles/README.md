@@ -1,6 +1,6 @@
 # AYS Actor Template Files
 
-- [Actions](Actions.md)
-- [Configuration](Config.md)
-- [Schema](Schema.md)
-- [Debugging](Debugging.md)
+An [actor template](Definitions/ActorTemplate.md) is basically three files:
+- [`actions.py`](Actions.md)
+- [`config.yaml`](Config.md)
+- [`schema.capnp`](Schema.md)

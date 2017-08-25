@@ -63,7 +63,7 @@ the following commands show you the typical order in which you need to execute a
 - [template](template) : Groupf of commands about actor templates
     - [list](template/list): List available template to be used in a blueprint.
 
-    
+
 ```toml
 !!!
 title = "AYS Commands Intro"

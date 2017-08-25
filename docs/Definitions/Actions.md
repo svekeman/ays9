@@ -32,6 +32,8 @@ See [Blueprints](Blueprints.md) for more details.
 
 Recurring actions are scheduled at the level of the actor template, meaning that all AYS services created from a specific version of an AYS actor will have them same recurring action configuration.
 
+They are executed asynchronously with no [runs](Runs.md).
+
 Here's an example of a `recurring` section in a `config.yaml`:
 ```yaml
 recurring:

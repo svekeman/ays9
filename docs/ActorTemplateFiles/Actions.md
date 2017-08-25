@@ -1,6 +1,6 @@
 # Actions
 
-AYS services are controlled through their actions, which are implemented as Python functions in their `actions.py` files.
+[AYS services](../Definitions/Services.md) are controlled through their actions, which are implemented as Python functions in their `actions.py` files.
 
 Each function corresponds to an action. In the example below the actor implements two actions, `install(job)` and `uninstall(job)`.
 
@@ -82,20 +82,6 @@ def uninstall(job):
     machine = space.machines[service.name]
     machine.delete()
 ```
-
-## Schedule actions
-
-
-
-## Action states
-
-States of an action:
-
-- scheduled
-- ok
-- error
-- new
-
 
 ## Default actions
 

@@ -1,4 +1,4 @@
-# AYS Service
+# AYS Services
 
 AYS is an application lifecycle management system for cloud applications.
 
