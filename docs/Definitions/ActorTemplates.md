@@ -20,14 +20,14 @@ AYS actor templates can be local or global:
 - **Global** actor templates are available to all AYS repositories from the AYS system directory `/opt/code/github/jumpscale/ays9`
 - **Local** actor templates are only available to a specific AYS repository from its `actorTemplates` subdirectory
 
-All this is defined and implemented in the actor template files:
+All this is defined and implemented in the [actor template files](../ActorTemplateFiles/README.md):
 
-- [schema.capnp](../FileDetails/ActorSchema.md): describes all AYS service attributes that can be passed to AYS via a blueprint and/or set/changed by AYS   
-- [config.yaml](../FileDetails/ActorConfig.md): describes all relations (links), recurring actions, time outs, events and long running jobs of an AYS service
-- [actions.py](../FileDetails/ActorActions.md): implements all actions of the AYS service
+- [schema.capnp](../ActorTemplateFiles/Schema.md): describes all AYS service attributes that can be passed to AYS via a blueprint and/or set/changed by AYS   
+- [config.yaml](../ActorTemplateFiles/Config.md): describes all relations (links), recurring actions, time outs, events and long running jobs of an AYS service
+- [actions.py](../ActorTemplateFiles/Actions.md): implements all actions of the AYS service
 
 
-## AYS Service Roles
+## Roles
 
 Both an actor template, actors and AYS service can be given a role, which is derived from the name of the AYS actor template.
 

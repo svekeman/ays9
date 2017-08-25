@@ -1,12 +1,6 @@
-# AYS File Locations & Details
+# AYS Actor Template Files
 
-- [Actor Actions](Actions.md)
-- [Actor Configuration](Config.md)
-- [Actor Schema](Schema.md)
-
-```
-!!!
-title = "FilesDetails"
-date = "2017-04-08"
-tags = []
-```
+- [Actions](Actions.md)
+- [Configuration](Config.md)
+- [Schema](Schema.md)
+- [Debugging](Debugging.md)
