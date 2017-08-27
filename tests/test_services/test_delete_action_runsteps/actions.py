@@ -38,10 +38,14 @@ def test(job):
 
         run = cl.getRun(repository=repo, runid=runid).json()
         run = cl.executeRun(repository=repo, data=None, runid=runid).json()
-        run = cl.getRun(repository=repo, runid=runid).json()
-        while run['state'] != 'ok':
+        # run = cl.getRun(repository=repo, runid=runid).json()
+        while run['state'] not in ['ok', 'error']:
             time.sleep(2)
-            run = cl.getRun(repository=repo, runid=runid).json()
+            try:
+                run = cl.getRun(repository=repo, runid=runid).json()
+            except Exception as ex:
+                print('Failed to retrieve run {} in repository {}'.format(runid, repo))
+                break
         return run
 
 
