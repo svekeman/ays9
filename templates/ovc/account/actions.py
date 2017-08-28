@@ -3,7 +3,8 @@ from js9 import j
 
 def init_actions_(service, args):
     dependencies = {
-        'list_disks': ['init']
+        'list_disks': ['init'],
+        'get_consumption': ['install']
     }
     return dependencies
 
@@ -148,3 +149,13 @@ def list_disks(job):
     account = cl.account_get(name=service.model.dbobj.name)
     service.model.disks = account.disks
     service.save()
+
+
+def get_consumption(job):
+    service = job.service
+    g8client = service.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    account = cl.account_get(name=service.model.dbobj.name)
+    data = account.get_consumption(service.model.data.consumptionFrom, service.model.data.consumptionTo)
+    with open('%s/account.zip' % service.model.data.consumptionLocation, 'wb') as f:
+        f.write(data)

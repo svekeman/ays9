@@ -1,0 +1,20 @@
+g8client__env:
+  url: '{environment}'
+  login: '{username}'
+  password: '{password}'
+
+account__{account}:
+  description: '{description}'
+  g8client: 'env'
+  consumptionFrom: 1503051093
+  consumptionTo: 1503915102
+  consumptionLocation: '/tmp'
+
+test_account_consumption__test:
+  g8client: env
+  account: {account}
+
+actions:
+  - action: get_consumption
+  - action: test
+    actor: test_account_consumption
