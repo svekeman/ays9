@@ -92,4 +92,4 @@ ays service state -r <role of the AYS service> -n <name of the AYS service>
 
 ## Debug actions
 
-See: [How to debug actor templates](../Howto/Debug_actor_template/README).
+See: [How to debug actor templates](../Howto/Debug_actor_templates/README.md).
