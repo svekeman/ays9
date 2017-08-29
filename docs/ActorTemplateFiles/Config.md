@@ -49,19 +49,26 @@ Here's an example:
 ```yaml
 doc:
   property:
-  - sshkey: '...'
+  - key: '...'
 
 links:
   consume:
-  - argname: sshkey
-    auto: true
+  - role: sshkey
+    argname: key
+    min: '3'
     max: 100
-    min: '1'
-    role: sshkey
-
+    auto: true
 ```
 
-This describes that the AYS service consumes a minimum of `1` and a maximum of `100` `sshkey` AYS service instances, and that it should auto-create these instances if they don't already exist. The `min` and `max` tags are optional, they default to `min=max=1`. The `auto` tag is also optional. Setting `max` to `0` means that there is no limit.
+This describes that the AYS service consumes a minimum of `3` and a maximum of `100` `sshkey` AYS service instances, and that it should auto-create these instances if they don't already exist. The `min` and `max` tags are optional, they both default to `1`. The `auto` tag is also optional. Setting `max` to `0` means that there is no limit. Also `argname` is optional. It allows you to pass tha name to the producing AYS service to an attribute that has a name that is different from the producing actor template name, as is the case in this example.
+
+Here's an example of a blueprint for creating an AYS service that depends on at least three AYS service instances created from the `sshkey` actor template, with the above `config.yaml`:
+
+![](Images/producer-consumer1.png)
+
+In the above example four `sshkey` AYS service instances are defined in the blueprint. Alternativelly you can ommit the explicit definitions of the `sshkey` AYS service instances, and let AYS auto-create them, and since the minimum was set to three instances, only three of them will be created. Also note that AYS will give them auto-generated names, in this case `auto1`, `auto2` and `auto3`.
+
+![](Images/producer-consumer2.png)
 
 
 <a id="part-child"></a>
