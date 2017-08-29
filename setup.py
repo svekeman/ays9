@@ -14,7 +14,7 @@ def _post_install(libname, libpath):
 
     print("****:%s:%s" % (libname, libpath))
 
-    j.tools.jsloader.generateJumpscalePlugins()
+    j.tools.jsloader.generate()
     j.tools.jsloader.copyPyLibs()
 
 
