@@ -81,7 +81,7 @@ All AYS services instantiated from the specified AYS actor templates will use th
 
 This mechanism allows to have different versions of an actor template per repository.
 
-Apart from the AYS services as explicitelly defined in the blueprint, AYS will typically also instantiate other AYS services on which the explicitelly defined AYS services depend. See the section [Producers & Children](Producers-Consumers) for more details.
+Apart from the AYS services as explicitly defined in the blueprint, AYS will typically also instantiate other AYS services on which the explicitly defined AYS services depend. See the section [Producers & Children](Producers-Consumers) for more details.
 
 
 <a id="create-service"></a>

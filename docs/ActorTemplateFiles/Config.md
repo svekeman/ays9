@@ -39,7 +39,7 @@ It basically indicates that the AYS service is dependent on another AYS service,
 
 AYS uses this insight to:
 - Decide the order in which AYS services need to be instantiated
-- Automaticly instantiate depending AYS services when not specified explicitelly
+- Automaticly instantiate depending AYS services when not specified explicitly
 - And most importantly, for self-healing purposes
 
 The consumption of another service is specified in the `config.yaml` file of the actor template, using the `consume` keyword in the `links` section.
@@ -64,11 +64,15 @@ This describes that the AYS service consumes a minimum of `3` and a maximum of `
 
 Here's an example of a blueprint for creating an AYS service that depends on at least three AYS service instances created from the `sshkey` actor template, with the above `config.yaml`:
 
-![](Images/producer-consumer1.png)
+![](Images/producer-consumer-1.png)
 
 In the above example four `sshkey` AYS service instances are defined in the blueprint. Alternativelly you can ommit the explicit definitions of the `sshkey` AYS service instances, and let AYS auto-create them, and since the minimum was set to three instances, only three of them will be created. Also note that AYS will give them auto-generated names, in this case `auto1`, `auto2` and `auto3`.
 
-![](Images/producer-consumer2.png)
+![](Images/producer-consumer-2.png)
+
+In the next example the blueprint defines two instances of the consuming `actorXYZ` actor template. Since the producing `sshkey` AYS service instances are not defined explicitly, three of them will be auto-created, as you can see both `actorXYZ` AYS service instances will use the same three auto-created `sshkey` instances:
+
+![](Images/producer-consumer-3.png)
 
 
 <a id="part-child"></a>
