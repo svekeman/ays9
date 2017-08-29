@@ -64,21 +64,21 @@ This describes that the AYS service consumes a minimum of `3` and a maximum of `
 
 Here's an example of a blueprint for creating an AYS service that depends on at least three AYS service instances created from the `sshkey` actor template, with the above `config.yaml`:
 
-![](Images/producer-consumer-1.png)
+![](Images/producer-consumer1.png)
 
 In the above example four `sshkey` AYS service instances are defined in the blueprint. Alternativelly you can ommit the explicit definitions of the `sshkey` AYS service instances, and let AYS auto-create them, and since the minimum was set to three instances, only three of them will be created. Also note that AYS will give them auto-generated names, in this case `auto1`, `auto2` and `auto3`.
 
-![](Images/producer-consumer-2.png)
+![](Images/producer-consumer2.png)
 
 In the next example the blueprint defines two instances of the consuming `actorXYZ` actor template. Since the producing `sshkey` AYS service instances are not defined explicitly, three of them will be auto-created, as you can see both `actorXYZ` AYS service instances will use the same three auto-created `sshkey` instances:
 
-![](Images/producer-consumer-3.png)
+![](Images/producer-consumer3.png)
 
 
 <a id="part-child"></a>
 ### Parents & Children
 
-This is a special kind of the [Producer-Consumer](producer-consumer) relation, where there can only be at most one parent for a child. The "producing" child AYS service can only be "consumed" by one parent AYS service. So while the producer-consumer relation can be one-to-many, a parent-child is always one-to-one consumer-partent relation.
+This is a special case of the [Producer-Consumer](producer-consumer) relation, where there can only be at most one parent for a child. The "producing" child AYS service can only be "consumed" by one parent AYS service. So while the producer-consumer relation can be one-to-many, a parent-child is always one-to-one consumer-parent relation.
 
 AYS uses this to:
 - Prevent that a given child AYS service gets consumed by more than one parent
@@ -93,9 +93,9 @@ doc:
 
 links:
   parent:
-    argname: 'node'
-    auto: true
     role: node
+    argname: node
+    auto: true
     optional: false
 ```
 
@@ -105,7 +105,11 @@ Further more:
 - `auto` instructs AYS to look for an already existing parent of the specified type, and if yes to use that one
 - `optional` tag informs AYS that the parent relationship is not required
 
-Both the `optional` and `auto`  tags are optional.
+Both the `optional` and `auto` tags are optional.
+
+Taking again the example from above, here each `actorXYZ` AYS service instance have a one-to-one relationship with an `sshkey` AYS service instance, which gets auto-created because of the `auto: true` in the definition:
+
+![](Images/parent-child.png)
 
 To clarify how AYS hierarchically organizes AYS services that have a parent-child relationship consider the following additional example:
 
@@ -173,6 +177,20 @@ services/
     │   └── service.json
     └── service.json
 ```
+
+Or a real OpenvCloud example:
+
+![](Images/typical-example.png)
+
+You can check the actual actual templates files for the above OpenvCloud example here:
+- [sshkey](https://github.com/Jumpscale/ays9/tree/master/templates/clients/sshkey)
+- [g8client](https://github.com/Jumpscale/ays9/tree/master/templates/clients/g8client)
+- [account](https://github.com/Jumpscale/ays9/tree/master/templates/ovc/account)
+- [vdcfarm](https://github.com/Jumpscale/ays9/tree/master/templates/ovc/vdcfarm)
+- [vdc](https://github.com/Jumpscale/ays9/tree/master/templates/ovc/vdc)
+- [node.ovc](https://github.com/Jumpscale/ays9/tree/master/templates/nodes/node.ovc)
+- [os.ssh.ubuntu](https://github.com/Jumpscale/ays9/tree/master/templates/os/os.ssh.ubuntu)
+
 
 
 ## Recurring actions
