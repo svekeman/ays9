@@ -12,3 +12,17 @@ curl https://raw.githubusercontent.com/Jumpscale/developer/$GIGDEVELOPERBRANCH/j
 # build image
 source ~/.jsenv.sh
 js9_build -l
+
+
+# docker using bash installers
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+
+export ZUTILSBRANCH=master
+export ZBRANCH=9.1.1_remove_gigdir
+curl https://raw.githubusercontent.com/Jumpscale/bash/$ZUTILSBRANCH/install.sh?$RANDOM > /tmp/install.sh;sudo -E bash /tmp/install.sh
+ZCodeGetJS
+ZDockerInstallLocal
+eval $(ssh-agent)
+ssh-add
+ZInstaller_js9_full
+ZInstaller_ays9
