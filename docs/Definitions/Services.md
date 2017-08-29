@@ -42,7 +42,7 @@ The lifecycle of an AYS service itself is as follows:
 - [Updating the AYS service](#update-service)
 - [Deleting the AYS service](#delete-service)
 
-![](lifecycle.png)
+![](Images/lifecycle.png)
 
 
 <a id="create-template"></a>
@@ -71,7 +71,7 @@ See [Blueprints](Blueprints.md) for more details.
 
 An actor is a copy of an actor template, residing in the `actors` subdirectory of the AYS repository.
 
-![](lifecycle.png)
+![](Images/fromtemplates2services.png)
 
 This is how the copy process works:
 - First AYS looks in the subdirectory `actorTemplates` for a local version of the actor template, and if not found checks wether there is global actor template with the name as specifed in the blueprint
