@@ -28,7 +28,7 @@ struct Schema {
 	cloneName @24 :Text;
 	snapshots @25 :List(Text);
 	snapshotEpoch @26 :Text;
-  sshAuthorized @27 :Bool = false;
+	sshAuthorized @27 :Bool = false;
 
 	struct UserVdcEntry {
 		name @0 :Text;
