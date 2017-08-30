@@ -26,6 +26,8 @@ ZCodeGetJS
 ZDockerInstallLocal
 eval $(ssh-agent)
 ssh-add
-ZInstaller_js9_full
+# ZInstaller_js9_full
+# docker stop build
+ZInstall_ays9
 docker stop build
-ZInstaller_ays9
+# ZDockerActive -b jumpscale/ays9 -i ays9
