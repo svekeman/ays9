@@ -9,9 +9,9 @@ struct Schema {
 	maxCPUCapacity @5 :Int64 = -1;
 	maxNumPublicIP @6 :Int64 = -1;
 	maxDiskCapacity @7 :Int64 = -1;
-	consumptionFrom @8 :Float64;
-	consumptionTo @9 :Float64;
-	consumptionLocation @10 :Text;
+	consumptionFrom @8 :Int64;
+	consumptionTo @9 :Int64;
+	consumptionData @10 :Data;
 
 	struct UserVdcEntry {
 		name @0 :Text;

@@ -10,7 +10,7 @@ doc:
   - maxDiskCapacity: ''
   - consumptionFrom: ''
   - consumptionTo: ''
-  - consumptionLocation: ''
+  - consumptionData: ''
 links:
   consume:
   - argname: g8client

@@ -5,9 +5,6 @@ g8client__env:
 
 account__testaccount:
   g8client: 'env'
-  consumptionFrom: 1503051093
-  consumptionTo: 1503915102
-  consumptionLocation: '/tmp'
 
 test_account_consumption__test:
   g8client: env

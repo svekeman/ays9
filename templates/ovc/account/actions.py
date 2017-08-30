@@ -152,10 +152,13 @@ def list_disks(job):
 
 
 def get_consumption(job):
+    import datetime
     service = job.service
     g8client = service.producers["g8client"][0]
     cl = j.clients.openvcloud.getFromService(g8client)
     account = cl.account_get(name=service.model.dbobj.name)
-    data = account.get_consumption(service.model.data.consumptionFrom, service.model.data.consumptionTo)
-    with open('%s/account.zip' % service.model.data.consumptionLocation, 'wb') as f:
-        f.write(data)
+    if not service.model.data.consumptionFrom and not service.model.data.consumptionTo:
+        service.model.data.consumptionFrom = account.model['creationTime']
+        end = datetime.datetime.fromtimestamp(service.model.data.consumptionFrom) + datetime.timedelta(hours=1)
+        service.model.data.consumptionTo = end.timestamp()
+    service.model.data.consumptionData = account.get_consumption(service.model.data.consumptionFrom, service.model.data.consumptionTo)
