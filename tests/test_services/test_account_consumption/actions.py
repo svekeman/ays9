@@ -27,7 +27,7 @@ def authenticate(g8client):
 
 
 def test(job):
-    import sys
+    import sys, time
     service = job.service
     try:
         g8client = service.producers['g8client'][0]
@@ -36,22 +36,31 @@ def test(job):
 
         account = service.producers['account'][0]
         accountData = account.model.data
+        cl = j.clients.openvcloud.getFromService(g8client)
+        acc = cl.account_get(account.model.dbobj.name)
+        space = acc.space_get('%sVdcConsumption' % account.model.dbobj.name, g8client.model.data.url.split('.')[0])
+        while space.model['status'] != 'DEPLOYED':
+            time.sleep(3)
+            space = acc.space_get('%sVdcConsumption' % account.model.dbobj.name, g8client.model.data.url.split('.')[0])
         API_URL = url + '/restmachine/cloudapi/accounts/getConsumption?accountId={id}&start={start}&end={end}'.format(id=accountData.accountID,
                                                                                                                       start=accountData.consumptionFrom,
                                                                                                                       end=accountData.consumptionTo)
 
         response = session.get(url=API_URL)
-        with open('%s/account.zip' % accountData.consumptionLocation, 'r') as f:
-            if f.read() == response.content.decode("utf-8"):
-                service.model.data.result = 'RESULT_OK : test_create_accounts_with_specs'
-            else:
-                service.model.data.result = 'RESULT_FAILED : test_create_accounts_with_specs'
+        if account.model.data.consumptionData == response.content:
+            service.model.data.result = 'RESULT_OK : test_create_accounts_with_specs'
+        else:
+            service.model.data.result = 'RESULT_FAILED : test_create_accounts_with_specs'
     except:
         service.model.data.result = 'RESULT_ERROR :  %s %s' % ('test_create_accounts_with_specs', str(sys.exc_info()[:2]))
     finally:
         if 'g8client' in service.producers and 'account' in service.producers:
             session = authenticate(service.producers['g8client'][0])
             account = service.producers['account'][0]
+            cl = j.clients.openvcloud.getFromService(g8client)
+            acc = cl.account_get(account.model.dbobj.name)
+            space = acc.space_get('%sVdcConsumption' % account.model.dbobj.name, g8client.model.data.url.split('.')[0])
+            space.delete()
             API_URL = 'https://%s/restmachine/cloudapi/accounts/delete' % g8client.model.data.url
             API_BODY = {'accountId': account.model.data.accountID}
             session.post(url=API_URL, data=API_BODY)

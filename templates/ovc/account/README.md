@@ -22,11 +22,15 @@ This actor template is responsible for creating an account on any openVCloud env
 
 - maxDiskCapacity: The limit on the disk capacity that can be used by the account. Default: -1 (unlimited)
 
-- consumptionFrom: determines the start date of the required period to fetch the account consumption info from.
+- consumptionFrom: determines the start date of the required period to fetch the account consumption info from. If left empty will be creation time of the account.
 
-- consumptionTo: determines the end date of the required period to fetch the account consumption info from.
+- consumptionTo: determines the end date of the required period to fetch the account consumption info from. If left empty will be consumptionfrom + 1 hour.
 
-- consumptionLocation: the directory the consumption info will be saved to(will be saved as 'account.zip' in the directory).
+- consumptionData: consumption data will be saved here as series of bytes which represents a zip file. example of writing the data:
+```
+with open('/tmp/account.zip', 'wb') as f:
+    f.write(service.model.data.consumptionData)
+```
 
 ## Add/remove/update user
 
@@ -142,7 +146,6 @@ account__acc:
   g8client: 'env'
   consumptionFrom: <start epoch>
   consumptionTo: <end epoch>
-  consumptionLocation: '<download location>'
 
 actions:
   - action: get_consumption
