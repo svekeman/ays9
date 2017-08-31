@@ -6,7 +6,7 @@
 * [Create a Repository](Create_repository/README.md)
 * [Create a Blueprint](Create_blueprint/README.md)
 * [Execute a Blueprint](Execute_blueprint/README.md)
-* [Debug Actor Templates](Debug_actor_template/README.md)
+* [Debug Actor Templates](Debug_actor_templates/README.md)
 
 
 ## Working with OpenvCloud Templates

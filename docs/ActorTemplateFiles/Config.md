@@ -11,7 +11,7 @@ In the (optional) `config.yaml` file of an [actor template](../Definitions/Actor
 
 ## Documentation
 
-In the `doc` section of the `config.yaml` you can document to meaning of the AYS service attributes.
+In the `doc` section of the `config.yaml` you can document the AYS service attributes.
 
 Here's an example:
 ```yaml
@@ -22,13 +22,13 @@ doc:
 
 ## Relations
 
-Relations is about the relations with - or dependencies of an AYS service to - other AYS services.
+Relations is about the relations with - or dependencies to - other AYS services.
 
 Two kind of relations can be defined:
 - [Producer-Consumer](#producer-consumer) relations
 - [Parent-Child](#parent-child) relations
 
-Both are types a relations are configured in the `links` section of `config.yaml`.
+Both types of relations are configured in the `links` section of `config.yaml`.
 
 <a id="producer-consumer"></a>
 ### Producers & consumers
@@ -37,7 +37,7 @@ Each service can consume a service delivered by another "producing" AYS service.
 
 It basically indicates that the AYS service is dependent on another AYS service, and that it can not be instantiated before the other `producing` AYS services has been instantiated.
 
-AYS uses this insight to:
+AYS uses this to:
 - Decide the order in which AYS services need to be instantiated
 - Automaticly instantiate depending AYS services when not specified explicitly
 - And most importantly, for self-healing purposes
@@ -45,7 +45,6 @@ AYS uses this insight to:
 The consumption of another service is specified in the `config.yaml` file of the actor template, using the `consume` keyword in the `links` section.
 
 Here's an example:
-
 ```yaml
 doc:
   property:
@@ -60,13 +59,13 @@ links:
     auto: true
 ```
 
-This describes that the AYS service consumes a minimum of `3` and a maximum of `100` `sshkey` AYS service instances, and that it should auto-create these instances if they don't already exist. The `min` and `max` tags are optional, they both default to `1`. The `auto` tag is also optional. Setting `max` to `0` means that there is no limit. Also `argname` is optional. It allows you to pass tha name to the producing AYS service to an attribute that has a name that is different from the producing actor template name, as is the case in this example.
+This describes that the AYS service consumes a minimum of `3` and a maximum of `100` `sshkey` AYS service instances, and that it should auto-create these instances if they don't already exist. The `min` and `max` tags are optional, they both default to `1`. The `auto` tag is also optional. Setting `max` to `0` means that there is no limit. Also `argname` is optional. It allows you to pass the name to the producing AYS service to an attribute that has a name that is different from the producing actor template name, as is the case in this example.
 
-Here's an example of a blueprint for creating an AYS service that depends on at least three AYS service instances created from the `sshkey` actor template, with the above `config.yaml`:
+Here's an example of a blueprint for creating an AYS service that depends on at least three `sshkey` AYS service instances created, with the above `config.yaml`:
 
 ![](Images/producer-consumer1.png)
 
-In the above example four `sshkey` AYS service instances are defined in the blueprint. Alternativelly you can ommit the explicit definitions of the `sshkey` AYS service instances, and let AYS auto-create them, and since the minimum was set to three instances, only three of them will be created. Also note that AYS will give them auto-generated names, in this case `auto1`, `auto2` and `auto3`.
+In this example blueprint four `sshkey` AYS service instances are explicitly defined. Alternativelly you can omit the explicit definitions of the `sshkey` AYS service instances, and let AYS auto-create them, and since the minimum was set to three instances, (only) three of them will be created. Also note that AYS will give them auto-generated names, in this case `auto1`, `auto2` and `auto3`.
 
 ![](Images/producer-consumer2.png)
 
@@ -111,10 +110,9 @@ Taking again the example from above, here each `actorXYZ` AYS service instance h
 
 ![](Images/parent-child.png)
 
-To clarify how AYS hierarchically organizes AYS services that have a parent-child relationship consider the following additional example:
+To clarify how AYS hierarchically organizes AYS services that have a parent-child relationship consider the following additional example.
 
-Considering the following blueprint:
-
+Considering this blueprint:
 ```yaml
 datacenter__eu:
     location: 'Europe'
@@ -148,7 +146,6 @@ rack__storage4:
 In this example the `rack` AYS service uses the datacenter AYS service as parent.
 
 AYS will create the following tree in the AYS repository when instantiating the AYS services:
-
 ```shell
 $ tree services/
 services/
@@ -178,7 +175,7 @@ services/
     └── service.json
 ```
 
-Or a real OpenvCloud example:
+And finally, here is am OpenvCloud example:
 
 ![](Images/typical-example.png)
 
