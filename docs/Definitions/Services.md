@@ -4,15 +4,19 @@ AYS is an application lifecycle management system for cloud applications.
 
 Each application or application component managed by AYS is represented by an AYS service.
 
-So an AYS service can be seen as an AYS server-hosted proxy for a cloud application or any of its components.
+So an AYS service can be seen as an AYS server-hosted "proxy" for a cloud application or any of its components.
+
+An AYS service "lives" in an AYS server:
+
+![](Images/services.png)
 
 It has the following application lifecycle management functions:
-- Install the actual application and all its components
-- Start, restart, stop the application or any of its components
-- Monitor the application and all its compenents, and take appropriate actions when needed
-- Perform backup, restore operations, self-healing and auto-scaling operations
-- Uninstall the application and all its components
-- Other application-specific management functions
+- **Install** the actual application and all its components
+- **Start, restart and stop** the application or any of its components
+- **Monitor** the application and all its components, and take appropriate actions when needed
+- Perform **backup and restore** operations, **self-healing** and **auto-scaling** operations
+- **Uninstall** the application and all its components
+- Other **application-specific** management functions
 
 AYS services are instantiated by executing AYS blueprints, discussed in [Blueprints](Blueprints.md).
 

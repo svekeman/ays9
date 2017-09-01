@@ -36,7 +36,7 @@ Each application or application component managed by AYS is represented by an AY
 
 So an AYS service can be seen as an AYS server-hosted proxy for an application or any of its components.
 
-A service is an abstraction for almost anything:
+An AYS service is an abstraction for almost anything:
 
 - Simple package i.e. `MongoDB`
 - Server cluster i.e. `MongoDB cluster`
