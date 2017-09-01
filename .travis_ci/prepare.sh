@@ -1,33 +1,14 @@
 #!/bin/bash
 
-# # generate ssh keys
-# ssh-keygen -t rsa -N "" -f ~/.ssh/main
-# export SSHKEYNAME=main
-#
-# export GIGSAFE=1
-# export GIGDEVELOPERBRANCH=master
-#
-# curl https://raw.githubusercontent.com/Jumpscale/developer/$GIGDEVELOPERBRANCH/jsinit.sh?$RANDOM > /tmp/jsinit.sh; bash /tmp/jsinit.sh
-#
-# # build image
-# source ~/.jsenv.sh
-# js9_build -l
-#
-
-# docker using bash installers
-sudo su -
+# Install ays9 in a docker contianer using bash installers
 ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
 
-export ZUTILSBRANCH=fixes
-export ZBRANCH=9.1.1_remove_gigdir
+export ZUTILSBRANCH=${ZUTILSBRANCH:-master}
+
 curl https://raw.githubusercontent.com/Jumpscale/bash/$ZUTILSBRANCH/install.sh?$RANDOM > /tmp/install.sh;sudo -E bash /tmp/install.sh
-source /opt/code/github/jumpscale/bash/zlibs.sh
-ZCodeGetJS
-ZDockerInstallLocal
+sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZCodeGetJS"
+sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZDockerInstallLocal"
 eval $(ssh-agent)
 ssh-add
-# ZInstaller_js9_full
-# docker stop build
-ZInstall_ays9
-docker stop build
-# ZDockerActive -b jumpscale/ays9 -i ays9
+sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZInstall_ays9"
+sudo -HE docker stop build
