@@ -4,7 +4,7 @@
 
 The elevator pitch:
 - AYS is an abbreviation for "At Your Service"
-- AYS is an application lifecycle management system for cloud infrastructure and applications
+- AYS is an "[Infrastructure as Code](https://en.wikipedia.org/wiki/Infrastructure_as_Code)" application lifecycle management system for cloud infrastructure and applications
 - AYS is installed as part of a JumpScale
 
 AYS combines functions such as:
