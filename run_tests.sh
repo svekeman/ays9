@@ -1,4 +1,6 @@
 #!/bin/bash
+eval $(ssh-agent)
+ssh-add
 
 # Start ays9 container
 sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZDockerActive -b jumpscale/ays9 -i ays9"
