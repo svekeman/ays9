@@ -181,7 +181,7 @@ And finally, here is an OpenvCloud example:
 
 Here the relations are defined as follows:
 
-![](Imgages/ovc-links.png)
+![](Images/ovc-links.png)
 
 You can check the actual actual templates files for the above OpenvCloud example here:
 - [sshkey](https://github.com/Jumpscale/ays9/tree/master/templates/clients/sshkey)
