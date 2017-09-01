@@ -175,9 +175,13 @@ services/
     └── service.json
 ```
 
-And finally, here is am OpenvCloud example:
+And finally, here is an OpenvCloud example:
 
-![](Images/typical-example.png)
+![](Images/ovc-example.png)
+
+Here the relations are defined as follows:
+
+![](Imgages/ovc-links.png)
 
 You can check the actual actual templates files for the above OpenvCloud example here:
 - [sshkey](https://github.com/Jumpscale/ays9/tree/master/templates/clients/sshkey)
