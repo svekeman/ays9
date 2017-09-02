@@ -70,7 +70,7 @@ events:
 
 See [Actor Configuration](../ActorTemplateFiles/Config.md) for more details about the `events` section.
 
-This configuration will schedule the actions `install()` and `actionX()` for execution every thime the event `install_mynode` happens in the events channel `telegram`.
+This configuration will schedule the actions `install()` and `actionX()` for execution every time the event `install_mynode` happens in the events channel `telegram`.
 
 Note that actions can also be registered as event handlers at run time, using code. This and more details about events is covered in [Events](Events.md).
 
