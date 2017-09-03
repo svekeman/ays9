@@ -185,7 +185,7 @@ def _authorization_user(machine, service, action=""):
     try:
         machine_info = machine.client.api.cloudapi.machines.get(machineId=machine.id)
     except ApiError as err:
-        j.logger.logging.error(
+        service.logger.error(
             'Failed to retrieve machine information for machine {}. Error: {}'.format(machine.id, err)
         )
         raise
@@ -206,29 +206,29 @@ def _authorization_user(machine, service, action=""):
                                 machineId=machine.id, userId=user, accesstype=uvdc.accesstype
                             )
                         except ApiError as err:
-                            service.logger.logging.error(
+                            service.logger.error(
                                 """
-                                Failed to register access rights for user {} on machine {}. 
+                                Failed to register access rights for user {} on machine {}.
                                 Error: {}
                                 """.format(user, machine.name, err)
                             )
                             raise
                         if result is not True:
-                            service.logger.logging.error(
+                            service.logger.error(
                                 'Failed to register access rights for user {} on machine {}'.format(user, machine.name)
                             )
             elif action == 'delete':
-                service.logger.logging.warning(
+                service.logger.warning(
                     'User {} does not have access rights on machine {}'.format(user, machine.name)
                 )
             else:
                 # user is not registered while action is not add,
                 # then we need to fail to prevent users from registering users by mistake
                 msg = """
-                User {} is not registered to have access rights on machine {}. 
+                User {} is not registered to have access rights on machine {}.
                 If you want to register user, please use add_user action
                 """.format(user, machine.name)
-                service.logger.logging.error(msg)
+                service.logger.error(msg)
                 raise RuntimeError(msg)
 
         else:
@@ -242,23 +242,23 @@ def _authorization_user(machine, service, action=""):
                                 machineId=machine.id, userId=user, accesstype=uvdc.accesstype
                             )
                         except ApiError as err:
-                            service.logger.logging.error(
+                            service.logger.error(
                                 """
-                                Failed to update access rights for user {} on machine {}. 
+                                Failed to update access rights for user {} on machine {}.
                                 Error: {}""".format(user, machine.name, err)
                             )
                             raise
                         if result is not True:
-                            service.logger.logging.error(
+                            service.logger.error(
                                 'Failed to update access rights for user {} on machine {}'.format(user, machine.name)
                             )
                     elif action == 'delete':
                         try:
                             machine.client.api.cloudapi.machines.deleteUser(machineId=machine.id, userId=user)
                         except ApiError as err:
-                            service.logger.logging.error(
+                            service.logger.error(
                                 """
-                                Failed to delete access rights for user {} on machine {}. 
+                                Failed to delete access rights for user {} on machine {}.
                                 Error: {}""".format(user, machine.name, err)
                             )
                             raise
