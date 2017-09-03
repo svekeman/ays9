@@ -132,7 +132,6 @@ class Run:
             self.state = 'error'
             raise
         finally:
-            import ipdb; ipdb.set_trace()
             if self.callbackUrl:
                 data = {'runid': self.key, 'runState': self.state.__str__()}
                 requests.post(self.callbackUrl, headers={'Content-type': 'application/json'}, data=json.dumps(data))
