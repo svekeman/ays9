@@ -247,6 +247,7 @@ async def listRuns(request, repository):
 
     return json(runs, 200)
 
+
 async def createRun(request, repository):
     '''
     Create a run based on all the action scheduled. This call returns an AYSRun object describing what is going to hapen on the repository.
@@ -255,12 +256,13 @@ async def createRun(request, repository):
     using the 'GET /ays/repository/{repository}/aysrun/{aysrun_key}' endpoint
     It is handler for POST /ays/repository/<repository>/aysrun
     '''
+    import requests
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
         return json({'error': e.message}, 404)
-
     simulate = j.data.types.bool.fromString(request.args.get('simulate', 'False'))
+    callback_url = request.args.get('callback_url')
 
     try:
         to_execute = repo.findScheduledActions()
@@ -268,10 +270,14 @@ async def createRun(request, repository):
         run.save()
         if not simulate:
             await repo.run_scheduler.add(run)
+        if callback_url:
+            run.callbackUrl = callback_url
+            run.save()
         return json(run_view(run), 200)
 
     except j.exceptions.Input as e:
         return json({'error': e.msgpub}, 500)
+
 
 async def getRun(request, aysrun, repository):
     '''
@@ -696,7 +702,7 @@ async def deleteServiceByName(request, name, role, repository):
         error_msg = "Error during deletion of service:\n %s" % str(e)
         j.atyourservice.server.logger.exception(error_msg)
         return json({'error': str(e)}, 403)
- 
+
     return json({}, 204)
 
 
