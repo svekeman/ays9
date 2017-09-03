@@ -247,6 +247,7 @@ async def listRuns(request, repository):
 
     return json(runs, 200)
 
+
 async def createRun(request, repository):
     '''
     Create a run based on all the action scheduled. This call returns an AYSRun object describing what is going to hapen on the repository.
@@ -270,12 +271,14 @@ async def createRun(request, repository):
         if not simulate:
             await repo.run_scheduler.add(run)
         if callback_url:
+            run.callbackUrl = callback_url
             data = {'runid': run.key, 'runState': run.state.__str__()}
             requests.post(callback_url, headers={'Content-type': 'application/json'}, data=JSON.dumps(data))
         return json(run_view(run), 200)
 
     except j.exceptions.Input as e:
         return json({'error': e.msgpub}, 500)
+
 
 async def getRun(request, aysrun, repository):
     '''
