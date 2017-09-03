@@ -12,4 +12,3 @@ sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZDockerInstal
 eval $(ssh-agent)
 ssh-add
 sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZInstall_ays9"
-sudo -HE docker stop build
