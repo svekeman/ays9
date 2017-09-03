@@ -272,8 +272,7 @@ async def createRun(request, repository):
             await repo.run_scheduler.add(run)
         if callback_url:
             run.callbackUrl = callback_url
-            data = {'runid': run.key, 'runState': run.state.__str__()}
-            requests.post(callback_url, headers={'Content-type': 'application/json'}, data=JSON.dumps(data))
+            run.save()
         return json(run_view(run), 200)
 
     except j.exceptions.Input as e:
