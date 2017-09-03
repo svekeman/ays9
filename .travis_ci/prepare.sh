@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Install ays9 in a docker contianer using bash installers
 ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
