@@ -16,8 +16,9 @@ class JobModel(ModelBase):
                                           self.dbobj.actionName, self.dbobj.serviceKey), returnIndex=True)
         for matched in res:
             self.collection._index.index_remove(matched[0])
-        ind = "%s:%s:%s:%s:%s:%s" % (self.dbobj.actorName, self.dbobj.serviceName,
-                                     self.dbobj.actionName, self.dbobj.state, self.dbobj.serviceKey, self.dbobj.lastModDate)
+        ind = "%s:%s:%s:%s:%s:%s:%s" % (self.dbobj.actorName, self.dbobj.serviceName,
+                                     self.dbobj.actionName, self.dbobj.state, self.dbobj.serviceKey,
+                                     self.dbobj.lastModDate, ''.join(self.dbobj.tags)) # maybe tags should be alphabetically ordered to avoid creating multipule indices
         self.collection._index.index({ind: self.key})
 
     def log(self, msg, level=5, category="msg", epoch=None, tags=''):
@@ -141,8 +142,10 @@ class JobModel(ModelBase):
     def delete(self):
         # delete actual model object
         if self.collection._db.exists(self.key):
-            index = "%s:%s:%s:%s:%s:%s" % (self.dbobj.actorName, self.dbobj.serviceName,
-                                         self.dbobj.actionName, self.dbobj.state, self.dbobj.serviceKey, self.dbobj.lastModDate)
+            index = "%s:%s:%s:%s:%s:%s:%s" % (self.dbobj.actorName, self.dbobj.serviceName,
+                                              self.dbobj.actionName, self.dbobj.state,
+                                              self.dbobj.serviceKey, self.dbobj.lastModDate,
+                                              ''.join(self.dbobj.tags))
             self.collection._index.index_remove(keys=index)
             self.collection._db.delete(self.key)
             self.logger.handlers = []
