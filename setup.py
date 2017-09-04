@@ -65,7 +65,7 @@ setup(
         'JumpScale9>=9.1.1',
         'JumpScale9Lib>=9.1.1',
         'jsonschema>=2.6.0',
-        'python-jose>=1.3.2',
+        'python-jose==1.3.2',
         'sanic>=0.5.4'
     ],
     cmdclass={
