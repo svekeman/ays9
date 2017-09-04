@@ -26,10 +26,11 @@ This actor template is responsible for creating an account on any openVCloud env
 
 - consumptionTo: determines the end date of the required period to fetch the account consumption info from. If left empty will be consumptionfrom + 1 hour.
 
-- consumptionData: consumption data will be saved here as series of bytes which represents a zip file. example of writing the data:
+- consumptionData: consumption data will be saved here as series of bytes which represents a zip file. Example of writing the data:
 ```
+service = response.json() # response is the service view that can be obtained from getServiceByName
 with open('/tmp/account.zip', 'wb') as f:
-    f.write(service.model.data.consumptionData)
+    f.write(service['data']['consumptionData'])
 ```
 
 ## Add/remove/update user
