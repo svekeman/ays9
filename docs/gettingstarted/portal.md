@@ -11,8 +11,8 @@ In the JumpScale interactive shell ('js9') execute:
 ```python
 prefab = j.tools.prefab.local
 prefab.apps.portal.install()
-prefab.solutions.cockpit.install(ip="<Zero-Tier-IP-address>")
 ```
+
 
 This will install and start the AYS Portal on port 8200: http://<Zero-Tier-IP-address>:8200/.
 
@@ -70,3 +70,5 @@ Now restart the portal:
 cd /opt/jumpscale9/apps/portals/main
 python3 portal_start.py
 ```
+
+Also see the [AYS Portal](../AYS-Portal/README.md) documentation.
