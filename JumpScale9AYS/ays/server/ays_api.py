@@ -15,11 +15,12 @@ from js9 import j
 
 logger = j.logger.get('j.ays.sanic')
 
-Blueprint_schema = JSON.load(open(j.sal.fs.joinPaths(j.sal.fs.getParent(__file__),'schema/Blueprint_schema.json')))
-Repository_schema = JSON.load(open(j.sal.fs.joinPaths(j.sal.fs.getParent(__file__),'schema/Repository_schema.json')))
-TemplateRepo_schema = JSON.load(open(j.sal.fs.joinPaths(j.sal.fs.getParent(__file__),'schema/TemplateRepo_schema.json')))
+Blueprint_schema = JSON.load(open(j.sal.fs.joinPaths(j.sal.fs.getParent(__file__), 'schema/Blueprint_schema.json')))
+Repository_schema = JSON.load(open(j.sal.fs.joinPaths(j.sal.fs.getParent(__file__), 'schema/Repository_schema.json')))
+TemplateRepo_schema = JSON.load(open(j.sal.fs.joinPaths(j.sal.fs.getParent(__file__), 'schema/TemplateRepo_schema.json')))
 
 AYS_REPO_DIR = j.dirs.VARDIR + '/cockpit_repos'
+
 
 async def reload(request):
     try:
@@ -27,6 +28,7 @@ async def reload(request):
         return json({})
     except Exception as e:
         return json({'error': e.message}, 500)
+
 
 async def addTemplateRepo(request):
     '''
@@ -51,6 +53,7 @@ async def addTemplateRepo(request):
 
     return json({'message': 'repo added'}, 201)
 
+
 async def listRepositories(request):
     '''
     list all repositorys
@@ -62,6 +65,7 @@ async def listRepositories(request):
         return json([])
     repos = [repository_view(repo) for repo in j.atyourservice.server.aysRepos.list()]
     return json(repos)
+
 
 async def createRepository(request):
     '''
@@ -103,6 +107,7 @@ async def getRepository(request, repository):
     except j.exceptions.NotFound as e:
         return json({'error': e.message}, 404)
 
+
 async def deleteRepository(request, repository):
     '''
     Delete a repository
@@ -112,13 +117,14 @@ async def deleteRepository(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     await repo.delete()
     if j.sal.fs.exists(repo.path):
         j.sal.fs.removeDirTree(repo.path)
 
     return json({}, 204)
+
 
 async def destroyRepository(request, repository):
     '''
@@ -129,7 +135,7 @@ async def destroyRepository(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     await repo.destroy()
 
@@ -240,12 +246,13 @@ async def listRuns(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     runs = repo.runsList()
     runs = [{'key': run.model.key, 'epoch': run.model.dbobj.lastModDate, 'state': str(run.state)} for run in runs]
 
     return json(runs, 200)
+
 
 async def createRun(request, repository):
     '''
@@ -261,6 +268,7 @@ async def createRun(request, repository):
         return json({'error': e.message}, 404)
 
     simulate = j.data.types.bool.fromString(request.args.get('simulate', 'False'))
+    callback_url = request.args.get('callback_url', None)
 
     try:
         to_execute = repo.findScheduledActions()
@@ -273,6 +281,7 @@ async def createRun(request, repository):
     except j.exceptions.Input as e:
         return json({'error': e.msgpub}, 500)
 
+
 async def getRun(request, aysrun, repository):
     '''
     Get an aysrun
@@ -281,12 +290,12 @@ async def getRun(request, aysrun, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     try:
         aysrun_model = repo.runGet(aysrun)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     aysrun = aysrun_model.objectGet()
     return json(run_view(aysrun), 200)
@@ -313,6 +322,40 @@ async def getJob(request, jobid, repository):
     return json(job_view(jobobj), 200)
 
 
+async def listJobs(request, actor="", service="", action="", state="", serviceKey="", fromEpoch=0, toEpoch=9999999999999, tags=[]):
+    '''
+    List all jobs that match the filters.
+    returns requested fields
+    '''
+
+    fields = request.args.get('fields', '')
+    actor = request.args.get('actor', '')
+    service = request.args.get('service', '')
+    action = request.args.get('action', '')
+    state = request.args.get('state', '')
+    serviceKey = request.args.get('serviceKey', '')
+    fromEpoch = request.args.get('fromEpoch', 0)
+    toEpoch = request.args.get('toEpoch', 9999999999999)
+    tags = request.args.get('tags', '')
+
+    tags = [tag.strip() for tag in tags.split(',') if tag.strip()]
+    fields = [field.strip() for field in fields.split(',') if field.strip()]
+    result = list()
+
+    for job in j.core.jobcontroller.db.jobs.find(actor=actor, service=service, action=action, state=state, serviceKey=serviceKey, fromEpoch=fromEpoch, toEpoch=toEpoch, tags=tags):
+        data = {'actor': job.dbobj.actorName, 'service': job.dbobj.serviceName, 'action': job.dbobj.actionName, 'state': str(job.dbobj.state), 'data': dict()}
+
+        for field in fields:
+            if not hasattr(job.dbobj, field):
+                return json('No such field "{}" in job "{}" data'.format(field, job), 400)
+            data['data'][field] = _sanitize(getattr(job.dbobj, field))
+        result.append(data)
+    result = sorted(result, key=lambda job: job['actor'])
+    return json(result, 200)
+
+
+
+
 async def deleteRun(request, aysrun, repository):
     '''
     Delete an aysrun
@@ -321,7 +364,7 @@ async def deleteRun(request, aysrun, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     try:
         repo.runDelete(aysrun)
@@ -361,7 +404,7 @@ async def listBlueprints(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
     include_archived = j.data.types.bool.fromString(request.args.get('archived', 'True'))
     blueprints = [{'name': blueprint.name} for blueprint in repo.blueprints]
 
@@ -423,7 +466,7 @@ async def getBlueprint(request, blueprint, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     bp = None
     blueprints = repo.blueprints + repo.blueprintsDisabled
@@ -432,7 +475,7 @@ async def getBlueprint(request, blueprint, repository):
             bp = item
             break
     else:
-        return json({'error':"No blueprint found with this name '%s'" % blueprint}, 404)
+        return json({'error': "No blueprint found with this name '%s'" % blueprint}, 404)
 
     return json(blueprint_view(bp), 200)
 
@@ -459,7 +502,7 @@ async def executeBlueprint(request, blueprint, repository):
         inputs = request.json
         message = inputs.get('message') if inputs else None
         jobkeys, msg = await repo.blueprintExecute(path=bp.path, context={'token': extract_token(request)},
-                                              message=message)
+                                                   message=message)
 
     except j.exceptions.Input as inputEx:
         error_msg = "Input Exception : \n %s" % str(inputEx)
@@ -488,7 +531,7 @@ async def updateBlueprint(request, blueprint, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     inputs = request.json
     try:
@@ -501,7 +544,7 @@ async def updateBlueprint(request, blueprint, repository):
     names = [bp.name for bp in repo.blueprints]
     names.extend([bp.name for bp in repo.blueprintsDisabled])
     if name not in names:
-        return json({'error':"blueprint with the name %s not found" % name}, 404)
+        return json({'error': "blueprint with the name %s not found" % name}, 404)
     # write content to the old file, then rename to the new name
     blueprint_path = j.sal.fs.joinPaths(repo.path, 'blueprints', name)
     blueprint = repo.blueprintGet(blueprint_path)
@@ -521,6 +564,7 @@ async def updateBlueprint(request, blueprint, repository):
         blueprint = repo.blueprintGet(new_path)
         return json(blueprint_view(blueprint), 200)
 
+
 async def deleteBlueprint(request, blueprint, repository):
     '''
     delete blueprint
@@ -529,7 +573,7 @@ async def deleteBlueprint(request, blueprint, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     by_names = {bp.name: bp for bp in repo.blueprints}
     for bp in repo.blueprintsDisabled:
@@ -545,6 +589,7 @@ async def deleteBlueprint(request, blueprint, repository):
 
     return json({}, 204)
 
+
 async def archiveBlueprint(request, blueprint, repository):
     '''
     archive the blueprint
@@ -553,15 +598,16 @@ async def archiveBlueprint(request, blueprint, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     by_names = {bp.name: bp for bp in repo.blueprints}
     if blueprint not in by_names:
-        return json({'error':"blueprint with the name %s not found" % blueprint}, 404)
+        return json({'error': "blueprint with the name %s not found" % blueprint}, 404)
 
     by_names[blueprint].disable()
 
-    return json({'msg':'Blueprint %s archived' % blueprint}, 200)
+    return json({'msg': 'Blueprint %s archived' % blueprint}, 200)
+
 
 async def restoreBlueprint(request, blueprint, repository):
     '''
@@ -572,15 +618,16 @@ async def restoreBlueprint(request, blueprint, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     by_names = {bp.name: bp for bp in repo.blueprintsDisabled}
     if blueprint not in by_names:
-        return json({'error':"blueprint with the name %s not found" % blueprint}, 404)
+        return json({'error': "blueprint with the name %s not found" % blueprint}, 404)
 
     by_names[blueprint].enable()
 
-    return json({'msg':'Blueprint %s restored' % blueprint}, 200)
+    return json({'msg': 'Blueprint %s restored' % blueprint}, 200)
+
 
 async def listServices(request, repository):
     '''
@@ -590,11 +637,11 @@ async def listServices(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     services = list()
     for s in repo.services:
-         services.append({'role': s.model.role, 'name': s.name})
+        services.append({'role': s.model.role, 'name': s.name})
     services = sorted(services, key=lambda service: service['role'])
 
     return json(services, 200)
@@ -621,6 +668,7 @@ def _sanitize(value):
     else:
         return value
 
+
 async def listServicesByRole(request, role, repository):
     '''
     List all services of role 'role' in the repository
@@ -629,20 +677,21 @@ async def listServicesByRole(request, role, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     parent = request.args.get('parent', '')
     fields = request.args.get('fields', '')
 
     consumed_service = request.args.get('consume', '')
-    flatten = lambda l: [item for sublist in l for item in sublist]
+
+    def flatten(l): return [item for sublist in l for item in sublist]
 
     fields = [field.strip() for field in fields.split(',') if field.strip()]
     result = list()
     if consumed_service:
         consumed_service = "service:{}".format(consumed_service)
     for s in repo.servicesFind(role=role, parent=parent):
-        data = {'role': s.model.role, 'name': s.model.name, 'data':dict()}
+        data = {'role': s.model.role, 'name': s.model.name, 'data': dict()}
         if consumed_service:
             allproducer_services_lists = s.producers.values()
             all_svs = list(map(str, flatten(allproducer_services_lists)))
@@ -657,6 +706,7 @@ async def listServicesByRole(request, role, repository):
     result = sorted(result, key=lambda service: service['role'])
     return json(result, 200)
 
+
 async def getServiceByName(request, name, role, repository):
     '''
     Get a service name
@@ -666,11 +716,11 @@ async def getServiceByName(request, name, role, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     s = repo.serviceGet(role=role, instance=name, die=False)
     if s is None:
-        return json({'error':'Service not found'}, 404)
+        return json({'error': 'Service not found'}, 404)
 
     return json(service_view(s), 200)
 
@@ -683,14 +733,18 @@ async def deleteServiceByName(request, name, role, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
-
+        return json({'error': e.message}, 404)
 
     service = repo.serviceGet(role=role, instance=name, die=False)
     if service is None:
-        return json({'error':'Service role:%s name:%s not found in the repo %s' % (role, name, repository)}, 404)
+        return json({'error': 'Service role:%s name:%s not found in the repo %s' % (role, name, repository)}, 404)
 
-    await service.delete()
+    try:
+        await service.delete()
+    except j.exceptions.RuntimeError as e:
+        error_msg = "Error during deletion of service:\n %s" % str(e)
+        j.atyourservice.server.logger.exception(error_msg)
+        return json({'error': str(e)}, 403)
 
     return json({}, 204)
 
@@ -703,7 +757,7 @@ async def listActors(request, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     actors = [{'name': actor.model.name} for actor in repo.actors.values()]
 
@@ -718,7 +772,7 @@ async def getActorByName(request, name, repository):
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
-        return json({'error':e.message}, 404)
+        return json({'error': e.message}, 404)
 
     try:
         actor = repo.actorGet(name=name)

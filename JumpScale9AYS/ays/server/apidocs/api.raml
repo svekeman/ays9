@@ -229,6 +229,12 @@ types:
       state: string
       logs: Log[]
 
+  JobData:
+    properties:
+      jobid: string
+      state: string
+      data: object
+
   AYSStep:
      properties:
        number: integer
@@ -739,22 +745,68 @@ types:
                         type: Error
 
       /job:
-        /{jobid}:
-          uriParameters:
-            jobid:
-              type: string
           get:
-            displayName: getJob
-            description: Get a jobid
+            displayName: listJobs
+            description: List all jobs of the repository that match the filters
+            queryParameters:
+              actor:
+                description: Only list jobs of this actor
+                type:        string
+                required:    false
+              service:
+                description: Only list jobs of this service
+                type:        string
+                required:    false
+              action:
+                description: Only list jobs of this action
+                type:        string
+                required:    false
+              state:
+                description: Only list jobs with this state
+                type:        string
+                required:    false
+              serviceKey:
+                description: Only list jobs of this serviceKey
+                type:        string
+                required:    false
+              fromEpoch:
+                description: Only list jobs from this epoch
+                type:        integer
+                required:    false
+              toEpoch:
+                description: Only list jobs till this epoch
+                type:        integer
+                required:    false
+              tags:
+                description: comma-seperated list of tags to be included
+                type:        string
+                required:    false
+              fields:
+                description: comma-seperated list of fields to be included in the response
+                type:        string
+                required:    false
+
             responses:
               200:
                 body:
                   application/json:
-                    type: Job
-              404:
-                body:
-                  application/json:
-                    type: Error
+                    type: JobData[]
+          /{jobid}:
+            uriParameters:
+              jobid:
+                type: string
+            get:
+              displayName: getJob
+              description: Get a jobid
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Job
+                404:
+                  body:
+                    application/json:
+                      type: Error
 
 
 /webhooks:
