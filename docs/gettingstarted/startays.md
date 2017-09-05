@@ -18,7 +18,7 @@ Running AYS in production mode means that the ItsYou.online integration will be 
 
 The value for the configuration key `organization` needs to match with the name of an ItsYou.online organization name. If not yet created one, login to [ItsYou.online](http://ItsYou.online) and create a new organization:
 
-![](Images/create-organization.png)
+![](Images/create-organization-1.png)
 
 With the below command we make AYS listen on port 5000 on all interfaces:
 ```shell
@@ -42,11 +42,11 @@ You need to create an API key in order to generate a valid JWT.
 
 Login to [ItsYou.online](http://ItsYou.online), click **+ ADD** on the **Settings** tab of your organization, and label the API with any label:
 
-![](Images/create-api-key1.png)
+![](Images/create-ays-key1.png)
 
 Click **Create**, copy the generated secret value for later use, and then close the dialog.
 
-![](Images/create-api-key2.png)
+![](Images/create-ays-key2.png)
 
 
 <a id="generate-jwt"></a>
