@@ -327,20 +327,28 @@ async def listJobs(request, actor="", service="", action="", state="", serviceKe
     List all jobs that match the filters.
     returns requested fields
     '''
+
     fields = request.args.get('fields', '')
+    actor = request.args.get('actor', '')
+    service = request.args.get('service', '')
+    action = request.args.get('action', '')
+    state = request.args.get('state', '')
+    serviceKey = request.args.get('serviceKey', '')
+    fromEpoch = request.args.get('fromEpoch', 0)
+    toEpoch = request.args.get('toEpoch', 9999999999999)
+    tags = request.args.get('tags', '')
 
-    def flatten(l): return [item for sublist in l for item in sublist]
-
+    tags = [tag.strip() for tag in tags.split(',') if tag.strip()]
     fields = [field.strip() for field in fields.split(',') if field.strip()]
     result = list()
 
-    for job in j.core.jobcontroller.db.jobs.find(actor="", service="", action="", state="", serviceKey="", fromEpoch=0, toEpoch=9999999999999, tags=[]):
-        data = {'actor': job.model.actor, 'service': job.model.service, 'action': job.model.action, 'state': job.model.state, 'data': dict()}
+    for job in j.core.jobcontroller.db.jobs.find(actor=actor, service=service, action=action, state=state, serviceKey=serviceKey, fromEpoch=fromEpoch, toEpoch=toEpoch, tags=tags):
+        data = {'actor': job.dbobj.actorName, 'service': job.dbobj.serviceName, 'action': job.dbobj.actionName, 'state': str(job.dbobj.state), 'data': dict()}
 
         for field in fields:
-            if not hasattr(job.model.data, field):
+            if not hasattr(job.dbobj, field):
                 return json('No such field "{}" in job "{}" data'.format(field, job), 400)
-            data['data'][field] = _sanitize(getattr(job.model.data, field))
+            data['data'][field] = _sanitize(getattr(job.dbobj, field))
         result.append(data)
     result = sorted(result, key=lambda job: job['actor'])
     return json(result, 200)

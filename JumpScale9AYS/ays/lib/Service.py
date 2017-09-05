@@ -762,6 +762,7 @@ class Service:
         jobobj.dbobj.serviceKey = self.model.key
         jobobj.dbobj.state = "new"
         jobobj.dbobj.lastModDate = j.data.time.epoch
+        jobobj.dbobj.tags = args.get('tags', [])
         jobobj.args = args
         job = j.core.jobcontroller.newJobFromModel(jobobj)
         job.service = self

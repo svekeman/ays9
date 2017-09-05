@@ -79,10 +79,11 @@ class JobsCollection(ModelBaseCollection):
     def getIndexFromKey(self, key):
         job = self.get(key)
         if job:
+            tags = sorted(self.dbobj.tags, key=str.lower)
             ind = "%s:%s:%s:%s:%s:%s:%s" % (job.dbobj.actorName, job.dbobj.serviceName,
                                             job.dbobj.actionName, job.dbobj.state,
                                             job.dbobj.serviceKey, job.dbobj.lastModDate,
-                                            ''.join(self.dbobj.tags)) #alphabetical!
+                                            ''.join(tags))
             return ind
 
     def delete(self, actor="", service="", action="", state="", serviceKey="", fromEpoch=0, toEpoch=9999999999999, tags=[]):
