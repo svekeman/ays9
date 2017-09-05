@@ -84,7 +84,7 @@ oauth.client_secret:  '****'
 - `oauth.client_secret` is a client secret for the organization specified in `oauth.client_id`
 
 
-While you can specify the same organization for both `oauth.organization` and `oauth.client_id`, which can even be the same organization as specified in the [AYS Server Configuration](../gettingstarted/startays.md), it is supported to use 3 distinct ItsYou.online organizations. The below table clarifies how the three organizations are used.
+While you can specify the same organization for both `oauth.organization` and `oauth.client_id`, which can even be the same organization as specified in the [AYS Server Configuration](../../gettingstarted/startays.md), it is supported to use 3 distinct ItsYou.online organizations. The below table clarifies how the three organizations are used.
 
 ![](images/iyo-organizations.png)
 
