@@ -1,4 +1,7 @@
 #!bin/bash
+set -e
+
+js9 'j.clients.redis.get4core() or j.clients.redis.start4core()'
 
 echo "Starting AYS server"
 js9 'j.atyourservice.server.start(dev=True)'
@@ -19,7 +22,7 @@ done
 
 # run rq workers
 echo "Starting RQ workers"
-js9 "for index in range(10): j.tools.prefab.get().tmux.executeInScreen('main', 'rqworker{}'.format(index), cmd='rq worker', wait=0)"
+js9 "for index in range(10): j.tools.prefab.local.tmux.executeInScreen('main', 'rqworker{}'.format(index), cmd='rq worker', wait=0)"
 
 
 # running testsuite
