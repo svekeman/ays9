@@ -44,35 +44,48 @@ admingroups:
 authentication.method: 'me'
 gitlab.connection: 'main'
 force_oauth_instance: ''  # set to use oauth
-contentdirs:  ''
+contentdirs: ''
 
-production:  False
+production: False
 
-oauth.client_url:  'https://itsyou.online/v1/oauth/authorize'
-oauth.token_url:  'https://itsyou.online/v1/oauth/access_token'
-oauth.redirect_url:  'http://ae5d255c.ngrok.io/restmachine/system/oauth/authorize'
-oauth.client_scope:  'user:email:main,user:memberof:JSPortal'
+oauth.client_url: 'https://itsyou.online/v1/oauth/authorize'
+oauth.token_url: 'https://itsyou.online/v1/oauth/access_token'
+oauth.redirect_url: 'http://ae5d255c.ngrok.io/restmachine/system/oauth/authorize'
+oauth.client_scope: 'user:email:main,user:memberof:JSPortal'
+oauth.organization: 'testOrg'
 oauth.client_id:  'JSPortal'
 oauth.client_secret:  '8plUHNtpaQp8NExkRa-3MYa1SWkOr1mgEqRxGBm25DD78tHXiIlS'
 oauth.client_user_info_url:  'https://itsyou.online/api/users/'
 oauth.client_logout_url:  ''
-oauth.organization: testOrg
+
 oauth.default_groups:
     - admin
     - user
 ```
 
-In order activate ItsYou.online integration, you'll need to updated following items:
+In order to activate ItsYou.online integration, you'll need to update following items:
 ```yaml
 force_oauth_instance: 'itsyouonline'
 production: true
 
-oauth.redirect_url:  'http://172.25.226.34:8200/restmachine/system/oauth/authorize'
-oauth.client_scope:  'user:email:main,user:memberof:artilium-dev'
-oauth.client_id:  'artilium-dev'
+oauth.redirect_url: 'http://172.25.226.34:8200/restmachine/system/oauth/authorize'
+
+oauth.client_scope: 'user:email:main,user:memberof:organization-2'
+oauth.organization: 'organization-2'
+
+oauth.client_id: 'organization-3'
 oauth.client_secret:  '****'
-oauth.client_user_info_url:  'https://itsyou.online/api/users/'
-oauth.organization: artilium-dev
 ```
+
+- `force_oauth_instance` and `production` both need to be set as above in order to activate the ItsYou.online authorization
+- `oauth.redirect_url` specifies the callback URL that will be passed to ItsYou.online, update it with the URL where your AYS Portal is available
+- `oauth.client_scope` and `oauth.organization` both include the name of the ItsYou.online organization (here `organization-2`) to which you as an AYS Portal user need to be member; this can be the same organization as specified for `client_id`
+- `oauth.client_id` specifies the name of the ItsYou.online organization (here `organization-3`) as which the AYS Portal identifies itself to ItsYou.online; as an AYS Portal user you are not necessairly owner or member of this organization, but it is supported to specify the same organization as specified in ``oauth.organization``
+- `oauth.client_secret` is a client secret for the organization specified in `oauth.client_id`
+
+
+While you can specify the same organization for both `oauth.organization` and `oauth.client_id`, which can even be the same organization as specified in the [AYS Server Configuration](../gettingstarted/startays.md), it is supported to use 3 distinct ItsYou.online organizations. The below table clarifies how the three organizations are used.
+
+![](images/iyo-organizations.png)
 
 After having updated the configuration, you'll need to restart the portal. This is typically achieved by using CTRL+C in the TMUX window where the portal is running, and re-executing the last command.

@@ -1,18 +1,18 @@
 # Start AYS
 
-You will first want to review the configuation of your AYS server, as documented in [AYS Configuration](configuration.md).
+You will first want to review the configuation of your AYS server, as documented in [AYS Server Configuration](ays-server-configuration.md).
 
-Most importantly, in order to run AYS in **production mode** you need to update or add following two sections:
+Most importantly, in order to run AYS in **production mode** you need to update or add following two sections in `/optvar/cfg/jumpscale9.toml`:
 ```toml
 [ays]
 production = true
 
 [ays.oauth]
 jwt_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n27MjiGYvqalizeSWTHEpnd7oea9IQ8T5oJjMVH5cc0H5tFSKilFFeh//wngxIyny66+Vq5t5B0V0Ehy01+2ceEon2Y0XDkIKv"
-organization = ""
+organization = "organization-1"
 ```
 
-Running AYS in production mode means that the ItsYou.online integration will be activated. Once activated all interactions with AYS will require authentication against ItsYou.online. Using the RESTful API of AYS will then require a JWT in the HTTP header of all interactions. AYS will then use the public key of ItsYou.online as passed as a value for the configuration key `jwt_key` to verify the validity of the JWT, and check whether it was generated for the ItsYou.online organization as specified with the value for the configuration key `organization`.
+Running AYS in production mode means that the ItsYou.online integration will be activated. Once activated all interactions with AYS will require authentication against ItsYou.online. Using the RESTful API of AYS will then require a JWT in the HTTP header of all interactions. AYS will then use the public key of ItsYou.online as passed as a value for the configuration key `jwt_key` to verify the validity of the JWT, and check whether it was generated for the ItsYou.online organization as specified with the value (here `organization-1`) for the configuration key `organization`.
 
 > Note: the public key of ItsYou.online can be found and copied from the [JWT support documentation of ItsYou.online](https://gig.gitbooks.io/itsyouonline/content/oauth2/jwt.html))
 

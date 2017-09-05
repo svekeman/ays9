@@ -28,13 +28,16 @@ In order to activate ItsYou.online integration, you need to change the following
 force_oauth_instance: 'itsyouonline'
 production: true
 
-oauth.redirect_url:  'http://172.25.226.34:8200/restmachine/system/oauth/authorize'
-oauth.client_scope:  'user:email:main,user:memberof:artilium-dev'
-oauth.client_id:  'artilium-dev'
+oauth.redirect_url: 'http://172.25.226.34:8200/restmachine/system/oauth/authorize'
+oauth.client_scope: 'user:email:main,user:memberof:organization-2'
+oauth.organization: 'organization-2'
+oauth.client_id: 'organization-3'
 oauth.client_secret:  '****'
-oauth.client_user_info_url:  'https://itsyou.online/api/users/'
-oauth.organization: artilium-dev
 ```
+
+See [Installation of an AYS Portal](../AYS-Portal/installation/README.md) for details on how to use these configuation keys.
+
+> Note that you can specify for the same organization, in both `oauth.client_scope`, `oauth.organization` and `oauth.client_id`, and that it can actually be the same organization as specified when configuring the API Server, as documneted in [Start AYS](startays.md)
 
 Once updated restart the portal, typically by stopping the portal with CTRL+C in the TMUX window and simply re-executing  the last command.
 

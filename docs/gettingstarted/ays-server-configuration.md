@@ -1,4 +1,4 @@
-# AYS Configuration
+# AYS Server Configuration
 
 AYS is configured through a simple configuration file: `/optvar/cfg/jumpscale9.toml`:
 ```toml

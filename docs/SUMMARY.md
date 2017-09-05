@@ -43,7 +43,7 @@
 * [Getting Started](gettingstarted/README.md)
   * [Create a JS9 Docker Container](gettingstarted/js9.md)
   * [Start AYS](gettingstarted/startays.md)
-  * [AYS Configuration](gettingstarted/configuration.md)
+  * [AYS Server Configuration](gettingstarted/ays-server-configuration.md)
   * [Join Your ZeroTier Network](gettingstarted/zt.md)
   * [Start the AYS Portal](gettingstarted/portal.md)
   * [Install the Python client](gettingstarted/python.md)
