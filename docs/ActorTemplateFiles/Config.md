@@ -270,7 +270,7 @@ timeouts:
 
 ## Events
 
-An action get be registered as an event handler for an AYS event.
+An action can be registered as an event handler for an AYS event.
 
 This is done using an `events` section in the `config.yaml` of the template.
 
@@ -296,3 +296,5 @@ events:
         role: issue
         instance: myissue
 ```
+
+See [Events](../Definitions/Events/README.md) for an example of a "consuming" AYS service that handles the events triggered by another "producing" AYS service. The example as shows how to register an event handler using code, instead of doing it declaratively in the ` events` section. 
