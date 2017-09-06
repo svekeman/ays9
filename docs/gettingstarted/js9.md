@@ -1,6 +1,8 @@
 # Create a JS9 Docker Container
 
-In order to have your own AYS server creating a JumpScale9 Docker container is the easiest and quickest way, just follow the below steps.
+In order to have your own AYS server creating a JumpScale9 Docker container is the easiest and quickest way, just follow the instructions in the [jumpscale/developer](https://github.com/Jumpscale/developer) repository.
+
+Below is an example based on these instructions.
 
 Optionally first check if there is already JS9 Docker container running:
 ```shell
