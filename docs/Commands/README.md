@@ -30,7 +30,7 @@ Commands:
 
 ## Basic commands
 
-A typical flow in which you will execute the AYS commands is as follows:
+The following commands show you the typical order in which you sends commands:
 - [generate token](generatetoken.md) generates an ItsYou.online JWT token based on client_id and client_secret
 - [repo create](repo/create.md) creates a new AYS repository
 - [blueprint](blueprint/blueprint.md) executes one or more blueprints, converting them into AYS service instances
