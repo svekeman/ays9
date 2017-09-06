@@ -77,11 +77,11 @@ In the next example the blueprint defines two instances of the consuming `actorX
 <a id="part-child"></a>
 ### Parents & Children
 
-This is a special case of the [Producer-Consumer](producer-consumer) relation, where there can only be at most one parent for a child. The "producing" child AYS service can only be "consumed" by one parent AYS service. So while the producer-consumer relation can be one-to-many, a parent-child is always one-to-one consumer-parent relation.
+This is a special case of the [Producer-Consumer](producer-consumer) relation, where there can only be at most one parent for a child. The "consuming" child AYS service can only have one "producing" parent AYS service. So while the producer-consumer relation can be one-to-many, a parent-child is always one-to-one consumer-parent relation.
 
 AYS uses this to:
-- Prevent that a given child AYS service gets consumed by more than one parent
-- Organize the AYS services hierarchically in the `services` direcory of the AYS repository, grouping all children under their parent
+- Prevent that a given "consuming" child AYS service has more than one "producing" parent
+- Organize the AYS services hierarchically in the `services` direcory of the AYS repository, grouping all "consuming" children under their "producing" parent
 
 
 Here's an example:
