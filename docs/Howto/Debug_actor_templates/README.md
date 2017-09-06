@@ -22,7 +22,7 @@ ays actor update --name <actor-name>
 
 Schedule execution of the updated action:
 ```bash
-ays action <action-name> --actor <actor-name> --service <service-name>
+ays action <action-name> --force --actor <actor-name> --service <service-name>
 ```
 
 Create a new run:
