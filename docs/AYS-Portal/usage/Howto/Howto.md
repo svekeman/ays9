@@ -2,7 +2,6 @@
 
 * [Get an OAuth authorization code](Get_oauth_authorization_code/Get_oauth_authorization_code.md)
 * [Get an OAuth access token](Get_oauth_access_token/Get_oauth_access_token.md)
-* [Get a JWT](Get_JWT/Get_JWT.md)
 * [Create a repository](Create_repository/Create_repository.md)
 * [List all repositories](List_repositories/List_repositories.md)
 * [Create a blueprint](Create_blueprint/Create_blueprint.md)

@@ -1,8 +1,8 @@
 g8client__uk:
   url: uk-g8-1.demo.greenitglobe.com
-  login: yves
-  password: IAM4greenIT
-  account: Account of Yves
+  login: *****
+  password: *****
+  account: *****
 
 uservdc__yves:
   g8client: uk

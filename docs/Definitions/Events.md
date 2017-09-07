@@ -1,14 +1,18 @@
-## Events
+# Events
 
-To fire a new event you need to push a `payload` on the command queue. The payload has two keys:
-- `command`, where the event_name is set.
--  `args`, which is a list of event arguments.
+AYS services can trigger events and/or implement event handlers.
 
-#### Example
-Here we have a simple example around two actors `producer`and `consumer`, where `producer` executes a `longjob` and consumer wants to execute some specific action on that event.
+To fire a new event you need to push a `payload` on the command queue.
+
+The payload has two keys:
+- `command`, where the `event_name` is set
+- `args`, which is a list of event arguments
+
+
+Here's a simple example with two actors, `producer` and `consumer`, where `producer` has two actions `install` and `longjob`, both fires an event when finished execution, `consumer` has an event handler for both events:
 
 - producer
-    - schema.capnp
+    - schema.capnp:
     ```yaml
     @0xe7f7fbc7a590904f;
     struct Schema {
@@ -57,11 +61,3 @@ Here we have a simple example around two actors `producer`and `consumer`, where 
         print("************Producer done with the long job")
 
     ```
-
-
-    
-!!!
-title = "Events"
-date = "2017-04-08"
-tags = []
-```
