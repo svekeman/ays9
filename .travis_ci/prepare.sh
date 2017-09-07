@@ -8,5 +8,4 @@ export SSHKEYNAME=id_rsa
 export ZUTILSBRANCH=${ZUTILSBRANCH:-master}
 
 curl https://raw.githubusercontent.com/Jumpscale/bash/$ZUTILSBRANCH/install.sh?$RANDOM > /tmp/install.sh;sudo -E bash /tmp/install.sh
-sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZKeysLoad"
-sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZInstall_ays9 -f"
+sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZKeysLoad; ZInstall_ays9 -f"
