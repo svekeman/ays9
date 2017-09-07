@@ -2,9 +2,8 @@
 set -e
 
 # Install ays9 in a docker contianer using bash installers
-ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+sudo ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa
 export SSHKEYNAME=id_rsa
-
 
 export ZUTILSBRANCH=${ZUTILSBRANCH:-master}
 
