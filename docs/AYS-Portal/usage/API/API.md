@@ -4,7 +4,7 @@ The Cockpit exposes its functionality through a REST API.
 
 The REST interface is generated from a [RAML](http://raml.org/) specification using [go-raml](https://github.com/jumpscale/go-raml). The RAML file is located at https://raw.githubusercontent.com/Jumpscale/jscockpit/master/ays_api/specifications/api.raml
 
-The REST API is documented in the **API Console** of your portal. See the section about the [API Console](../API_console/API_Console.md) for more information.
+The REST API is documented in the **API Console** of your portal. See the section about the [API Console](../API_Console/API_Console.md) for more information.
 
 
 ### API Client
