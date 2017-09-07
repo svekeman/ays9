@@ -26,16 +26,21 @@ def test(job):
         vm = service.producers['node'][0]
         disk = vm.producers['disk'][0]
         maxIOPS = disk.model.data.maxIOPS
+        readBytesSec = disk.model.data.readBytesSec
+        writeBytesSec = disk.model.data.writeBytesSec
         fio_cmd = "fio --ioengine=libaio --group_reporting --filename=/dev/{1} "\
                   "--runtime=30 --readwrite=randrw --size=500M --name=test{0} "\
                   "--output={0}".format('b1', 'vdb')
         vm_exe.core.run(fio_cmd)
-        out = vm_exe.core.run("cat %s | grep -o 'iops=[0-9]\{1,\}' | cut -d '=' -f 2" % 'b1')
-        list = out[1].split('\n')
-        int_list = [int(i) for i in list if int(i) > maxIOPS]
-        iops = len(int_list)
-        if iops != 0:
-            service.model.data.result = 'FAILED : {} {}'.format('test_limit_iops', str(sys.exc_info()[:2]))
+        outIops = vm_exe.core.run("cat %s | grep -o 'iops=[0-9]\{1,\}' | cut -d '=' -f 2" % 'b1')
+        listIops = outIops[1].split('\n')
+        outBytes = vm_exe.core.run("cat %s | grep -o 'bw=[0-9]\{1,\}\.[0-9]\{1,\}' | cut -d '=' -f 2" % 'b1')
+        listBytes = outBytes[1].split('\n')
+        int_listIops = [int(i) for i in listIops if int(i) > maxIOPS]
+        float_listBytes = [float(i) * 1000 for i in listBytes]
+        iops = len(int_listIops)
+        if iops != 0 or float_listBytes[0] > readBytesSec or float_listBytes[1] > writeBytesSec:
+            service.model.data.result = 'FAILED : {} {}'.format('test_limit_iops: disk limit not properly set')
             service.save()
             return
 
@@ -47,34 +52,40 @@ def test(job):
         space = acc.space_get(vdc.model.dbobj.name, vdc.model.data.location)
         machine = space.machines[vm.name]
         disk_id = machine.add_disk(name='disk_c', description='test', size=50, type='D')
-        machine.disk_limit_io(disk_id, 1000)
+        machine.disk_limit_io(disk_id, 0, 4000000, 4000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000)
 
         log.info('Run fio on vdc, iops should be less than 1000')
         fio_cmd = "fio --ioengine=libaio --group_reporting --filename=/dev/{1} "\
                   "--runtime=30 --readwrite=randrw --size=500M --name=test{0} "\
                   "--output={0}".format('c1', 'vdc')
         vm_exe.core.run(fio_cmd)
-        out = vm_exe.core.run("cat %s | grep -o 'iops=[0-9]\{1,\}' | cut -d '=' -f 2" % 'c1')
-        list = out[1].split('\n')
-        int_list = [int(i) for i in list if int(i) > 1000]
-        iops = len(int_list)
-        if iops != 0:
-            service.model.data.result = 'FAILED : {} {}'.format('test_limit_iops', str(sys.exc_info()[:2]))
+        outIops = vm_exe.core.run("cat %s | grep -o 'iops=[0-9]\{1,\}' | cut -d '=' -f 2" % 'c1')
+        listIops = outIops[1].split('\n')
+        outBytes = vm_exe.core.run("cat %s | grep -o 'bw=[0-9]\{1,\}\.[0-9]\{1,\}' | cut -d '=' -f 2" % 'c1')
+        listBytes = outBytes[1].split('\n')
+        int_listIops = [int(i) for i in listIops if int(i) > 1000]
+        float_listBytes = [float(i) * 1000 for i in listBytes]
+        iops = len(int_listIops)
+        if iops != 0 or float_listBytes[0] > 4000000 or float_listBytes[1] > 4000000:
+            service.model.data.result = 'FAILED : {} {}'.format('test_limit_iops: disk limit not properly set')
             service.save()
             return
 
         log.info('Run fio on vdc, iops should be less than 500')
-        machine.disk_limit_io(disk_id, 500)
+        machine.disk_limit_io(disk_id, 0, 2000000, 2000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 500)
         fio_cmd = "fio --ioengine=libaio --group_reporting --filename=/dev/{1} "\
                   "--runtime=30 --readwrite=randrw --size=500M --name=test{0} "\
                   "--output={0}".format('c2', 'vdc')
         vm_exe.core.run(fio_cmd)
-        out = vm_exe.core.run("cat %s | grep -o 'iops=[0-9]\{1,\}' | cut -d '=' -f 2" % 'c2')
-        list = out[1].split('\n')
-        int_list = [int(i) for i in list if int(i) > 500]
-        iops = len(int_list)
-        if iops != 0:
-            service.model.data.result = 'FAILED : {} {}'.format('test_limit_iops', str(sys.exc_info()[:2]))
+        outIops = vm_exe.core.run("cat %s | grep -o 'iops=[0-9]\{1,\}' | cut -d '=' -f 2" % 'c2')
+        listIops = outIops[1].split('\n')
+        outBytes = vm_exe.core.run("cat %s | grep -o 'bw=[0-9]\{1,\}\.[0-9]\{1,\}' | cut -d '=' -f 2" % 'c2')
+        listBytes = outBytes[1].split('\n')
+        int_listIops = [int(i) for i in listIops if int(i) > 500]
+        float_listBytes = [float(i) * 1000 for i in listBytes]
+        iops = len(int_listIops)
+        if iops != 0 or float_listBytes[0] > 2000000 or float_listBytes[1] > 2000000:
+            service.model.data.result = 'FAILED : {} {}'.format('test_limit_iops: disk limit not properly set')
             service.save()
             return
         service.model.data.result = 'OK : {} '.format('test_limit_iops')
