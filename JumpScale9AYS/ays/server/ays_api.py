@@ -42,7 +42,7 @@ async def addTemplateRepo(request):
     except jsonschema.ValidationError as e:
         return text('Bad Request Body', 400)
 
-    path = j.do.pullGitRepo(url=inputs['url'], branch=inputs['branch'])
+    path = j.clients.git.pullGitRepo(url=inputs['url'], branch=inputs['branch'])
 
     # Register/update the cloned/pulled template repo
     template_repo_collection = j.atyourservice.server.templateRepos
@@ -262,11 +262,11 @@ async def createRun(request, repository):
     using the 'GET /ays/repository/{repository}/aysrun/{aysrun_key}' endpoint
     It is handler for POST /ays/repository/<repository>/aysrun
     '''
+    import requests
     try:
         repo = get_repo(repository)
     except j.exceptions.NotFound as e:
         return json({'error': e.message}, 404)
-
     simulate = j.data.types.bool.fromString(request.args.get('simulate', 'False'))
     callback_url = request.args.get('callback_url', None)
 
@@ -276,6 +276,9 @@ async def createRun(request, repository):
         run.save()
         if not simulate:
             await repo.run_scheduler.add(run)
+        if callback_url:
+            run.callbackUrl = callback_url
+            run.save()
         return json(run_view(run), 200)
 
     except j.exceptions.Input as e:
