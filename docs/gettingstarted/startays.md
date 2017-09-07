@@ -54,7 +54,7 @@ Click **Create**, copy the generated secret value for later use, and then close 
 
 With the generated secret value, you can now generate a JWT using the AYS command line tool:
 ```shell
-ays generatetoken --clientid "name-of-your-organization" --clientsecret "generated-secret-value"
+ays generatetoken --clientid "organization-1" --clientsecret "generated-secret-value"
 ```
 > In case of error downgrade to version 1.3.2 of `python-jose`:
 > `pip uninstall python-jose`

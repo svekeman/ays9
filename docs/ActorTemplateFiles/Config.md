@@ -59,7 +59,7 @@ links:
     auto: true
 ```
 
-This describes that the AYS service consumes a minimum of `3` and a maximum of `100` `sshkey` AYS service instances, and that it should auto-create these instances if they don't already exist. The `min` and `max` tags are optional, they both default to `1`. The `auto` tag is also optional. Setting `max` to `0` means that there is no limit. Also `argname` is optional. It allows you to pass the name to the producing AYS service to an attribute that has a name that is different from the producing actor template name, as is the case in this example.
+This describes that the AYS service consumes a minimum of `3` and a maximum of `100` `sshkey` AYS service instances, and that it should auto-create these instances if they don't already exist. The `min` and `max` tags are optional, they both default to `1`. The `auto` tag is a required tag, so you always need to specify a value (`true` or `false`) for it. Setting `max` to `0` means that there is no limit. Also `argname` is optional. It allows you to pass the name to the producing AYS service to an attribute that has a name that is different from the producing actor template name, as is the case in this example.
 
 Here's an example of a blueprint for creating an AYS service that depends on at least three `sshkey` AYS service instances created, with the above `config.yaml`:
 
@@ -104,7 +104,7 @@ Further more:
 - `auto` instructs AYS to look for an already existing parent of the specified type, and if yes to use that one
 - `optional` tag informs AYS that the parent relationship is not required
 
-Both the `optional` and `auto` tags are optional.
+Both the `optional` and `auto` tags are optional. When not specified they will default to `false`.
 
 Taking again the example from above, here each `actorXYZ` AYS service instance have a one-to-one relationship with an `sshkey` AYS service instance, which gets auto-created because of the `auto: true` in the definition:
 
@@ -297,4 +297,4 @@ events:
         instance: myissue
 ```
 
-See [Events](../Definitions/Events/README.md) for an example of a "consuming" AYS service that handles the events triggered by another "producing" AYS service. The example as shows how to register an event handler using code, instead of doing it declaratively in the ` events` section. 
+See [Events](../Definitions/Events/README.md) for an example of a "consuming" AYS service that handles the events triggered by another "producing" AYS service. The example as shows how to register an event handler using code, instead of doing it declaratively in the ` events` section.
