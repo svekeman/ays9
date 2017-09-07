@@ -309,7 +309,7 @@ class Service:
             if actor_action.name in self.model.actions:
                 self.model.actions[actor_action.name].actionKey = actor_action.actionKey
 
-        self.saveAll()
+        self.save()
 
     def saveToFS(self):
         j.sal.fs.createDir(self.path)
@@ -615,15 +615,11 @@ class Service:
             action_name = action_name = changeCategory.split('action_del_')[1]
             self.model.actionDelete(action_name)
 
-        # save the change for the service
-        self.saveAll()
-
         # execute the processChange method if it exists
         if 'processChange' in self.model.actions.keys():
             args.update({'changeCategory': changeCategory})
             job = self.getJob("processChange", args=args, context=context)
             args = job.executeInProcess()
-            job.model.save()
 
     async def processEvent(self, channel=None, command=None, secret=None, tags={}, payload=None):
         coros = []
@@ -762,6 +758,7 @@ class Service:
         jobobj.dbobj.serviceKey = self.model.key
         jobobj.dbobj.state = "new"
         jobobj.dbobj.lastModDate = j.data.time.epoch
+        jobobj.dbobj.tags = args.get('tags', [])
         jobobj.args = args
         job = j.core.jobcontroller.newJobFromModel(jobobj)
         job.service = self

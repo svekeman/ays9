@@ -65,7 +65,7 @@ class ays_tools(j.tools.code.classGetBase()):
             if not ays_repo:
                 updated = list()
                 for domain, domain_info in j.atyourservice.server.config['metadata'].items():
-                    base, provider, account, repo, dest, url = j.do.getGitRepoArgs(domain_info.get('url'),
+                    base, provider, account, repo, dest, url = j.clients.git.getGitRepoArgs(domain_info.get('url'),
                                                                                    codeDir=j.dirs.CODEDIR)
                     self.cuisine.development.git.pullRepo(domain_info.get('url'),
                                                           branch=domain_info.get('branch', 'master'),

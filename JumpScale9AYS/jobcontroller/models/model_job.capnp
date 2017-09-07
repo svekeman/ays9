@@ -118,6 +118,8 @@ struct Job {
   }
   # This list can contains different context infromation relative to the request that created the job
   context @19 :List(KV);
+
+  tags @20: List(Text);
 }
 
 #is one specific piece of code which can be executed
@@ -217,4 +219,5 @@ struct Run {
 
     #key of repo where run is created
     repo @5 :Text;
+    callbackUrl @6 :Text;
 }

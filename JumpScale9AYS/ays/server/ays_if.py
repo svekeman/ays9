@@ -134,6 +134,13 @@ class ays_repository_byrepository_job_byjobidView(HTTPMethodView):
 
 ays_if.add_route(ays_repository_byrepository_job_byjobidView.as_view(), '/ays/repository/<repository>/job/<jobid>')
 
+class ays_repository_byrepository_jobView(HTTPMethodView):
+
+    async def get(self, request, repository):
+        return await auth(request, ays_api.listJobs(request, repository))
+
+ays_if.add_route(ays_repository_byrepository_jobView.as_view(), '/ays/repository/<repository>/job')
+
 class ays_repository_byrepository_serviceView(HTTPMethodView):
 
     async def get(self, request, repository):
