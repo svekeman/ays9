@@ -325,9 +325,20 @@ async def getJob(request, jobid, repository):
     return json(job_view(jobobj), 200)
 
 
-async def listJobs(request, actor="", service="", action="", state="", serviceKey="", fromEpoch=0, toEpoch=9999999999999, tags=[]):
+async def listJobs(request, repository):
     '''
     List all jobs that match the filters.
+    filters are
+    actor:str  Only list jobs of this actor
+    service:str Only list jobs of this service
+    action:str Only list jobs of this action
+    type:str Only list jobs with this state
+    serviceKey:str Only list jobs of this serviceKey
+    fromEpoch:int Only list jobs from this epoch
+    toEpoch:int Only list jobs till this epoch
+    tags: comma-seperated list of tags to be included
+    fields:str comma-seperated list of fields to be included in the response
+
     returns requested fields
     '''
 
