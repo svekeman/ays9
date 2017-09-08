@@ -9,7 +9,7 @@ export ZUTILSBRANCH=${ZUTILSBRANCH:-master}
 curl https://raw.githubusercontent.com/Jumpscale/bash/$ZUTILSBRANCH/install.sh?$RANDOM > /tmp/install.sh;sudo -E bash /tmp/install.sh
 
 # During nightly build, build the full docker image
-if [ -n $TRAVIS_EVENT_TYPE ] || [ $TRAVIS_EVENT_TYPE == "cron" ]; then
+if [ -n $TRAVIS_EVENT_TYPE ] && [ $TRAVIS_EVENT_TYPE == "cron" ]; then
     # Install ays9 in a docker contianer using bash installers
     sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZKeysLoad; ZInstall_ays9 -f"
 else
