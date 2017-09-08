@@ -13,7 +13,8 @@ if [ $TRAVIS_EVENT_TYPE == "cron" ]; then
     # Install ays9 in a docker contianer using bash installers
     sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZKeysLoad; ZInstall_ays9 -f"
 else
+    sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZKeysLoad; ZInstall_ays9 -f"
     sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZKeysLoad; ZCodeGetJS"
-    docker pull jumpscale/ays9nightly
+    # docker pull jumpscale/ays9nightly
 fi
 
