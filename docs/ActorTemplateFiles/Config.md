@@ -214,7 +214,16 @@ recurring:
 
 This configuration will result in AYS service with the `monitor()` action that is scheduled to be executed every 30 seconds, and a `dosomethingelse()` action scheduled for execution every minute.
 
-
+You can use monitor actions to self_heal any failed actions by using `self_heal_action` method
+```python
+def monitor(job):
+    # Check here for failed action ....
+    # ....
+    # ....
+    import asyncio
+    service = job.service
+    asyncio.run_coroutine_threadsafe(service.self_heal_action('<ACTION_NAME>'), loop=service.aysrepo._loop)
+``` 
 ## Long running tasks
 
 AYS is using [asyncio](https://docs.python.org/3/library/asyncio.html) for implementing concurrency.
