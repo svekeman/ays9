@@ -3,6 +3,7 @@ from js9 import j
 def init_actions_(service, args):
     dependencies = {
         'enable': ['install'],
+        'execute_routeros_script': ['install'],
         'disable': ['install']
     }
     return dependencies
@@ -216,3 +217,18 @@ def disable(job):
     space.disable('The space should be disabled.')
     service.model.data.disabled = True
     service.saveAll()
+
+
+def execute_routeros_script(job):
+    service = job.service
+    if 'g8client' not in service.producers:
+        raise j.exceptions.AYSNotFound("No producer g8client found. Cannot continue executing of %s" % service)
+    script = service.model.data.script
+    if not script:
+        raise j.exceptions.AYSNotFound("Param script can't be empty. Cannot continue executing of %s" % service)
+    script.replace("\n", ";")
+    g8client = service.producers["g8client"][0]
+    cl = j.clients.openvcloud.getFromService(g8client)
+    acc = cl.account_get(service.model.data.account)
+    space = acc.space_get(service.model.dbobj.name, service.model.data.location)
+    space.execute_routeros_script(script)
