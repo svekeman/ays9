@@ -1,6 +1,10 @@
 import asyncio
 from js9 import j
 from JumpScale9AYS.ays.lib.Recurring import LongRunningTask, RecurringTask
+from JumpScale9AYS.ays.lib.AtYourServiceDependencies import build_nodes
+from JumpScale9AYS.ays.lib.AtYourServiceDependencies import create_graphs
+from JumpScale9AYS.ays.lib.AtYourServiceDependencies import get_task_batches
+
 
 
 class Service:
@@ -905,3 +909,54 @@ class Service:
     #         consumer.enable()
     #         consumer.start()
     #
+
+    async def self_heal_action(self, action):
+        """
+        This method is typically used from within monitoring actions to execute failed actions by
+        rescheduling them into a new run and add this run to repo run scheduler
+        :param action: str: action name which needed to be rescheduled
+        :return:
+        """
+
+        # Check if the action job is already existing at any run in the repo before
+        # rescheduling it again
+        existing_jobs = j.core.jobcontroller.db.jobs.find(action=action, service=self.name,
+                                                          state="new|running|error", tags=["self_heal"])
+        if not existing_jobs:
+            self.scheduleAction(action, force=True)
+            to_execute_actions = self.aysrepo.findScheduledActions()
+
+            all_nodes = build_nodes(self.aysrepo)
+            nodes = create_graphs(self.aysrepo, all_nodes, to_execute_actions)
+            run = j.core.jobcontroller.newRun(repo=self.aysrepo.path)
+
+            for bundle in get_task_batches(nodes):
+                to_add = []
+                jobs = None
+
+                for node in bundle:
+                    if node.service.model.actionsState[node.action] != 'ok':
+                        to_add.append(node)
+
+                if len(to_add) > 0:
+                    step = run.newStep()
+                    jobs = step.dbobj.init_resizable_list('jobs')
+
+                for node in to_add:
+                    job = node.service.getJob(node.action, {'tags': ['self_heal']})
+                    job.save()
+
+                    job_cache = jobs.add()
+                    job_cache.actionName = job.model.dbobj.actionName
+                    job_cache.actorName = job.model.dbobj.actorName
+                    job_cache.serviceName = job.model.dbobj.serviceName
+                    job_cache.serviceKey = job.model.dbobj.serviceKey
+                    job_cache.key = job.model.key
+
+                if jobs:
+                    jobs.finish()
+
+            run.model.reSerialize()
+            run.save()
+            await self.aysrepo.run_scheduler.add(run)
+        return
