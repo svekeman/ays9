@@ -220,9 +220,8 @@ def monitor(job):
     # Check here for failed action ....
     # ....
     # ....
-    import asyncio
     service = job.service
-    asyncio.run_coroutine_threadsafe(service.self_heal_action('<ACTION_NAME>'), loop=service.aysrepo._loop)
+    service.self_heal_action('<ACTION_NAME>')
 ``` 
 ## Long running tasks
 

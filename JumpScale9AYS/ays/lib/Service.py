@@ -910,7 +910,7 @@ class Service:
     #         consumer.start()
     #
 
-    async def self_heal_action(self, action):
+    def self_heal_action(self, action):
         """
         This method is typically used from within monitoring actions to execute failed actions by
         rescheduling them into a new run and add this run to repo run scheduler
@@ -958,5 +958,4 @@ class Service:
 
             run.model.reSerialize()
             run.save()
-            await self.aysrepo.run_scheduler.add(run)
-        return
+            asyncio.run_coroutine_threadsafe(self.aysrepo.run_scheduler.add(run), loop=self._loop)
