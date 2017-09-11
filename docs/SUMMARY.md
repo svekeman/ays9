@@ -65,6 +65,3 @@
     * [Change VDC Resource Limits](Howto/Change_VDC_Resource_Limits/README.md)
     * [Create a Virtual Machine](Howto/Create_VM/README.md)
  * [Release Notes](ReleaseNotes/README.md)
-   * [v9.1.1](ReleaseNotes/9.1.1.md)
-   * [v8.2](ReleaseNotes/8.2.md)
-   * [v8.1](ReleaseNotes/8.1.md)
