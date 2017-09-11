@@ -1,6 +1,9 @@
 #!bin/bash
 set -e
 
+RUNTYPE=$1
+
+
 js9 'j.clients.redis.get4core() or j.clients.redis.start4core()'
 
 echo "Starting AYS server"
@@ -11,7 +14,6 @@ sleep 30
 
 # check if the server started
 js9 'cli=j.clients.atyourservice.get();cli.api.ays.listRepositories()'
-
 
 # validate all the schemas
 echo "Validating Schemas"
@@ -26,5 +28,10 @@ js9 "for index in range(10): j.tools.prefab.local.tmux.executeInScreen('main', '
 
 
 # running testsuite
-echo "Running ays tests"
-js9 "from ays_testrunner.testrunner import AYSCoreTestRunner;AYSCoreTestRunner(name='core').run()"
+echo "Running ays core tests"
+js9 "from ays_testrunner.testrunner import AYSCoreTestRunner;AYSCoreTestRunner(name='core', config=/hostcfg/ays_testrunner.json).run()"
+
+if [ -n $RUNTYPE ] && [ $RUNTYPE == "cron" ]; then
+  echo "Running ays non-core tests"
+  js9 "from ays_testrunner.testrunner import AYSTestRunner;AYSTestRunner(name='non_core', config=/hostcfg/ays_testrunner.json).run()"
+fi
