@@ -30,7 +30,7 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
 - clone.name: The name of the machine that will be created when executing the clone action.
 - snapshots: The list of snapshots of the node. **filled in when executing the listSnapshots action, don't specify it in the blueprint**
 - snapshot.epoch: The epoch of a snapshot to rollback or delete.
-
+- vmInfoCallback: Callback url to send vm info after installing if succeeded or report the error to during installation.
 
 ### Changing port forwardings
 
