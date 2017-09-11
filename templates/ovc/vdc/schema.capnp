@@ -16,6 +16,7 @@ struct Schema {
 	externalNetworkID @12 :Int64 = -1;
 	maxNetworkPeerTransfer @13 :Int64 = -1;
 	disabled @14 :Bool = false;
+	script @15 :Text;
 
 	struct UserVdcEntry {
 		name @0 :Text;

@@ -8,6 +8,20 @@ doc:
   - size: disk size in GB
   - ssdSize: ''
   - location: ''
+  - totalBytesSec: ''
+  - readBytesSec: ''
+  - writeBytesSec: ''
+  - totalIopsSec: ''
+  - readIopsSec: ''
+  - writeIopsSec: ''
+  - totalBytesSecMax: ''
+  - readBytesSecMax: ''
+  - writeBytesSecMax: ''
+  - totalIopsSecMax: ''
+  - readIopsSecMax: ''
+  - writeIopsSecMax: ''
+  - sizeIopsSec: ''
+  - diskId: ''
 
 links:
   consume:

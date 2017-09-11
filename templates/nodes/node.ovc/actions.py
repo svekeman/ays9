@@ -128,13 +128,17 @@ def _configure_disks(service, machine, prefab):
             takendevices.append(data_disk.model.data.devicename)
 
         else:
-            disk_id = machine.add_disk(name=data_disk.model.dbobj.name,
-                                       description=disk_args.description,
-                                       size=disk_args.size,
-                                       type=disk_args.type.upper(),
-                                       ssdSize=disk_args.ssdSize)
+            disk_args.diskId = machine.add_disk(name=data_disk.model.dbobj.name,
+                                                description=disk_args.description,
+                                                size=disk_args.size,
+                                                type=disk_args.type.upper(),
+                                                ssdSize=disk_args.ssdSize)
 
-            machine.disk_limit_io(disk_id, disk_args.maxIOPS)
+            machine.disk_limit_io(disk_args.diskId, disk_args.totalBytesSec, disk_args.readBytesSec, disk_args.writeBytesSec,
+                                  disk_args.totalIopsSec, disk_args.readIopsSec, disk_args.writeIopsSec,
+                                  disk_args.totalBytesSecMax, disk_args.readBytesSecMax, disk_args.writeBytesSecMax,
+                                  disk_args.totalIopsSecMax, disk_args.readIopsSecMax, disk_args.writeIopsSecMax,
+                                  disk_args.sizeIopsSec, disk_args.maxIOPS)
             rc, out, err = prefab.core.run("lsblk -J", die=False)
             if rc != 0:
                 raise j.exceptions.RuntimeError("Unexpected Error: {}".format(err))
@@ -394,12 +398,16 @@ def processChange(job):
                     if disk_service not in old_disks_services:
                         service.consume(disk_service)
                         disk_args = disk_service.model.data
-                        disk_id = machine.add_disk(name=disk_service.name,
-                                                   description=disk_args.description,
-                                                   size=disk_args.size,
-                                                   type=disk_args.type.upper(),
-                                                   ssdSize=disk_args.ssdSize)
-                        machine.disk_limit_io(disk_id, disk_args.maxIOPS)
+                        disk_args.diskId = machine.add_disk(name=disk_service.name,
+                                                            description=disk_args.description,
+                                                            size=disk_args.size,
+                                                            type=disk_args.type.upper(),
+                                                            ssdSize=disk_args.ssdSize)
+                        machine.disk_limit_io(disk_args.diskId, disk_args.totalBytesSec, disk_args.readBytesSec, disk_args.writeBytesSec,
+                                              disk_args.totalIopsSec, disk_args.readIopsSec, disk_args.writeIopsSec,
+                                              disk_args.totalBytesSecMax, disk_args.readBytesSecMax, disk_args.writeBytesSecMax,
+                                              disk_args.totalIopsSecMax, disk_args.readIopsSecMax, disk_args.writeIopsSecMax,
+                                              disk_args.sizeIopsSec, disk_args.maxIOPS)
 
                 setattr(service.model.data, key, value)
 
