@@ -27,13 +27,13 @@ def create(job):
     else:
         raise j.exceptions.AYSNotFound("Location not found. cannot continue init of %s" % service)
 
-    account.create_disk(
-        name=service.model.data.devicename,
+    service.model.data.diskId = account.create_disk(
+        name=service.model.dbobj.name,
         gid=location['gid'],
         description=service.model.data.description,
         size=service.model.data.size,
         type=service.model.data.type,
-        ssd_size= service.model.data.ssdSize
+        ssd_size=service.model.data.ssdSize
     )
 
 
@@ -43,23 +43,40 @@ def delete(job):
     client = j.clients.openvcloud.getFromService(g8client)
     account = client.account_get(g8client.model.data.account, create=True)
     for disk in account.disks:
-        if disk['name'] in [service.model.data.devicename, service.model.dbobj.name]:
-            disk_to_delete = disk
+        if disk['id'] == service.model.data.diskId:
             break
     else:
         raise j.exceptions.AYSNotFound("Data Disk was not found. cannot continue init of %s" % service)
-    account.delete_disk(disk_to_delete['id'])
+    account.delete_disk(service.model.data.diskId)
+
+
+def processChange(job):
+    service = job.service
+    args = job.model.args
+    category = args.pop('changeCategory')
+    if category == "dataschema":
+        for key, value in args.items():
+            if key not in ['size', 'type', 'description', 'devicename', 'ssdSize', 'g8client', 'location']:
+                setattr(service.model.data, key, value)
+        if service.aysrepo.servicesFind(actor='node.ovc'):
+            j.tools.async.wrappers.sync(service.executeAction('limit_io'))
 
 
 def limit_io(job):
     service = job.service
     g8client = service.producers["g8client"][0]
+    data = service.model.data
     client = j.clients.openvcloud.getFromService(g8client)
     account = client.account_get(g8client.model.data.account, create=True)
     for disk in account.disks:
-        if disk['machineId'] and disk['name'] in [service.model.data.devicename, service.model.dbobj.name]:
-            disk_to_set = disk
+        if disk['id'] == service.model.data.diskId:
             break
     else:
         raise j.exceptions.AYSNotFound("Data Disk was not found. cannot continue init of %s" % service)
-    client.api.cloudapi.disks.limitIO(diskId=disk_to_set['id'], iops=service.model.data.maxIOPS)
+    client.api.cloudapi.disks.limitIO(diskId=data.diskId, iops=data.maxIOPS, total_bytes_sec=data.totalBytesSec,
+                                      read_bytes_sec=data.readBytesSec, write_bytes_sec=data.writeBytesSec, total_iops_sec=data.totalIopsSec,
+                                      read_iops_sec=data.readIopsSec, write_iops_sec=data.writeIopsSec,
+                                      total_bytes_sec_max=data.totalBytesSecMax, read_bytes_sec_max=data.readBytesSecMax,
+                                      write_bytes_sec_max=data.writeBytesSecMax, total_iops_sec_max=data.totalIopsSecMax,
+                                      read_iops_sec_max=data.readIopsSecMax, write_iops_sec_max=data.writeIopsSecMax,
+                                      size_iops_sec=data.sizeIopsSec)
