@@ -123,3 +123,25 @@ vdc__cs2:
 actions:
   - action: enable
 ```
+
+## Example for executing routeros script on VDC
+
+```yaml
+g8client__example:
+    url: '<url of the environment>'
+    login: '<username>'
+    password: '<password>'
+    account: '<account name>'
+
+vdc__cs2:
+    location: '<name of the environment>'
+    # script can be a single line i.e '/ip service set www address=0.0.0.0/0'
+    # or use YAML multi lines using "|" i.e:
+    # |
+    # /ip service
+    # set www address=0.0.0.0/0
+    script: '<SCRIPT>' 
+
+actions:
+  - action: execute_routeros_script
+```
