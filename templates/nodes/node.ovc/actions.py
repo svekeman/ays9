@@ -273,40 +273,52 @@ def _authorization_user(machine, service, action=""):
 
 
 def install(job):
-    service = job.service
-    space = _get_cloud_space(service)
+    try:
+        import requests
+        import json
+        import traceback
+        service = job.service
+        space = _get_cloud_space(service)
+        # Get machine if already exists or create a new one
+        machine = space.machines.get(service.name)
+        if not machine:
+            machine = _create_machine(service, space)
 
-    # Get machine if already exists or create a new one
-    machine = space.machines.get(service.name)
-    if not machine:
-        machine = _create_machine(service, space)
+        # Configure Ports including SSH port if not defined
+        _configure_ports(service, machine)
 
-    # Configure Ports including SSH port if not defined
-    _configure_ports(service, machine)
+        # register users acls
+        _authorization_user(machine, service)
 
-    # register users acls
-    _authorization_user(machine, service)
+        # set machine id, ip, login data
+        ip, vm_info = machine.get_machine_ip()
+        if not ip:
+            raise j.exceptions.RuntimeError('The machine %s does not get an IP ' % service.name)
 
-    # set machine id, ip, login data
-    ip, vm_info = machine.get_machine_ip()
-    if not ip:
-        raise j.exceptions.RuntimeError('The machine %s does not get an IP ' % service.name)
+        service.model.data.machineId = machine.id
+        service.model.data.ipPublic = machine.space.model['publicipaddress'] or space.get_space_ip()
+        service.model.data.ipPrivate = ip
+        service.model.data.sshLogin = vm_info['accounts'][0]['login']
+        service.model.data.sshPassword = vm_info['accounts'][0]['password']
 
-    service.model.data.machineId = machine.id
-    service.model.data.ipPublic = machine.space.model['publicipaddress'] or space.get_space_ip()
-    service.model.data.ipPrivate = ip
-    service.model.data.sshLogin = vm_info['accounts'][0]['login']
-    service.model.data.sshPassword = vm_info['accounts'][0]['password']
+        # Authorize ssh key into the machine
+        prefab = _check_ssh_authorization(service, machine)
 
-    # Authorize ssh key into the machine
-    prefab = _check_ssh_authorization(service, machine)
+        # configure disks
+        if prefab:
+            _configure_disks(service, machine, prefab)
 
-    # configure disks
-    if prefab:
-        _configure_disks(service, machine, prefab)
+        _, vm_info = machine.get_machine_ip()
+        if service.model.data.vmInfoCallback:
+            requests.post(service.model.data.vmInfoCallback, headers={'Content-type': 'application/json'}, data=json.dumps(vm_info))
 
-    # Save the service
-    service.saveAll()
+        # Save the service
+        service.saveAll()
+    except Exception as e:
+        trace = traceback.format_exc()
+        if service.model.data.vmInfoCallback:
+            requests.post(service.model.data.vmInfoCallback, headers={'Content-type': 'application/json'}, data=json.dumps({'traceback': trace}))
+        raise e
 
 
 def processChange(job):

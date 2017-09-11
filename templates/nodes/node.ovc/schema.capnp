@@ -29,6 +29,7 @@ struct Schema {
 	snapshots @25 :List(Text);
 	snapshotEpoch @26 :Text;
 	sshAuthorized @27 :Bool = false;
+	vmInfoCallback @28 :Text;
 
 	struct UserVdcEntry {
 		name @0 :Text;
