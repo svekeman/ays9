@@ -7,13 +7,27 @@ This actor template represents a disk in ovc to be used later on by other servic
 ## Schema:
  - size: disk size in GB.
  - type: type of disk boot or normal.
- - description: description of disk. 
+ - description: description of disk.
  - maxIOPS: max inputs outputs per second.
- - devicename: device name.
+ - devicename: device name (leave empty).
  - ssdSize: ssd size always available , will default to 10
  - location: location of the resource on cloud (i.e du-conv-2)
+ - totalBytesSec: ''
+ - readBytesSec: ''
+ - writeBytesSec: ''
+ - totalIopsSec: ''
+ - readIopsSec: ''
+ - writeIopsSec: ''
+ - totalBytesSecMax: ''
+ - readBytesSecMax: ''
+ - writeBytesSecMax: ''
+ - totalIopsSecMax: ''
+ - readIopsSecMax: ''
+ - writeIopsSecMax: ''
+ - sizeIopsSec: ''
+ - diskId: Id of disk.
 
-Replace \<with actual value \>
+Disk name will be service name.
 
 ## Example for creating disks
 ```yaml
@@ -26,7 +40,6 @@ g8client__env:
 disk.ovc__disk1:
     size: <disk size>
     g8client: 'env'
-    devicename: '<disk name>'
     description: '<Description of the disk>'
     type: '<B or D. B for Boot and D for Data>'
     location: '<location of the disk>'
@@ -51,7 +64,6 @@ g8client__env:
     account: '<account>'
 
 disk.ovc__disk1:
-    devicename: '<disk name>'
 
 actions:
 
@@ -64,7 +76,7 @@ actions:
     service: disk1
 ```
 
-## Example for limit IO for disks
+## Example for limit IO for disks you can only limit disks that are attached to a vm, which is done using node.ovc service.
 (note that the disk MUST be attached to a machine)
 ```yaml
 g8client__env:
@@ -74,8 +86,9 @@ g8client__env:
     account: '<account>'
 
 disk.ovc__disk1:
-    devicename: '<disk name>'
     maxIOPS: 100
+    readBytesSec: 6500000
+    writeBytesSec: 6500000
 
 actions:
 
