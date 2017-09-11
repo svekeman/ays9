@@ -278,7 +278,6 @@ def install(job):
         import json
         import traceback
         service = job.service
-        5/0
         space = _get_cloud_space(service)
         # Get machine if already exists or create a new one
         machine = space.machines.get(service.name)
