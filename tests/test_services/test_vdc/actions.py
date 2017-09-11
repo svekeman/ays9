@@ -2,6 +2,7 @@ def init_actions_(service, args):
     return {
         'test_create': ['install'],
         'test_delete': ['install'],
+        'test_routeros': ['install'],
         'test_enable': ['enable'],
         'test_disable': ['disable'],
     }
@@ -120,4 +121,31 @@ def test_disable(job):
 
     except Exception as e:
         service.model.data.result = RESULT_ERROR % (str(sys.exc_info()[:2]) + str(e))
+    service.save()
+
+
+def test_routeros(job):
+    import sys
+    import requests
+    RESULT_OK = 'OK : %s '
+    RESULT_FAILED = 'FAILED : %s'
+    RESULT_ERROR = 'ERROR : %s'
+
+    service = job.service
+    g8client = service.producers['g8client'][0]
+    client = j.clients.openvcloud.getFromService(g8client)
+    vdc = service.producers['vdc'][0]
+    vdc_id = vdc.model.data.cloudspaceID
+    cloud_space = client.api.cloudapi.cloudspaces.get(cloudspaceId=vdc_id)
+    try:
+        # Check if we can reach the routeros page after running the routeros script
+        requests.get('http://{ip}:9080'.format(ip=cloud_space['publicipaddress']))
+        service.model.data.result = RESULT_OK % 'test_routeros'
+    except requests.ConnectionError:
+        failure = "Couldn't reach router os web page"
+        service.model.data.result = RESULT_FAILED % failure
+    except Exception as e:
+        service.model.data.result = RESULT_ERROR % (str(sys.exc_info()[:2]) + str(e))
+    finally:
+        client.api.cloudapi.cloudspaces.delete(cloudspaceId=vdc_id)
     service.save()
