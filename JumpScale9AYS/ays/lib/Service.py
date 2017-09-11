@@ -905,3 +905,24 @@ class Service:
     #         consumer.enable()
     #         consumer.start()
     #
+
+    def self_heal_action(self, action):
+        """
+        This method is typically used from within monitoring actions to execute failed actions by
+        rescheduling them into a new run and add this run to repo run scheduler
+        :param action: str: action name which needed to be rescheduled
+        :return:
+        """
+
+        # Check if the action job is already existing at any run in the repo before
+        # rescheduling it again
+        existing_jobs = j.core.jobcontroller.db.jobs.find(action=action, service=self.name,
+                                                          state="new|running|error", tags=["self_heal_internal"])
+        if not existing_jobs:
+            self.scheduleAction(action, force=True)
+            action_chain = []
+            self._build_actions_chain(action, ds=action_chain)
+            action_chain.reverse()
+            to_execute_actions = {self: [action_chain]}
+            run = self.aysrepo.runCreate(to_execute_actions, jobs_tags=['self_heal_internal'])
+            asyncio.run_coroutine_threadsafe(self.aysrepo.run_scheduler.add(run), loop=self._loop)
