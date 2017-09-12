@@ -453,10 +453,10 @@ class BaseRunner:
         """
         Intialize test runner
         """
-        
+        if config is None:
+            config = {}
+        self._config = config
         self._logger = j.logger.get('aystestrunner.{}'.format(name))
-        # check if config is a file, then load cofnig from the file
-        self._config = self._check_config(config)
         self._name = name
         self._task_queue = Queue(connection=Redis(), default_timeout=self._config.get('TEST_TIMEOUT', DEFAULT_TEST_TIMEOUT))
         self._failed_tests = {}
@@ -476,23 +476,7 @@ class BaseRunner:
         report tests
         """
         raise NotImplementedError("Not Implemented")
-
-    
-    def _check_config(self, config):
-        """
-        Check if config is file the it will try to read it as a json file
-        """
-        config = {}
-        try:
-            if type(self._config) is str:
-                if j.sal.fs.exists(config):
-                    config = json.load(open(config))
-                else:
-                    self._logger.warning('Config file {} does not exist. Default values will be used'.format(self._config))
-        finally:
-            return config
-                
-
+            
 
 
 
