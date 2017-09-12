@@ -41,4 +41,4 @@ exclude_paths:
 - script/
 - test/
 - vendor/
-- **/api-console-vendor.js
+- "**/api-console-vendor.js"
