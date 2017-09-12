@@ -87,7 +87,7 @@ def install(job):
     pm = prefab.processmanager.get('tmux')
     bin_location = prefab.core.command_location('fs')
     cmd = '%s -config %s' % (bin_location, config_path)
-    pm.ensure("fs_%s" % service.name, cmd=cmd, env={}, path='$JSCFGDIR/fs', descr='G8OS FS', autostart=True, wait="3m")
+    pm.ensure("fs_%s" % service.name, cmd=cmd, env={}, path='$JSCFGDIR/fs', descr='G8OS FS', autostart=True, wait=180)
 
     # wait until all targets are actually mounted
     # We wait max 1 min per target
