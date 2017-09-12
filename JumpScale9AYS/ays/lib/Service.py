@@ -235,7 +235,10 @@ class Service:
                     raise j.exceptions.Input(message="Specified services [%s] are more than maximum services: [%s]" % (str(usersetservices), str(producer_model.maxServices)),
                                              level=1, source="", tags="", msgpub="")
 
-            tocreate = producer_model.minServices - len(available_services) - len(usersetservices)
+            if producer_model.auto:
+                tocreate = producer_model.minServices - len(available_services) - len(usersetservices)
+            else:
+                tocreate = producer_model.minServices - len(usersetservices)
             if tocreate > 0:
                 if producer_model.auto:
                     for idx in range(tocreate):
