@@ -16,7 +16,12 @@ from rq import Queue
 import logging
 import time
 
-AYS_CORE_BP_TESTS_PATH = j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'core')
+AYS_CORE_BP_TESTS_PATH = [j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'core')]
+
+AYS_NON_CORE_BP_TESTS_PATH = [j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'basic'),
+                              j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'advanced'),
+                              j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'extend')]
+                              
 # AYS_DEFAULT_PLACEHOLDERS = ['URL', 'LOGIN', 'ACCOUNT', 'PASSWORD', 'LOCATION']
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
 AYS_TESTRUNNER_REPO_GIT = 'https://github.com/ahussein/ays_testrunner.git'
@@ -448,14 +453,16 @@ class BaseRunner:
         """
         Intialize test runner
         """
-        if config is None:
-            config = {}
-        self._config = config
+        
+        self._logger = j.logger.get('aystestrunner.{}'.format(name))
+        # check if config is a file, then load cofnig from the file
+        self._config = self._check_config(config)
         self._name = name
         self._task_queue = Queue(connection=Redis(), default_timeout=self._config.get('TEST_TIMEOUT', DEFAULT_TEST_TIMEOUT))
-        self._logger = j.logger.get('aystestrunner.{}'.format(name))
         self._failed_tests = {}
         self._tests = []
+        
+        self._default_bp_paths = []
 
 
     def run(self):
@@ -470,12 +477,37 @@ class BaseRunner:
         """
         raise NotImplementedError("Not Implemented")
 
+    
+    def _check_config(self, config):
+        """
+        Check if config is file the it will try to read it as a json file
+        """
+        config = {}
+        try:
+            if type(self._config) is str:
+                if j.sal.fs.exists(config):
+                    config = json.load(open(config))
+                else:
+                    self._logger.warning('Config file {} does not exist. Default values will be used'.format(self._config))
+        finally:
+            return config
+                
+
+
 
 
 class AYSCoreTestRunner(BaseRunner):
     """
     Test Runner to run ays core tets
     """
+
+    def __init__(self, name, config=None):
+        """
+        Initialize core test runner
+        """
+        super().__init__(name, config)
+        self._default_bp_paths = AYS_CORE_BP_TESTS_PATH
+
 
     def _pre_process_tests(self):
         """
@@ -497,7 +529,7 @@ class AYSCoreTestRunner(BaseRunner):
         """
         try:
             jobs = {}
-            self._tests = collect_tests(paths=self._config.get('bp_paths', [AYS_CORE_BP_TESTS_PATH]), logger=self._logger)
+            self._tests = collect_tests(paths=self._config.get('bp_paths', self._default_bp_paths), logger=self._logger)
             self._pre_process_tests()
             for test in self._tests:
                 self._logger.info('Scheduling test {}'.format(test.name))
@@ -571,3 +603,16 @@ class AYSCoreTestRunner(BaseRunner):
                 if failed_test.exc_info:
                     print(failed_test.exc_info)
             raise RuntimeError('Failures while running ays tests')
+
+
+class AYSTestRunner(AYSCoreTestRunner):
+    """
+    Test runner for non-core tests
+    """
+
+    def __init__(self, name, config=None):
+        """
+        Initialize non-core test runner
+        """
+        super().__init__(name=name, config=config)
+        self._default_bp_paths = AYS_NON_CORE_BP_TESTS_PATH
