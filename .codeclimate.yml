@@ -1,11 +1,6 @@
----
 engines:
-  brakeman:
-    enabled: false
-  bundler-audit:
-    enabled: false
   csslint:
-    enabled: false
+    enabled: true
   duplication:
     enabled: true
     config:
@@ -15,30 +10,17 @@ engines:
       - python
       - php
   eslint:
-    enabled: false
+    enabled: true
   fixme:
-    enabled: false
-  rubocop:
-    enabled: false
+    enabled: true
+  radon:
+    enabled: true
 ratings:
   paths:
-  - Gemfile.lock
-  - "**.erb"
-  - "**.haml"
-  - "**.rb"
-  - "**.rhtml"
-  - "**.slim"
   - "**.css"
   - "**.inc"
   - "**.js"
   - "**.jsx"
   - "**.module"
-  - "**.php"
-  - "**.py"
 exclude_paths:
-- config/
-- db/
-- script/
-- test/
-- vendor/
 - "**/api-console-vendor.js"
