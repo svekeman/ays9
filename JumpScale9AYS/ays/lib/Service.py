@@ -245,9 +245,11 @@ class Service:
                     auto_actor = self.aysrepo.actorGet(producer_role)
                     available_services.append(await auto_actor.asyncServiceCreate(instance="auto_%s" % idx, args={}))
 
-            for idx, producer_obj in enumerate(usersetservices + available_services):
-                if producer_model.auto is False and idx >= len(usersetservices) and idx >= producer_model.minServices:
-                    break
+            if producer_model.minServices > len(usersetservices):
+                available_services = available_services[:producer_model.minServices - len(usersetservices)]
+            else:
+                available_services = []
+            for producer_obj in (usersetservices + available_services):
                 self.model.producerAdd(
                     actorName=producer_obj.model.dbobj.actorName,
                     serviceName=producer_obj.model.dbobj.name,
