@@ -45,6 +45,14 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
  - Adding new disk in the blueprint will create a new disk and attach it to the machine, then set its IO limit.
  - Removing boot disks will be ignored.
 
+## User access rights
+
+Use the uservdc parameter to specify the user access right to the machine. Note that if only name exist in the entry(no accesstype) then the access right will be by default `ACDRUX`.
+
+Note that the data in the blueprint is always reflected in the machine, which means that removing an entry in the blueprint will remove or change it in the machine. If the user only wants to edit some data then it is possible to do so by using processChange action.
+
+Using process change it is possible to add, remove and update user access to machine. To add user after executing the run and creating the machine, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. Changing the accesstype will update the user access when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
+
 ### Access rights
 
 For information about the different access rights check docs at [openvcloud](https://github.com/0-complexity/openvcloud/blob/2.1.7/docs/EndUserPortal/Authorization/AuthorizationModel.md).
@@ -312,80 +320,6 @@ node.ovc__demo:
 actions:
   - action: detach_external_network
     actor: node.ovc
-```
-
-## Example for adding user to a machine
-```yaml
-g8client__env:
-    url: '<env_url>'
-    login: '<login>'
-    password: '<password>'
-    account: '<account>'
-
-vdc__vdcname:
-    location: '<location>'
-
-uservdc__demo_user:
-    g8client: env
-
-node.ovc__demo:
-  uservdc:
-    - name: demo_user
-      accesstype: ACDRUX
-
-actions:
-  - action: add_user
-    actor: node.ovc
-    service: demo
-```
-
-## Example for updating user access right on a machine
-```yaml
-g8client__env:
-    url: '<env_url>'
-    login: '<login>'
-    password: '<password>'
-    account: '<account>'
-
-vdc__vdcname:
-    location: '<location>'
-
-uservdc__demo_user:
-    g8client: env
-
-node.ovc__demo:
-  uservdc:
-    - name: demo_user
-      accesstype: R
-
-actions:
-  - action: update_user
-    actor: node.ovc
-    service: demo
-```
-
-## Example for delete user access right from a machine
-```yaml
-g8client__env:
-    url: '<env_url>'
-    login: '<login>'
-    password: '<password>'
-    account: '<account>'
-
-vdc__vdcname:
-    location: '<location>'
-
-uservdc__demo_user:
-    g8client: env
-
-node.ovc__demo:
-  uservdc:
-    - name: demo_user
-
-actions:
-  - action: delete_user
-    actor: node.ovc
-    service: demo
 ```
 
 ## Example for listing snapshots of a machine
