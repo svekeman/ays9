@@ -137,7 +137,7 @@ def processChange(job):
             if key == 'uservdc':
                 # value is a list of (uservdc)
                 if not isinstance(value, list):
-                    raise j.exceptions.Input(message="Value is not a list.")
+                    raise j.exceptions.Input(message="%s should be a list" % key)
                 if 'uservdc' in service.producers:
                     for s in service.producers['uservdc']:
                         if not any(v['name'] == s.name for v in value):
