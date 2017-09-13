@@ -45,6 +45,9 @@ e.g: to expose port 22 of the VM to the port 9000 on the public port of the vdc 
  - Adding new disk in the blueprint will create a new disk and attach it to the machine, then set its IO limit.
  - Removing boot disks will be ignored.
 
+### Access rights
+
+For information about the different access rights check docs at [openvcloud](https://github.com/0-complexity/openvcloud/blob/2.1.7/docs/EndUserPortal/Authorization/AuthorizationModel.md).
 
 ## Example for creating machine
 ```yaml

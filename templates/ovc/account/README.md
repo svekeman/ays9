@@ -35,7 +35,15 @@ with open('/tmp/account.zip', 'wb') as f:
 
 ## Add/remove/update user
 
-It is possible to add, remove and update user access to the account. To add a user after creating the account, a new uservdc has to be added in the blueprint. Executing the blueprint will trigger the process change and add it to the account. In the same way a user can be removed from the account by deleting the entry from the accountusers in the blueprint. Changing the accesstype of as user will update the user access to the account when executing the blueprint.
+Use the accountusers parameter to specify the user access right to the account. Note that if only name exist in the entry(no accesstype) then the access right will be by default `ACDRUX`.
+
+Note that the data in the blueprint is always reflected in the account, which means that removing an entry in the blueprint will remove or change it in the account. If the user only wants to edit some data then it is possible to do so by using processChange action.
+
+It is possible to add, remove and update user access to the account. To add a user after creating the account, a new uservdc has to be added in the blueprint. Executing the blueprint will trigger the process change and add it to the account. In the same way a user can be removed from the account by deleting the entry from the accountusers in the blueprint. Changing the accesstype of as user will update the user access to the account when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
+
+## Access rights
+
+For information about the different access rights check docs at [openvcloud](https://github.com/0-complexity/openvcloud/blob/2.1.7/docs/EndUserPortal/Authorization/AuthorizationModel.md).
 
 ## Example for creating an account
 
