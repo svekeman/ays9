@@ -93,7 +93,7 @@ def run_view(run):
                 'service_name': job.model.dbobj.serviceName,
                 'state': str(job.model.dbobj.state),
                 'logs': logs,
-                'result': job.dbobj.result
+                'result': job.model.dbobj.result
             })
         obj['steps'].append(aystep)
 
