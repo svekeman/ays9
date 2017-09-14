@@ -26,6 +26,8 @@ def authorization_user(account, service):
     authorized_users = account.authorized_users
 
     userslist = service.producers.get('uservdc', [])
+    if not userslist:
+        return
     users = []
     user_exists = True
     for u in userslist:
