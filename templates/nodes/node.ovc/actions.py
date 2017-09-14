@@ -187,69 +187,67 @@ def authorization_user(machine, service):
     for item in machine_info['acl']:
         acl_info[item['userGroupId']] = item
 
-    userslist = service.producers.get('uservdc', None)
+    userslist = service.producers.get('uservdc', [])
 
-    if userslist is not None:
-        users = []
-        for u in userslist:
-            if u.model.data.provider != '':
-                users.append(u.model.dbobj.name + "@" + u.model.data.provider)
-            else:
-                users.append(u.model.dbobj.name)
+    users = []
+    for u in userslist:
+        if u.model.data.provider != '':
+            users.append(u.model.dbobj.name + "@" + u.model.data.provider)
+        else:
+            users.append(u.model.dbobj.name)
 
-        # Authorize users
-        for user in users:
-            user_exists = True
-            if user not in acl_info:
-                user_exists = False
-            for uvdc in service.model.data.uservdc:
-                if uvdc.name == user.split('@')[0]:
-                    if user_exists and uvdc.accesstype != acl_info[user]['right']:
-                        try:
-                            result = machine.client.api.cloudapi.machines.updateUser(
-                                machineId=machine.id, userId=user, accesstype=uvdc.accesstype
-                            )
-                        except ApiError as err:
-                            service.logger.error(
-                                """
-                                Failed to update access rights for user {} on machine {}.
-                                Error: {}""".format(user, machine.name, err)
-                            )
-                            raise
-                        if result is not True:
-                            service.logger.error(
-                                'Failed to update access rights for user {} on machine {}'.format(user, machine.name)
-                            )
-                    elif not user_exists:
-                        try:
-                            result = machine.client.api.cloudapi.machines.addUser(
-                                machineId=machine.id, userId=user, accesstype=uvdc.accesstype
-                            )
-                        except ApiError as err:
-                            service.logger.error(
-                                """
-                                Failed to register access rights for user {} on machine {}.
-                                Error: {}
-                                """.format(user, machine.name, err)
-                            )
-                            raise
-                        if result is not True:
-                            service.logger.error(
-                                'Failed to register access rights for user {} on machine {}'.format(user, machine.name)
-                            )
-        # this means that the there the user set the uservdc to empty list in the bp
-        # Unauthorize users not in the schema
-        for user in acl_info.keys():
-            if user not in users:
-                try:
-                    machine.client.api.cloudapi.machines.deleteUser(machineId=machine.id, userId=user)
-                except ApiError as err:
-                    service.logger.error(
-                        """
-                        Failed to delete access rights for user {} on machine {}.
-                        Error: {}""".format(user, machine.name, err)
-                    )
-                    raise
+    # Authorize users
+    for user in users:
+        user_exists = True
+        if user not in acl_info:
+            user_exists = False
+        for uvdc in service.model.data.uservdc:
+            if uvdc.name == user.split('@')[0]:
+                if user_exists and uvdc.accesstype != acl_info[user]['right']:
+                    try:
+                        result = machine.client.api.cloudapi.machines.updateUser(
+                            machineId=machine.id, userId=user, accesstype=uvdc.accesstype
+                        )
+                    except ApiError as err:
+                        service.logger.error(
+                            """
+                            Failed to update access rights for user {} on machine {}.
+                            Error: {}""".format(user, machine.name, err)
+                        )
+                        raise
+                    if result is not True:
+                        service.logger.error(
+                            'Failed to update access rights for user {} on machine {}'.format(user, machine.name)
+                        )
+                elif not user_exists:
+                    try:
+                        result = machine.client.api.cloudapi.machines.addUser(
+                            machineId=machine.id, userId=user, accesstype=uvdc.accesstype
+                        )
+                    except ApiError as err:
+                        service.logger.error(
+                            """
+                            Failed to register access rights for user {} on machine {}.
+                            Error: {}
+                            """.format(user, machine.name, err)
+                        )
+                        raise
+                    if result is not True:
+                        service.logger.error(
+                            'Failed to register access rights for user {} on machine {}'.format(user, machine.name)
+                        )
+    # Unauthorize users not in the schema
+    for user in acl_info.keys():
+        if user not in users and acl_info[user]['canBeDeleted'] is True:
+            try:
+                machine.client.api.cloudapi.machines.deleteUser(machineId=machine.id, userId=user)
+            except ApiError as err:
+                service.logger.error(
+                    """
+                    Failed to delete access rights for user {} on machine {}.
+                    Error: {}""".format(user, machine.name, err)
+                )
+                raise
 
 
 def install(job):
@@ -329,6 +327,7 @@ def processChange(job):
     args = job.model.args
     category = args.pop('changeCategory')
     if category == "dataschema" and service.model.actionsState['install'] == 'ok':
+        from JumpScale9Lib.clients.portal.PortalClient import ApiError
 
         for key, value in args.items():
             if key == 'ports':
@@ -420,8 +419,7 @@ def processChange(job):
                         for v in value:
                             accessRight = v.get('accesstype', '')
                             if v['name'] == s.name and accessRight != get_user_accessright(s.name, service):
-                                name = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
-                                space.update_access(name, accessRight)
+                                user = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
                                 try:
                                     result = machine.client.api.cloudapi.machines.updateUser(
                                         machineId=machine.id, userId=user, accesstype=accessRight

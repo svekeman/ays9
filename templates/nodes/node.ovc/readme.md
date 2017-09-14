@@ -51,7 +51,7 @@ Use the uservdc parameter to specify the user access right to the machine. Note 
 
 Note that the data in the blueprint is always reflected in the machine, which means that removing an entry in the blueprint will remove or change it in the machine. If the user only wants to edit some data then it is possible to do so by using processChange action.
 
-Using process change it is possible to add, remove and update user access to machine. To add user after executing the run and creating the machine, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. Changing the accesstype will update the user access when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
+Using process change it is possible to add, remove and update user access to machine. To add user after executing the run and creating the machine, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the machine or removing user by deleting the entry in the blueprint. Changing the accesstype will update the user access when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
 
 ### Access rights
 
