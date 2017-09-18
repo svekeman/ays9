@@ -129,7 +129,7 @@ def processChange(job):
                         service.consume(userservice)
             setattr(service.model.data, key, value)
 
-        authorization_user(account, service)
+        authorization_user(account, service, g8client)
 
         # update capacity
         account.model['maxMemoryCapacity'] = service.model.data.maxMemoryCapacity
