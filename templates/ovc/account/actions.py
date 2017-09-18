@@ -21,11 +21,15 @@ def init(job):
 
     service.saveAll()
 
-def authorization_user(account, service, update=False):
+
+def authorization_user(account, service):
     authorized_users = account.authorized_users
 
     userslist = service.producers.get('uservdc', [])
+    if not userslist:
+        return
     users = []
+    user_exists = True
     for u in userslist:
         if u.model.data.provider != '':
             users.append(u.model.dbobj.name + "@" + u.model.data.provider)
@@ -35,23 +39,26 @@ def authorization_user(account, service, update=False):
     # Authorize users
     for user in users:
         if user not in authorized_users:
-            for uvdc in service.model.data.accountusers:
-                if uvdc.name == user.split('@')[0]:
-                    if uvdc.accesstype:
-                        account.authorize_user(username=user, right=uvdc.accesstype)
-                    else:
-                        account.authorize_user(username=user)
-
-    if update:
+            user_exists = False
+        for uvdc in service.model.data.accountusers:
+            if uvdc.name == user.split('@')[0]:
+                if user_exists:
+                    for acl in account.model['acl']:
+                        if acl['userGroupId'] == user and acl['right'] != uvdc.accesstype:
+                            account.update_access(username=user, right=uvdc.accesstype)
+                else:
+                    account.authorize_user(username=user, right=uvdc.accesstype)
         # Unauthorize users not in the schema
-        for user in authorized_users:
-            if user not in users:
-                account.unauthorize_user(username=user)
+    for user in authorized_users:
+        if user not in users:
+            account.unauthorize_user(username=user)
+
 
 def get_user_accessright(username, service):
     for u in service.model.data.accountusers:
         if u.name == username:
             return u.accesstype
+
 
 def install(job):
     service = job.service
@@ -72,7 +79,7 @@ def install(job):
     service.model.data.accountID = account.model['id']
     service.model.save()
 
-    authorization_user(account, service, False)
+    authorization_user(account, service)
     # Unauthorize users not in the schema
     # THIS FUNCTIONALITY IS DISABLED UNTIL OVC DOESN'T REQUIRE USERS TO BE ADMIN
 
@@ -102,16 +109,17 @@ def processChange(job):
             if key == 'accountusers':
                 # value is a list of (uservdc)
                 if not isinstance(value, list):
-                    raise j.exceptions.Input(message="Value is not a list.")
+                    raise j.exceptions.Input(message="%s should be a list" % key)
 
-                for s in service.producers['uservdc']:
-                    if not any(v['name'] == s.name for v in value):
-                        service.model.producerRemove(s)
-                    for v in value:
-                        accessRight = v.get('accesstype', '')
-                        if v['name'] == s.name and accessRight != get_user_accessright(s.name, service) and accessRight:
-                            name = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
-                            account.update_access(name, v['accesstype'])
+                if 'uservdc' in service.producers:
+                    for s in service.producers['uservdc']:
+                        if not any(v['name'] == s.name for v in value):
+                            service.model.producerRemove(s)
+                        for v in value:
+                            accessRight = v.get('accesstype', '')
+                            if v['name'] == s.name and accessRight != get_user_accessright(s.name, service) and accessRight:
+                                name = s.name + '@' + s.model.data.provider if s.model.data.provider else s.name
+                                account.update_access(name, v['accesstype'])
 
                 for v in value:
                     userservice = service.aysrepo.serviceGet('uservdc', v['name'])
@@ -119,7 +127,7 @@ def processChange(job):
                         service.consume(userservice)
             setattr(service.model.data, key, value)
 
-        authorization_user(account, service, True)
+        authorization_user(account, service)
 
         # update capacity
         account.model['maxMemoryCapacity'] = service.model.data.maxMemoryCapacity

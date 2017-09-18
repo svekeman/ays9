@@ -28,7 +28,11 @@ Use the uservdc parameter to specify the user access right to the vdc. Note that
 
 Note that the data in the blueprint is always reflected in the vdc, which means that removing an entry in the blueprint will remove or change it in the vdc. If the user only wants to edit some data then it is possible to do so by using processChange action.
 
-Using process change it is possible to add, remove and update user access to the cloudspace. To add user after executing the run and creating the vdc, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. changing the accesstype will update the user access when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
+Using process change it is possible to add, remove and update user access to the cloudspace. To add user after executing the run and creating the vdc, add a new user in the blueprint and execute the blueprint to trigger process change and add new user to the cloudspace or removing user by deleting the entry in the blueprint. Changing the accesstype will update the user access when executing the blueprint and as above removing it will change the access right to the default value `ACDRUX`.
+
+## Access rights
+
+For information about the different access rights check docs at [openvcloud](https://github.com/0-complexity/openvcloud/blob/2.1.7/docs/EndUserPortal/Authorization/AuthorizationModel.md).
 
 ## Example for creating VDC
 
@@ -140,7 +144,7 @@ vdc__cs2:
     # |
     # /ip service
     # set www address=0.0.0.0/0
-    script: '<SCRIPT>' 
+    script: '<SCRIPT>'
 
 actions:
   - action: execute_routeros_script

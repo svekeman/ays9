@@ -11,7 +11,7 @@ For more information and how to use see [docs](docs/AYS-Introduction.md).
 - [version & roadmap info](https://github.com/Jumpscale/home/blob/master/README.md)
 
 ## Installation
-To install and use ays9 you need a JumpScale 9 installation. To install JumpScale follow the documentation [here](https://github.com/Jumpscale/developer/blob/master/README.md).
+To install and use ays9 you need a JumpScale 9 installation. To install JumpScale follow the documentation [here](https://github.com/Jumpscale/bash/blob/master/README.md).
 
 To install ays dependencies navigate to repo path and execute:
 ```bash
