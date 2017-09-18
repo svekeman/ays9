@@ -1,6 +1,7 @@
 import asyncio
 from js9 import j
 from JumpScale9AYS.ays.lib.Recurring import LongRunningTask, RecurringTask
+from . import utils
 
 
 class Service:
@@ -314,14 +315,16 @@ class Service:
 
     def saveToFS(self):
         j.sal.fs.createDir(self.path)
-        path2 = j.sal.fs.joinPaths(self.path, "service.json")
-        j.sal.fs.writeFile(path2, self.model.dictJson, append=False)
+        with utils.Lock(j.sal.fs.joinPaths(self.path, ".lock")):
 
-        path3 = j.sal.fs.joinPaths(self.path, "data.json")
-        j.sal.fs.writeFile(path3, self.model.dataJSON)
+            path2 = j.sal.fs.joinPaths(self.path, "service.json")
+            j.sal.fs.writeFile(path2, self.model.dictJson, append=False)
 
-        path4 = j.sal.fs.joinPaths(self.path, "schema.capnp")
-        j.sal.fs.writeFile(path4, self.model.dbobj.dataSchema)
+            path3 = j.sal.fs.joinPaths(self.path, "data.json")
+            j.sal.fs.writeFile(path3, self.model.dataJSON)
+
+            path4 = j.sal.fs.joinPaths(self.path, "schema.capnp")
+            j.sal.fs.writeFile(path4, self.model.dbobj.dataSchema)
 
     def save(self):
         if not self._deleted:
