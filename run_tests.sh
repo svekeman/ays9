@@ -22,9 +22,9 @@ if [ -n $TRAVIS_EVENT_TYPE ] && [ $TRAVIS_EVENT_TYPE == "cron" ]; then
 
     pushd ~/backend_vpn
     # write files
-    echo "$VPN_USER_CERT" > user.crt
+    echo "$VPN_USER_CRT" > user.crt
     echo "$VPN_USER_KEY" > user.key
-    echo "$VPN_CERT" > ca.crt
+    echo "$VPN_CRT" > ca.crt
     echo "$VPN_OVPN_FILE" > gig.tech.ovpn
 
     # starting vpn connection in deamon mode

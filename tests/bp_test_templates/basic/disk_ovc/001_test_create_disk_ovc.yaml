@@ -13,7 +13,8 @@ disk.ovc__testdisk:
     location: <LOCATION>
 
 test_disk_ovc__testcreatedisk:
-    disk: testdisk
+    disk: 
+      - testdisk
 
 actions:
 

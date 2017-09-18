@@ -364,7 +364,10 @@ class AYSTest:
         self._logger.info('Replacing placeholders for test blueprint {}'.format(self._path))
         for item, value in config.items():
             cmd = sed_base_command.format(key=item, value=value, path=self._path)
-            self._prefab.core.run(cmd)
+            try:
+                self._prefab.core.run(cmd)
+            except:
+                self._logger.warning('Failed to replace placeholder {}'.format(item))
 
 
     def setup(self):

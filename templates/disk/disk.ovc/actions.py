@@ -35,6 +35,7 @@ def create(job):
         type=service.model.data.type,
         ssd_size=service.model.data.ssdSize
     )
+    service.saveAll()
 
 
 def delete(job):
