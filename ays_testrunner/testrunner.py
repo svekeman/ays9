@@ -171,7 +171,7 @@ def report_run(cli, repo_info, logger=None):
 
     return errors
 
-def collect_tests(paths, logger=None, setup=None, teardown=None):
+def collect_tests(paths, logger=None, setup=None, teardown=None, repo_info=None):
     """
     Collects all test bp from the given paths
     This will only scan only one level of the paths and collect all the files that that ends with .yaml and .bp files
@@ -189,7 +189,7 @@ def collect_tests(paths, logger=None, setup=None, teardown=None):
             continue
         if j.sal.fs.isFile(path):
             name = j.sal.fs.getBaseName(path)
-            result.append(AYSTest(name=name, path=path))
+            result.append(AYSTest(name=name, path=path, setup=setup, teardown=teardown, repo_info=repo_info))
             continue
         for dir_ in j.sal.fs.listDirsInDir(path):
             logger.debug('Creating group test for path {}'.format(dir_))
@@ -198,7 +198,7 @@ def collect_tests(paths, logger=None, setup=None, teardown=None):
                                                                                   (file__.endswith('{}yaml'.format(os.path.extsep)) or
                                                                                   file__.endswith('{}bp'.format(os.path.extsep)))]):
             logger.debug('Creating test for path {}'.format(file_))
-            result.append(AYSTest(name=j.sal.fs.getBaseName(file_), path=file_, setup=setup, teardown=teardown))
+            result.append(AYSTest(name=j.sal.fs.getBaseName(file_), path=file_, setup=setup, teardown=teardown, repo_info=repo_info))
     return result
 
 
@@ -224,7 +224,14 @@ class AYSGroupTest:
             self._logger = logging.getLogger()
         else:
             self._logger = logger
-        self._tests = collect_tests(paths=[path], logger=self._logger, setup=self.setup, teardown=self.teardown)
+        # create a repo per group test
+        try:
+            self._cli = j.clients.atyourservice.get().api.ays
+            self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
+        except Exception as ex:
+            self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
+
+        self._tests = collect_tests(paths=[path], logger=self._logger, setup=self.setup, teardown=self.singletest_teardwon, repo_info=self._repo_info)
 
 
     @property
@@ -252,13 +259,33 @@ class AYSGroupTest:
         pass
 
 
+    def singletest_teardwon(self):
+        """
+        Override single test member teardown
+        """
+        pass
+
+
     def teardown(self):
         """
         Teardown steps
         """
+        repo_exist = False
         try:
             for test in self._tests:
                 test.teardown()
+            res, ok = check_status_code(self._cli.listRepositories())
+            if ok:
+                for repo_info in res.json():
+                    if repo_info['name'] == self._repo_info.get('name', None):
+                        repo_exist = True
+                        break
+
+            if repo_exist:
+                # destroy repo
+                self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
+                # delete repo
+                self._cli.deleteRepository(repository=self._repo_info['name'])
         except Exception as err:
             self._errors.append('Errors while executing teardown for group test {}. Errors: {}'.format(self._name, err))
 
@@ -293,7 +320,7 @@ class AYSTest:
     """
     Represents an AYS test bp
     """
-    def __init__(self, name, path, logger=None, setup=None, teardown=None):
+    def __init__(self, name, path, logger=None, setup=None, teardown=None, repo_info=None):
         """
         Initialize the test
 
@@ -311,10 +338,10 @@ class AYSTest:
         self._cli  = None
         self._starttime = None
         self._endtime = None
-        if setup is None:
-            self._setup = self.setup
-        if teardown is None:
-            self._teardown = self.teardown
+        if setup is not None:
+            self.setup = setup
+        if teardown is not None:
+            self.teardown = teardown
 
         if logger is None:
             # FIXME: problem with using the js logger when pickling the object
@@ -326,7 +353,10 @@ class AYSTest:
         # create a repo per test
         try:
             self._cli = j.clients.atyourservice.get().api.ays
-            self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
+            if repo_info is None:
+                self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
+            else:
+                self._repo_info = repo_info
         except Exception as ex:
             self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
 
@@ -394,7 +424,7 @@ class AYSTest:
                 # destroy repo
                 self._cli.destroyRepository(data={}, repository=self._repo_info['name'])
                 # delete repo
-                # self._cli.deleteRepository(repository=self._repo_info['name'])
+                self._cli.deleteRepository(repository=self._repo_info['name'])
         except Exception as err:
             self._errors.append('Failed to destroy/delete repository {}. Error: {}'.format(self._repo_info['name'], err))
 

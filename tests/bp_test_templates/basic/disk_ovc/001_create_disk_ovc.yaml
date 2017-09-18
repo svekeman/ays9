@@ -12,20 +12,12 @@ disk.ovc__testdisk:
     type: "D"
     location: <LOCATION>
 
-test_disk_ovc__testdeletedisk:
-    disk: 
-      - testdisk
-
 actions:
 
   - action: install
     actor: g8client
     service: env
 
-  - action: delete
+  - action: create
     actor: disk.ovc
     service: testdisk
-
-  - action: test_delete
-    actor: test_disk_ovc
-    service: testdeletedisk
