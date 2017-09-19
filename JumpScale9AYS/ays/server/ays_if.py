@@ -177,7 +177,7 @@ ays_if.add_route(ays_repository_byrepository_templateView.as_view(), '/ays/repos
 class ays_repository_byrepository_template_bynameView(HTTPMethodView):
 
     async def get(self, request, name, repository):
-        return await auth(request=request, funcname='getTemplate', name=name, repository=repository)
+        return await auth(request=request, funcname='getTemplate', template=name, repository=repository)
 
 ays_if.add_route(ays_repository_byrepository_template_bynameView.as_view(), '/ays/repository/<repository>/template/<name>')
 
