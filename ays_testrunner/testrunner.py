@@ -19,8 +19,9 @@ import time
 AYS_CORE_BP_TESTS_PATH = [j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'core')]
 
 AYS_NON_CORE_BP_TESTS_PATH = [j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'basic'),
-                              j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'advanced'),
-                              j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'extend')]
+                            #   j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'advanced'),
+                            #   j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'extend')
+                              ]
                               
 # AYS_DEFAULT_PLACEHOLDERS = ['URL', 'LOGIN', 'ACCOUNT', 'PASSWORD', 'LOCATION']
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
