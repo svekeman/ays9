@@ -66,6 +66,7 @@ def _execute_cb(job, future):
         job.logger.info("job {} done sucessfuly".format(str(job)))
 
     if service_action_obj.period > 0:   # recurring action.
+        job.model.save()
         job.model.delete()
         del job
     else:
