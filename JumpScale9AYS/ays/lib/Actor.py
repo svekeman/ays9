@@ -1,6 +1,6 @@
 from js9 import j
 from .Service import Service
-from .utils import validate_service_name
+from .utils import validate_service_name, Lock
 import capnp
 from JumpScale9AYS.ays.lib import model_capnp as ModelCapnp
 
@@ -83,22 +83,21 @@ class Actor():
 
 
     def saveToFS(self):
-
         j.sal.fs.createDir(self.path)
+        with Lock(j.sal.fs.joinPaths(self.path, ".lock")):
+            path = j.sal.fs.joinPaths(self.path, "actor.json")
+            j.sal.fs.writeFile(filename=path, contents=str(self.model.dictJson), append=False)
 
-        path = j.sal.fs.joinPaths(self.path, "actor.json")
-        j.sal.fs.writeFile(filename=path, contents=str(self.model.dictJson), append=False)
+            actionspath = j.sal.fs.joinPaths(self.path, "actions.py")
+            j.sal.fs.writeFile(actionspath, self.model.actionsSourceCode)
 
-        actionspath = j.sal.fs.joinPaths(self.path, "actions.py")
-        j.sal.fs.writeFile(actionspath, self.model.actionsSourceCode)
+            # path3 = j.sal.fs.joinPaths(self.path, "config.json")
+            # if self.model.data != {}:
+            #     j.sal.fs.writeFile(path3, self.model.dataJSON)
 
-        # path3 = j.sal.fs.joinPaths(self.path, "config.json")
-        # if self.model.data != {}:
-        #     j.sal.fs.writeFile(path3, self.model.dataJSON)
-
-        path4 = j.sal.fs.joinPaths(self.path, "schema.capnp")
-        if self.model.dbobj.serviceDataSchema.strip() != "":
-            j.sal.fs.writeFile(path4, self.model.dbobj.serviceDataSchema)
+            path4 = j.sal.fs.joinPaths(self.path, "schema.capnp")
+            if self.model.dbobj.serviceDataSchema.strip() != "":
+                j.sal.fs.writeFile(path4, self.model.dbobj.serviceDataSchema)
 
     def saveAll(self):
         self.model.save()
