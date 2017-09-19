@@ -55,8 +55,8 @@ class RunsCollection(ModelBaseCollection):
     def find(self, state="", repo="", fromEpoch=0, toEpoch=9999999999999):
         res = []
         for key in self._list_keys(state, fromEpoch, toEpoch):
-            if key:
-                if self.exists(key):
+            if self.exists(key):
+                if self.get(key):
                     if repo:
                         model = self.get(key)
                         if model.dbobj.repo != repo:
