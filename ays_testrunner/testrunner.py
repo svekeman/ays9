@@ -9,19 +9,22 @@ core = AYSCoreTestRunner('core', config={'bp_paths': ['/root/gig/code/github/jum
 core.run()
 """
 from js9 import j
+
 import os
 import random
 from redis import Redis
 from rq import Queue
-import logging
 import time
+import logging
 
-AYS_CORE_BP_TESTS_PATH = [j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'core')]
 
-AYS_NON_CORE_BP_TESTS_PATH = [j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'basic'),
-                            #   j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'advanced'),
-                            #   j.sal.fs.joinPaths(j.sal.fs.getParent(j.sal.fs.getParent(__file__)), 'tests', 'bp_test_templates', 'extend')
-                              ]
+
+AYS_CORE_BP_TESTS_PATH = [os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'bp_test_templates', 'core')]
+
+AYS_NON_CORE_BP_TESTS_PATH = [os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'bp_test_templates', 'basic'),
+                            #   os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'bp_test_templates', 'advanced'),
+                            #   os.path.join(os.path.dirname(os.path.dirname(__file__)), 'tests', 'bp_test_templates', 'extend')
+                            ]
                               
 # AYS_DEFAULT_PLACEHOLDERS = ['URL', 'LOGIN', 'ACCOUNT', 'PASSWORD', 'LOCATION']
 AYS_TESTRUNNER_REPO_NAME = 'ays_testrunner'
@@ -46,6 +49,7 @@ def ensure_test_repo(cli, repo_name, logger=None):
     """
     Ensure a new repo for running tests is created with unique name
     """
+
     if logger is None:
         logger = j.logger.logging
 
@@ -79,6 +83,7 @@ def execute_blueprint(cli, blueprint, repo_info, logger=None):
     """
     Execute a blueprint
     """
+
     if logger is None:
         logger = j.logger.logging
 
@@ -100,6 +105,7 @@ def create_run(cli, repo_info, logger=None):
     """
     Create a run and execute it
     """
+
     if logger is None:
         logger = j.logger.logging
 
@@ -121,6 +127,7 @@ def report_run(cli, repo_info, logger=None):
     check run status and report errors and logs if status is not ok
     if run status is ok then check the services result attribute and report errors if found
     """
+
     if logger is None:
         logger = j.logger.logging
 
@@ -140,9 +147,9 @@ def report_run(cli, repo_info, logger=None):
                     for step in run_details['steps']:
                         if step['state'] == 'error':
                             for job in step['jobs']:
-                                msg = 'Actor: {} Action: {}'.format(job['actor_name'], job['action_name'])
-                                errors.append('\n%s' % msg)
-                                errors.append('%s\n' % ('-' * len(msg)))
+                                msg = 'Actor: [{}] Action: [{}]'.format(job['actor_name'], job['action_name'])
+                                errors.append(msg)
+                                errors.append('-' * len(msg))
                                 for log in job['logs']:
                                     if log['log']:
                                         errors.append(log['log'])
@@ -159,9 +166,9 @@ def report_run(cli, repo_info, logger=None):
                 if ok:
                     service_details = res.json()
                     if service_details['data'].get('result') and not service_details['data']['result'].startswith('OK'):
-                        msg = 'Service role: {} Service instance: {}'.format(service_info['role'], service_info['name'])
-                        errors.append('\n%s' % msg)
-                        errors.append('%s\n' % ('-' * len(msg)))
+                        msg = 'Service role: [{}] Service instance: [{}]'.format(service_info['role'], service_info['name'])
+                        errors.append(msg)
+                        errors.append('-' * len(msg))
                         errors.append(service_details['data']['result'])
                 else:
                     errors.append('Failed to get service [{}!{}]'.format(service_info['role'], service_info['name']))
@@ -179,6 +186,7 @@ def collect_tests(paths, logger=None, setup=None, teardown=None, repo_info=None)
     If path in the list is a file then it will be considered a test file
     For all the directories on the same level, a group test will be created for each directory
     """
+
     if logger is None:
         logger = j.logger.logging
 
@@ -216,6 +224,8 @@ class AYSGroupTest:
         @param path: Path to the hosting folder of the test bps
         @param logger: Logger object to use for logging
         """
+    
+        
         self._name = name
         self._path = path
         self._errors = []
@@ -230,8 +240,9 @@ class AYSGroupTest:
             self._cli = j.clients.atyourservice.get().api.ays
             self._repo_info = ensure_test_repo(self._cli, AYS_TESTRUNNER_REPO_NAME, logger=self._logger)
         except Exception as ex:
+            self._repo_info = None
             self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
-
+            
         self._tests = collect_tests(paths=[path], logger=self._logger, setup=self.setup, teardown=self.singletest_teardwon, repo_info=self._repo_info)
 
 
@@ -331,6 +342,8 @@ class AYSTest:
         @param setup: Setup function to be called before the test
         @param teardown: Teardown function to be called after the test
         """
+    
+        
         self._path = path
         self._name = name
         self._prefab = j.tools.prefab.local
@@ -440,13 +453,14 @@ class AYSTest:
         - Collect run results
         - Destroy repo
         """
+    
         self.setup()
 
         try:
             if self._repo_info is None:
                 self._errors.append('Failed to create new ays repository for test {}'.format(self._name))
             else:
-                j.sal.fs.copyFile(self._path, j.sal.fs.joinPaths(self._repo_info['path'], 'blueprints', self._name))
+                j.sal.fs.copyFile(self._path, os.path.join(self._repo_info['path'], 'blueprints', self._name))
                 # execute bp
                 self._errors.extend(execute_blueprint(self._cli, self._name, self._repo_info, logger=self._logger))
                 if not self._errors:
@@ -487,6 +501,7 @@ class BaseRunner:
         """
         Intialize test runner
         """
+    
         if config is None:
             config = {}
         self._config = config
@@ -533,6 +548,14 @@ class AYSCoreTestRunner(BaseRunner):
         """
         for test in self._tests:
             test.replace_placehlders(self._config.get('BACKEND_ENV', {}))
+    
+    def _collect_and_preprocess(self):
+        """
+        This is a workaround method that will be called from the run test scripts to avoid opening of the files during replacing the placeholders
+        RQ is trying to pickle objects behind the scene and it fails if we open files in the same process.
+        """
+        self._tests = collect_tests(paths=self._config.get('bp_paths', self._default_bp_paths), logger=self._logger)
+        self._pre_process_tests()
 
 
     def run(self):
@@ -547,8 +570,7 @@ class AYSCoreTestRunner(BaseRunner):
         """
         try:
             jobs = {}
-            self._tests = collect_tests(paths=self._config.get('bp_paths', self._default_bp_paths), logger=self._logger)
-            self._pre_process_tests()
+            self._collect_and_preprocess()
             for test in self._tests:
                 self._logger.info('Scheduling test {}'.format(test.name))
                 jobs[test] = self._task_queue.enqueue(test.run)
@@ -620,6 +642,7 @@ class AYSCoreTestRunner(BaseRunner):
                     print('\n'.join(failed_test.result))
                 if failed_test.exc_info:
                     print(failed_test.exc_info)
+                print('\n')
             raise RuntimeError('Failures while running ays tests')
 
 
