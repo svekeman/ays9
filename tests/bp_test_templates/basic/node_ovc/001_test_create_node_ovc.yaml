@@ -12,6 +12,7 @@ disk.ovc__testnodeovcdisk1:
   maxIOPS: 1000
 
 node.ovc__testnodeovc:
+    g8client: 'env'
     sizeID: 1
     os.image: 'Ubuntu 16.04 x64'
     disk:
