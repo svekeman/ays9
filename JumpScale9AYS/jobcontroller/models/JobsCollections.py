@@ -72,7 +72,8 @@ class JobsCollection(ModelBaseCollection):
     def find(self, actor="", service="", action="", state="", serviceKey="", fromEpoch=0, toEpoch=9999999999999, tags=[]):
         res = []
         for key in self.list(actor, service, action, state, serviceKey, fromEpoch, toEpoch, tags):
-            res.append(self.get(key))
+            if self.get(key):
+                res.append(self.get(key))
         return res
 
 
