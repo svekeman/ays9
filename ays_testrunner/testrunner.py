@@ -323,7 +323,10 @@ class AYSGroupTest:
                 self._errors = test.errors
                 break
 
-        self.teardown()
+        # only teardown if there is no errors, otherwise leave repo test for inspection 
+        if not self._errors:
+            self.teardown()
+            
         return self._errors
 
 
@@ -471,7 +474,9 @@ class AYSTest:
         except Exception as err:
             self._errors.append('Test {} failed withe error: {}'.format(self._name, err))
 
-        self.teardown()
+        # only teardown if there is no errors, otherwise leave repo test for inspection 
+        if not self._errors:
+            self.teardown()
 
         return self._errors
 
