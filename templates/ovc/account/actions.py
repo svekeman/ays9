@@ -22,7 +22,7 @@ def init(job):
     service.saveAll()
 
 
-def authorization_user(account, service):
+def authorization_user(account, service, g8client):
     authorized_users = account.authorized_users
 
     userslist = service.producers.get('uservdc', [])
@@ -51,6 +51,8 @@ def authorization_user(account, service):
         # Unauthorize users not in the schema
     for user in authorized_users:
         if user not in users:
+            if user == g8client.model.data.login:
+                raise j.exceptions.Input("Can't remove current authenticating user: %s. To remove use another user for g8client service." % user)
             account.unauthorize_user(username=user)
 
 
@@ -79,7 +81,7 @@ def install(job):
     service.model.data.accountID = account.model['id']
     service.model.save()
 
-    authorization_user(account, service)
+    authorization_user(account, service, g8client)
     # Unauthorize users not in the schema
     # THIS FUNCTIONALITY IS DISABLED UNTIL OVC DOESN'T REQUIRE USERS TO BE ADMIN
 
@@ -127,7 +129,7 @@ def processChange(job):
                         service.consume(userservice)
             setattr(service.model.data, key, value)
 
-        authorization_user(account, service)
+        authorization_user(account, service, g8client)
 
         # update capacity
         account.model['maxMemoryCapacity'] = service.model.data.maxMemoryCapacity
