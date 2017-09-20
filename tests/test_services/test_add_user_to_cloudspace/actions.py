@@ -1,12 +1,11 @@
-def init_actions_(service, args):
-    """
-    this needs to returns an array of actions representing the depencies between actions.
-    Looks at ACTION_DEPS in this module for an example of what is expected
-    """
-    return {
-        'test_add_user': ['init']
-    }
+def test_user_access(job):
+    pass
 
+def test_update_user_access(job):
+    pass
+
+def test_delete_user_access(job):
+    pass
 
 def test_vdc_user(job):
     import requests, sys, time
