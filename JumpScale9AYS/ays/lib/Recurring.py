@@ -31,8 +31,10 @@ class RecurringTask:
                 await asyncio.sleep(sleep)
 
                 # execute
-                await self._job.execute()
-
+                try:
+                    await self._job.execute()
+                except:
+                    pass
                 # update last exection time
                 action_info.lastRun = j.data.time.epoch
 
