@@ -4,9 +4,9 @@ g8client__example:
     password: <PASSWORD>
     account: <ACCOUNT>
 
-uservdc__usertest:
+uservdc__cloudspace_user:
     password: '<password>'
-    email: '<email>'
+    email: '<email>@gig.tech'
     groups:
       - user
     g8client: 'example'
