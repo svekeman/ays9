@@ -198,7 +198,7 @@ ays_if.add_route(ays_templatesView.as_view(), '/ays/templates')
 class ays_templates_bynameView(HTTPMethodView):
 
     async def get(self, request, name):
-        return await auth(request=request, funcname='getAYSTemplate', name=name)
+        return await auth(request=request, funcname='getAYSTemplate', template=name)
 
 ays_if.add_route(ays_templates_bynameView.as_view(), '/ays/templates/<name>')
 
