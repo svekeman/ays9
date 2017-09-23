@@ -1,5 +1,11 @@
 def test_user_access(job):
-    pass
+    import requests, sys, time
+    service = job.service
+    RESULT_OK = 'OK : %s '
+    RESULT_FAILED = 'FAILED : %s'
+    RESULT_ERROR = 'ERROR : %s'
+    failures = []
+    
 
 def test_update_user_access(job):
     pass
