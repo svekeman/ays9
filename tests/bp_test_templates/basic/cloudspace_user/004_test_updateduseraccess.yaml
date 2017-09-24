@@ -4,6 +4,6 @@ test_add_user_to_cloudspace__useraccessupdate:
 
 
 actions:
-  - action: test_update_user_access
+  - action: test_user_access
     service: useraccessupdate
     actor: test_add_user_to_cloudspace
