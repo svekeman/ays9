@@ -527,7 +527,7 @@ def init_actions_(service, args):
         'import_': ['init'],
         'monitor': ['start'],
         'stop': ['install'],
-        'clone': ['install', 'stop'],
+        'clone': ['stop'],
         'get_history': ['install'],
         'attach_external_network': ['install'],
         'detach_external_network': ['install'],
@@ -540,7 +540,7 @@ def init_actions_(service, args):
         'restart': ['install'],
         'list_snapshots': ['install'],
         'snapshot': ['install'],
-        'rollback_snapshot': ['install', 'stop'],
+        'rollback_snapshot': ['stop'],
         'delete_snapshot': ['install']
     }
 
