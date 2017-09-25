@@ -135,7 +135,6 @@ class Run:
             self.save()
             if self.callbackUrl:
                 data = {'runid': self.key, 'runState': self.state.__str__()}
-                self.save()
                 requests.post(self.callbackUrl, headers={'Content-type': 'application/json'}, data=json.dumps(data))
 
     def __repr__(self):
