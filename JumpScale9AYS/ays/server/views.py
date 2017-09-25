@@ -99,7 +99,7 @@ def run_view(run):
                 'result': job.model.dbobj.result
             })
         obj['steps'].append(aystep)
-        obj['retry'] = retry
+    obj['retry'] = retry
 
     return obj
 
