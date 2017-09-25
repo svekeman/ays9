@@ -132,10 +132,10 @@ class Run:
             self.state = 'error'
             raise
         finally:
+            self.save()
             if self.callbackUrl:
                 data = {'runid': self.key, 'runState': self.state.__str__()}
                 requests.post(self.callbackUrl, headers={'Content-type': 'application/json'}, data=json.dumps(data))
-            self.save()
 
     def __repr__(self):
         out = "RUN:%s\n" % (self.key)
