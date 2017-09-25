@@ -281,7 +281,7 @@ class Service:
         data = j.data.serializer.json.loads(self.model.dataJSON)
         for key, value in args.items():
             sanitized_key = j.data.text.sanitize_key(key)
-            if sanitized_key in data and data[sanitized_key] != value:
+            if sanitized_key not in data or data[sanitized_key] != value:
                 self.processChange(actor=actor, changeCategory="dataschema", args=args, context=context)
                 break
 
@@ -920,7 +920,7 @@ class Service:
 
         # Check if the action job is already existing at any run in the repo before
         # rescheduling it again
-        existing_jobs = j.core.jobcontroller.db.jobs.find(action=action, service=self.name,
+        existing_jobs = j.core.jobcontroller.db.jobs.find(actor=self.model.role, action=action, service=self.name,
                                                           state="new|running|error", tags=["self_heal_internal"])
         if not existing_jobs:
             self.scheduleAction(action, force=True)
