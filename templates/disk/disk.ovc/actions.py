@@ -13,6 +13,15 @@ def init(job):
         raise j.exceptions.Input("disk.ovc's type must be data (D) or boot (B) only")
     if 'g8client' not in service.producers:
         raise j.exceptions.AYSNotFound("no producer g8client found. cannot continue init of %s" % service)
+    data = service.model.data
+    if (data.maxIOPS or data.totalIopsSec) and (data.readIopsSec or data.writeIopsSec):
+        raise j.exceptions.Input("total and read/write of iops_sec cannot be set at the same time")
+    if (data.totalBytesSec) and (data.readBytesSec or data.writeBytesSec):
+        raise j.exceptions.Input("total and read/write of bytes_sec cannot be set at the same time")
+    if (data.totalBytesSecMax) and (data.readBytesSecMax or data.writeBytesSecMax):
+        raise j.exceptions.Input("total and read/write of bytes_sec_max cannot be set at the same time")
+    if (data.totalIopsSecMax) and (data.readIopsSecMax or data.writeIopsSecMax):
+        raise j.exceptions.Input("total and read/write of iops_sec_max cannot be set at the same time")
 
 
 def create(job):
