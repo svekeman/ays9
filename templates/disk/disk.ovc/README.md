@@ -8,23 +8,23 @@ This actor template represents a disk in ovc to be used later on by other servic
  - size: disk size in GB.
  - type: type of disk boot or normal.
  - description: description of disk.
- - maxIOPS: max inputs outputs per second.
+ - maxIOPS: max inputs outputs per second (same as totalIopsSec).
  - devicename: device name (leave empty).
  - ssdSize: ssd size always available , will default to 10
  - location: location of the resource on cloud (i.e du-conv-2)
- - totalBytesSec: ''
- - readBytesSec: ''
- - writeBytesSec: ''
- - totalIopsSec: ''
- - readIopsSec: ''
- - writeIopsSec: ''
- - totalBytesSecMax: ''
- - readBytesSecMax: ''
- - writeBytesSecMax: ''
- - totalIopsSecMax: ''
- - readIopsSecMax: ''
- - writeIopsSecMax: ''
- - sizeIopsSec: ''
+ - totalBytesSec: The optional total_bytes_sec element is the total throughput limit in bytes per second. This cannot appear with read_bytes_sec or write_bytes_sec.
+ - readBytesSec: The optional read_bytes_sec element is the read throughput limit in bytes per second.
+ - writeBytesSec: The optional write_bytes_sec element is the write throughput limit in bytes per second.
+ - totalIopsSec: The optional total_iops_sec element is the total I/O operations per second. This cannot appear with read_iops_sec or write_iops_sec (same as maxIOPS).
+ - readIopsSec: The optional read_iops_sec element is the read I/O operations per second.
+ - writeIopsSec: The optional write_iops_sec element is the write I/O operations per second.
+ - totalBytesSecMax: The optional total_bytes_sec_max element is the maximum total throughput limit in bytes per second.
+ - readBytesSecMax: The optional read_bytes_sec_max element is the maximum read throughput limit in bytes per second.
+ - writeBytesSecMax: The optional write_bytes_sec_max element is the maximum write throughput limit in bytes per second.
+ - totalIopsSecMax: The optional total_iops_sec_max element is the maximum total I/O operations per second. This cannot appear with read_iops_sec_max or write_iops_sec_max.
+ - readIopsSecMax: The optional read_iops_sec_max element is the maximum read I/O operations per second.
+ - writeIopsSecMax: The optional write_iops_sec_max element is the maximum write I/O operations per second.
+ - sizeIopsSec: The optional size_iops_sec element is the size of I/O operations per second.
  - diskId: Id of disk.
 
 Disk name will be service name.
