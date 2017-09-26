@@ -110,9 +110,14 @@ def install(job):
     space.save()
 
     status = space.model['status']
-    while status != 'DEPLOYED':
+    timeout_limit = time.time() + 60
+    while time.time() < timeout_limit:
+        if status == 'DEPLOYED':
+            break
         time.sleep(5)
         status = cl.api.cloudapi.cloudspaces.get(cloudspaceId=service.model.data.cloudspaceID)['status']
+    else:
+        raise j.exceptions.Timeout("VDC not yet deployed")
 
 
 def get_user_accessright(username, service):
