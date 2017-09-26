@@ -1,0 +1,8 @@
+
+links:
+  consume:
+  - argname: test
+    auto: false
+    max: 1
+    min: 0
+    role: actor1
