@@ -1,11 +1,11 @@
-import requests
+from js9 import j
 
 class Client:
     def __init__(self, base_uri="https://localhost:5000"):
         self.ayscl = j.clients.atyourservice.get(base_uri)
 
 
-    def create(name, git):
+    def create(self, name, git):
         """
         create a new AYS repository
         """
@@ -24,4 +24,4 @@ class Client:
             #print("AYS repository created at {}".format(resp.json()['path']))
 
         except Exception as e:
-            #print("Error during creation of the repository: {}".format(_extract_error(e))) 
+            print("Error during creation of the repository: {}".format(_extract_error(e)))
