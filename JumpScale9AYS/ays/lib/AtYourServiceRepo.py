@@ -440,7 +440,7 @@ class AtYourServiceRepo():
         items = []
         if j.sal.fs.exists(path=bpdir):
             items = j.sal.fs.listFilesInDir(bpdir)
-            return items
+        return items
 
     def _load_blueprints(self):
         bps = {}
