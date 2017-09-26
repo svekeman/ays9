@@ -16,9 +16,6 @@ vdc__vm_user:
     g8client: 'example'
     account: <ACCOUNT>
     location: <LOCATION>
-    uservdc:
-        - name: vm_user
-          accesstype: R
     allowedVMSizes:
         - 1
         - 2
