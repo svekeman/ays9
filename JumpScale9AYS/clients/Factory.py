@@ -1,5 +1,5 @@
 from JumpScale9AYS.clients.sync_client import Client
-from JumpScale9AYS.clients.yves_client import Client as Client2
+from JumpScale9AYS.clients.yves_client.client import Client as Client2
 
 class Factory:
 
