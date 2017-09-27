@@ -106,8 +106,8 @@ def _ssh_authorize(service, vm_info):
     return executor.prefab
 
 
-def _configure_disks(service, machine):
-    machine_disks = {disk['name']: disk['id'] for disk in machine.disks if disk['type'] != 'B'}
+def _configure_disks(service, machine, prefab):
+    machine_disks = {disk['name']: disk['id'] for disk in machine.disks if disk['type'] != 'B' and 'autoscale' not in disk['name']}
     disklist = service.producers.get('disk', [])
     for disk in disklist:
         disk_name = disk.model.dbobj.name
@@ -127,6 +127,19 @@ def _configure_disks(service, machine):
     for machine_name, machine_id in machine_disks.items():
         if not any(machine_name == disk.model.dbobj.name for disk in disklist):
             machine.detach_disk(machine_id)
+
+    rc, out, err = prefab.core.run("lsblk -J", die=False)
+    if rc != 0:
+        raise j.exceptions.RuntimeError("Unexpected Error: {}".format(err))
+    jsonout = j.data.serializer.json.loads(out)
+    available_devices = [x for x in jsonout['blockdevices'] if
+                         x['mountpoint'] is None and x['type'] == 'disk' and 'children' not in x]
+
+    for device in available_devices:
+        for disk in disklist:
+            if int(device['size'].split('G')[0]) == disk.model.data.size:
+                disk.model.data.devicename = device['name']
+                disk.saveAll()
 
 
 def input(job):
@@ -261,7 +274,7 @@ def install(job):
 
         # configure disks
         if prefab:
-            _configure_disks(service, machine)
+            _configure_disks(service, machine, prefab)
 
         _, vm_info = machine.get_machine_ip()
         if service.model.data.vmInfoCallback:
@@ -369,7 +382,7 @@ def processChange(job):
                     if disk_service not in old_disks_services:
                         service.consume(disk_service)
 
-                _configure_disks(service, machine)
+                _configure_disks(service, machine, service.executor.prefab)
 
                 setattr(service.model.data, key, value)
 
