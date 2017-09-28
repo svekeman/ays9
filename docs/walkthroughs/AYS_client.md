@@ -1,5 +1,23 @@
 # Use the JumpScale client for AYS
 
+## preparation
+
+Install ZeroTier (optionally):
+```bash
+curl -s https://install.zerotier.com/ | sudo bash
+```
+
+Start ZeroTier daemon (optionally):
+```bash
+zerotier-one -d
+```
+
+Join ZeroTier network (optionally):
+```bash
+ZT_ID=""
+zerotier-cli join $ZT_ID
+```
+
 ## List all repositories
 
 ```python
@@ -48,17 +66,78 @@ actions:
 
 ## Use the experimental AYS client
 
+Connect to you AYS server:
+```python
+base_uri="http://172.25.0.238:5000"
+cl=j.clients.atyourservice.get2(base_uri)
+```
+
+List all repositories:
+```bash
+client.repositories.list()
+```
+
+Create a new repository:
+```bash
+repo_name = "4test2"
+git_url = "http://gitrepo"
+repo=cl.repositories.create(repo_name, git_url)
+```
+
+Or use an existing repository:
+```bash
+repo=cl.repositories.get(repo_name)
+```
+
+Read blueprint from a file:
 ```python
 file_name="vdc.bp"
 blueprint_file = open(file_name,'r')
 blueprint = blueprint_file.read()
-
-client=j.clients.atyourservice.get2()
-repository = client.repository_get("...")
-
 ```
 
-Three  options.
+Create a blueprint:
+```python
+bp_name="myvdc.yaml"
+bp=repo.blueprints.create(bp_name, blueprint)
+```
+
+Or use an existing blueprint:
+```bash
+bp=repo.blueprints.get(bp_name)
+```
+
+Execute the blueprint:
+```python
+resp=b.execute()
+```
+
+Check result:
+```python
+resp.content
+```
+
+Check created services:
+```python
+r.services.list()
+```
+
+Create a run:
+```pyton
+key=r.runs.create()
+```
+
+List all runs:
+```python
+r.runs.list()
+```
+
+Check run:
+```python
+myrun=r.runs.get(key)
+myrun.model
+```
+
 
 **First option**, in two steps:
 ```bash
